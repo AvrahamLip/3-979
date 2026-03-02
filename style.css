@@ -293,19 +293,18 @@ tr:last-child td {
   color: #34d399;
 }
 
-/* בבסיס */
+/* בבית */
 .status-0 {
   background: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
 }
 
-/* בבית */
+/* מחלה */
 .status-2 {
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
 }
 
-/* מחלה */
 .status-other {
   background: rgba(148, 163, 184, 0.2);
   color: #cbd5e1;
@@ -413,36 +412,50 @@ tr:hover td {
 }
 
 @media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+
   .header-content {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+  }
+
+  .date-selector-wrapper {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
-  /* Table to Cards Transformation */
-  #details-table,
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Fixed horizontal scroll: use display none instead of absolute positioning */
   #details-table thead,
+  #details-table thead tr {
+    display: none !important;
+  }
+
+  #details-table,
   #details-table tbody,
   #details-table th,
   #details-table td,
   #details-table tr {
     display: block;
-  }
-
-  #details-table thead tr {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
+    width: 100%;
   }
 
   #details-table tr {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    padding: 1.2rem;
+    padding: 1rem;
     background: rgba(255, 255, 255, 0.02);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
@@ -450,11 +463,11 @@ tr:hover td {
   #details-table td {
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0.8rem 0;
+    padding: 0.6rem 0;
     padding-right: 35%;
     position: relative;
     text-align: left;
-    min-height: 2.8rem;
+    min-height: auto;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -477,5 +490,28 @@ tr:hover td {
 
   .status-badge {
     margin-right: 0;
+  }
+
+  /* Compact cards for summary */
+  .role-card-item {
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .status-counts {
+    gap: 0.4rem;
+  }
+
+  .status-counts span {
+    padding: 0.3rem 0;
+    font-size: 0.85rem;
+  }
+
+  .summary-card .value {
+    font-size: 2rem;
+  }
+
+  .dept-value {
+    font-size: 1.8rem;
   }
 }
