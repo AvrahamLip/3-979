@@ -5,6 +5,34 @@ const summarySection = document.getElementById('summary-section');
 const detailsSection = document.getElementById('details-section');
 const detailsBody = document.getElementById('details-body');
 const loadingOverlay = document.getElementById('loading-overlay');
+const themeToggle = document.getElementById('theme-toggle');
+
+// ── Theme (cookie-persisted) ──────────────────────────────
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+function setCookie(name, value, days) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function applyTheme(isLight) {
+    document.body.classList.toggle('light-mode', isLight);
+    themeToggle.textContent = isLight ? '🌙' : '☀️';
+}
+
+// Restore saved theme
+const savedTheme = getCookie('theme');
+applyTheme(savedTheme === 'light');
+
+themeToggle.addEventListener('click', () => {
+    const isNowLight = !document.body.classList.contains('light-mode');
+    applyTheme(isNowLight);
+    setCookie('theme', isNowLight ? 'light' : 'dark', 365);
+});
+// ──────────────────────────────────────────────────────────
 
 // Initialize with today's date
 const today = new Date().toISOString().split('T')[0];

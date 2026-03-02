@@ -13,6 +13,70 @@
   --font-family: 'Assistant', sans-serif;
 }
 
+/* ── Light Mode ── */
+body.light-mode {
+  --bg-color: #f1f5f9;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --text-color: #1e293b;
+  --text-muted: #64748b;
+  --accent-color: #6366f1;
+  --primary-glow: #818cf8;
+}
+
+body.light-mode .background-glow {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+}
+
+body.light-mode .glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode th {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+body.light-mode tr:hover td {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+body.light-mode .total-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+}
+
+body.light-mode .glass-input {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-color);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+body.light-mode .role-card-item {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Theme toggle button */
+.theme-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  line-height: 1;
+}
+
+.theme-btn:hover {
+  background: rgba(129, 140, 248, 0.15);
+  border-color: var(--accent-color);
+  transform: scale(1.1);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
