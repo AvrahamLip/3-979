@@ -53,35 +53,62 @@ function renderReport(data) {
         return;
     }
 
-    // 1. Process Summary Data — count present (todayValue == 1) by department & role
+    // 1. Process Summary Data
     const summary = processSummary(validData);
 
-    // Count total present
-    const totalPresent = validData.filter(item => String(item.todayValue) === '1').length;
+    // Count totals for all statuses
+    const totals = validData.reduce((acc, item) => {
+        const val = String(item.todayValue);
+        if (['0', '1', '2'].includes(val)) acc[val]++;
+        else acc['other']++;
+        return acc;
+    }, { '1': 0, '0': 0, '2': 0, 'other': 0 });
+
     const totalPeople = validData.length;
 
-    // Build total card + department cards
+    // Build total card
     let summaryHtml = `
       <div class="glass-card summary-card total-card">
-        <h3>סה"כ נוכחים</h3>
-        <div class="value">${totalPresent} <span class="total-of">/ ${totalPeople}</span></div>
+        <h3>סה"כ פלוגה</h3>
+        <div class="value">${totals['1']} <span class="total-of">/ ${totalPeople}</span></div>
+        <div class="role-breakdown">
+            <div class="role-item"><span>בבסיס:</span> <span>${totals['1']}</span></div>
+            <div class="role-item"><span>בבית:</span> <span>${totals['0']}</span></div>
+            <div class="role-item"><span>מחלה:</span> <span>${totals['2']}</span></div>
+            <div class="role-item"><span>אחר:</span> <span>${totals['other']}</span></div>
+        </div>
       </div>
     `;
 
+    // Department cards
     summaryHtml += Object.entries(summary).map(([dept, roles], index) => {
-        const deptTotal = Object.values(roles).reduce((sum, count) => sum + count, 0);
+        // deptTotal is total base attendance for the department
+        const deptBaseTotal = Object.values(roles).reduce((sum, s) => sum + s['1'], 0);
+
         const roleBreakdown = Object.entries(roles)
-            .map(([role, count]) => `
-                <div class="role-item">
-                    <span>${role}</span>
-                    <span>${count}</span>
+            .map(([role, statusCounts]) => {
+                const totalInRole = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+                return `
+                <div class="role-card-item">
+                    <div class="role-header">
+                        <span class="role-name">${role}</span>
+                        <span class="role-total">${statusCounts['1']} / ${totalInRole}</span>
+                    </div>
+                    <div class="status-counts">
+                        <span class="s-1" title="בבסיס">${statusCounts['1']}</span>
+                        <span class="s-0" title="בבית">${statusCounts['0']}</span>
+                        <span class="s-2" title="מחלה">${statusCounts['2']}</span>
+                        <span class="s-other" title="אחר">${statusCounts['other']}</span>
+                    </div>
                 </div>
-            `).join('');
+            `}).join('');
 
         return `
           <div class="glass-card summary-card" style="animation-delay: ${(index + 1) * 0.1}s">
-            <h3>${dept}</h3>
-            <div class="value">${deptTotal}</div>
+            <div class="dept-header">
+                <h3>${dept}</h3>
+                <div class="dept-value">${deptBaseTotal}</div>
+            </div>
             <div class="role-breakdown">
               ${roleBreakdown}
             </div>
@@ -115,17 +142,23 @@ function renderReport(data) {
 }
 
 function processSummary(data) {
-    // Group by Department -> Role -> Count where todayValue == 1
+    // Group by Department -> Role -> { status0, status1, status2, statusOther }
     return data.reduce((acc, item) => {
-        if (String(item.todayValue) === '1') {
-            const dept = item.department || 'כללי';
-            const role = item.role || 'אחר';
+        const dept = item.department || 'כללי';
+        const role = item.role || 'אחר';
+        const strValue = String(item.todayValue);
 
-            if (!acc[dept]) acc[dept] = {};
-            if (!acc[dept][role]) acc[dept][role] = 0;
-
-            acc[dept][role]++;
+        if (!acc[dept]) acc[dept] = {};
+        if (!acc[dept][role]) {
+            acc[dept][role] = { '1': 0, '0': 0, '2': 0, 'other': 0 };
         }
+
+        if (['0', '1', '2'].includes(strValue)) {
+            acc[dept][role][strValue]++;
+        } else {
+            acc[dept][role]['other']++;
+        }
+
         return acc;
     }, {});
 }

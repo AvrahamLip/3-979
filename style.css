@@ -149,6 +149,103 @@ h1 {
   margin-bottom: 0.3rem;
 }
 
+/* New Detailed Summary Styles */
+.dept-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dept-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.role-card-item {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.role-total {
+  color: var(--accent-color);
+  font-size: 0.85rem;
+}
+
+.status-counts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.status-counts span {
+  text-align: center;
+  padding: 0.2rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.status-counts span::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.s-1 {
+  color: #34d399;
+}
+
+/* בבסיס */
+.s-1::after {
+  background: var(--success);
+}
+
+.s-0 {
+  color: #fbbf24;
+}
+
+/* בבית */
+.s-0::after {
+  background: var(--warning);
+}
+
+.s-2 {
+  color: #f87171;
+}
+
+/* מחלה */
+.s-2::after {
+  background: var(--danger);
+}
+
+.s-other {
+  color: #94a3b8;
+}
+
+/* אחר */
+.s-other::after {
+  background: var(--text-muted);
+}
+
 /* Details List */
 .details-list {
   margin-top: 1rem;
