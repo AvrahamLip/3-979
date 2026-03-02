@@ -304,22 +304,37 @@ h1 {
 
 .status-counts span {
   text-align: center;
-  padding: 0.2rem;
+  padding: 0.3rem 0.2rem;
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.05);
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
 }
 
-.status-counts span::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+.si {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* legend uses color classes directly */
+.legend-item.s-1 {
+  color: #34d399;
+}
+
+.legend-item.s-0 {
+  color: #fbbf24;
+}
+
+.legend-item.s-2 {
+  color: #f87171;
+}
+
+.legend-item.s-other {
+  color: #94a3b8;
 }
 
 .s-1 {

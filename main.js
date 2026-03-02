@@ -98,19 +98,19 @@ function renderReport(data) {
     let summaryHtml = `
       <div class="legend-strip glass-card">
         <span class="legend-title">מקראה:</span>
-        <span class="legend-item"><span class="legend-dot s-1"></span> בבסיס</span>
-        <span class="legend-item"><span class="legend-dot s-0"></span> בבית</span>
-        <span class="legend-item"><span class="legend-dot s-2"></span> מחלה</span>
-        <span class="legend-item"><span class="legend-dot s-other"></span> אחר</span>
+        <span class="legend-item s-1">🪖 בבסיס</span>
+        <span class="legend-item s-0">🏠 בבית</span>
+        <span class="legend-item s-2">🤒 מחלה</span>
+        <span class="legend-item s-other">❓ אחר</span>
       </div>
       <div class="glass-card summary-card total-card">
         <h3>סה"כ פלוגה</h3>
         <div class="value">${totals['1']} <span class="total-of">/ ${totalPeople}</span></div>
         <div class="role-breakdown">
-            <div class="role-item"><span>בבסיס:</span> <span>${totals['1']}</span></div>
-            <div class="role-item"><span>בבית:</span> <span>${totals['0']}</span></div>
-            <div class="role-item"><span>מחלה:</span> <span>${totals['2']}</span></div>
-            <div class="role-item"><span>אחר:</span> <span>${totals['other']}</span></div>
+            <div class="role-item"><span>🪖 בבסיס</span> <span>${totals['1']}</span></div>
+            <div class="role-item"><span>🏠 בבית</span> <span>${totals['0']}</span></div>
+            <div class="role-item"><span>🤒 מחלה</span> <span>${totals['2']}</span></div>
+            <div class="role-item"><span>❓ אחר</span> <span>${totals['other']}</span></div>
         </div>
       </div>
     `;
@@ -130,10 +130,10 @@ function renderReport(data) {
                         <span class="role-total">${statusCounts['1']} / ${totalInRole}</span>
                     </div>
                     <div class="status-counts">
-                        <span class="s-1" title="בבסיס">${statusCounts['1']}</span>
-                        <span class="s-0" title="בבית">${statusCounts['0']}</span>
-                        <span class="s-2" title="מחלה">${statusCounts['2']}</span>
-                        <span class="s-other" title="אחר">${statusCounts['other']}</span>
+                        <span class="s-1"><span class="si">🪖</span>${statusCounts['1']}</span>
+                        <span class="s-0"><span class="si">🏠</span>${statusCounts['0']}</span>
+                        <span class="s-2"><span class="si">🤒</span>${statusCounts['2']}</span>
+                        <span class="s-other"><span class="si">❓</span>${statusCounts['other']}</span>
                     </div>
                 </div>
             `}).join('');
