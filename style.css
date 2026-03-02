@@ -324,4 +324,61 @@ tr:hover td {
   h1 {
     font-size: 2rem;
   }
+
+  /* Table to Cards Transformation */
+  #details-table,
+  #details-table thead,
+  #details-table tbody,
+  #details-table th,
+  #details-table td,
+  #details-table tr {
+    display: block;
+  }
+
+  #details-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  #details-table tr {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  #details-table td {
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.8rem 0;
+    padding-right: 35%;
+    position: relative;
+    text-align: left;
+    min-height: 2.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  #details-table td:last-child {
+    border-bottom: none;
+  }
+
+  #details-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    right: 0;
+    width: 30%;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: right;
+    font-size: 0.85rem;
+  }
+
+  .status-badge {
+    margin-right: 0;
+  }
 }

@@ -99,10 +99,10 @@ function renderReport(data) {
         row.classList.add('fade-in-row');
         const statusClass = getStatusClass(item.todayValue);
         row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.department || '---'}</td>
-          <td>${item.role || '---'}</td>
-          <td>
+          <td data-label="שם">${item.name}</td>
+          <td data-label="מחלקה">${item.department || '---'}</td>
+          <td data-label="תפקיד">${item.role || '---'}</td>
+          <td data-label="סטטוס">
             <span class="status-badge ${statusClass}">
               ${getStatusLabel(item.todayValue)}
             </span>
