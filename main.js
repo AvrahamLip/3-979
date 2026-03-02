@@ -66,8 +66,15 @@ function renderReport(data) {
 
     const totalPeople = validData.length;
 
-    // Build total card
+    // Build legend + total card
     let summaryHtml = `
+      <div class="legend-strip glass-card">
+        <span class="legend-title">מקראה:</span>
+        <span class="legend-item"><span class="legend-dot s-1"></span> בבסיס</span>
+        <span class="legend-item"><span class="legend-dot s-0"></span> בבית</span>
+        <span class="legend-item"><span class="legend-dot s-2"></span> מחלה</span>
+        <span class="legend-item"><span class="legend-dot s-other"></span> אחר</span>
+      </div>
       <div class="glass-card summary-card total-card">
         <h3>סה"כ פלוגה</h3>
         <div class="value">${totals['1']} <span class="total-of">/ ${totalPeople}</span></div>
