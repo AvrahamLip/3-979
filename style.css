@@ -28,7 +28,6 @@ body {
   line-height: 1.6;
 }
 
-/* Background Glow Effects */
 .background-glow {
   position: fixed;
   top: 0;
@@ -149,7 +148,7 @@ h1 {
   margin-bottom: 0.3rem;
 }
 
-/* New Detailed Summary Styles */
+/* Detailed Summary Styles */
 .dept-header {
   display: flex;
   justify-content: space-between;
@@ -214,7 +213,6 @@ h1 {
   color: #34d399;
 }
 
-/* בבסיס */
 .s-1::after {
   background: var(--success);
 }
@@ -223,7 +221,6 @@ h1 {
   color: #fbbf24;
 }
 
-/* בבית */
 .s-0::after {
   background: var(--warning);
 }
@@ -232,7 +229,6 @@ h1 {
   color: #f87171;
 }
 
-/* מחלה */
 .s-2::after {
   background: var(--danger);
 }
@@ -241,73 +237,88 @@ h1 {
   color: #94a3b8;
 }
 
-/* אחר */
 .s-other::after {
   background: var(--text-muted);
 }
 
-/* Details List */
+/* Details Table */
 .details-list {
   margin-top: 1rem;
 }
 
 .details-list h2 {
   margin-bottom: 1.5rem;
+  font-size: 1.4rem;
 }
 
 .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   text-align: right;
+  min-width: 480px;
 }
 
 th {
   color: var(--text-muted);
-  font-weight: 400;
-  padding: 1rem;
-  border-bottom: 1px solid var(--glass-border);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 2px solid var(--glass-border);
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--glass-border);
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 tr:last-child td {
   border-bottom: none;
 }
 
+tr:hover td {
+  background: rgba(129, 140, 248, 0.04);
+}
+
 .status-badge {
-  padding: 0.3rem 0.8rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .status-1 {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.15);
   color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* בבית */
 .status-0 {
-  background: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-/* מחלה */
 .status-2 {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.15);
   color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .status-other {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.15);
   color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .hidden {
@@ -346,7 +357,6 @@ tr:last-child td {
   animation: spin 1s linear infinite;
 }
 
-/* Animations */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -389,21 +399,14 @@ tr:last-child td {
   color: var(--text-muted);
 }
 
-/* Row Animations */
 .fade-in-row {
   animation: fadeInUp 0.4s ease-out backwards;
 }
 
-tr:hover td {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-/* Error State */
 .error {
   color: var(--danger);
 }
 
-/* Footer */
 .main-footer {
   text-align: center;
   color: var(--text-muted);
@@ -411,6 +414,7 @@ tr:hover td {
   font-size: 0.85rem;
 }
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
   .app-container {
     padding: 1rem;
@@ -436,75 +440,40 @@ tr:hover td {
     grid-template-columns: 1fr;
   }
 
-  /* Fixed horizontal scroll: use display none instead of absolute positioning */
-  #details-table thead,
-  #details-table thead tr {
-    display: none !important;
+  /* Table stays a real table, scrolls inside .table-wrapper */
+  .table-wrapper {
+    border-radius: 12px;
+    overflow-x: auto;
   }
 
-  #details-table,
-  #details-table tbody,
-  #details-table th,
-  #details-table td,
-  #details-table tr {
-    display: block;
-    width: 100%;
+  table {
+    min-width: 480px;
   }
 
-  #details-table tr {
-    margin-bottom: 1rem;
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  #details-table td {
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0.6rem 0;
-    padding-right: 35%;
-    position: relative;
-    text-align: left;
-    min-height: auto;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-
-  #details-table td:last-child {
-    border-bottom: none;
-  }
-
-  #details-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    right: 0;
-    width: 30%;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-align: right;
+  th,
+  td {
+    padding: 0.7rem 0.75rem;
     font-size: 0.85rem;
   }
 
   .status-badge {
-    margin-right: 0;
+    font-size: 0.76rem;
+    padding: 0.2rem 0.5rem;
   }
 
-  /* Compact cards for summary */
+  /* Compact summary cards */
   .role-card-item {
-    padding: 0.8rem;
-    margin-bottom: 0.6rem;
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
   }
 
   .status-counts {
-    gap: 0.4rem;
+    gap: 0.3rem;
   }
 
   .status-counts span {
-    padding: 0.3rem 0;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    padding: 0.25rem 0;
   }
 
   .summary-card .value {
@@ -513,5 +482,9 @@ tr:hover td {
 
   .dept-value {
     font-size: 1.8rem;
+  }
+
+  .details-list h2 {
+    font-size: 1.2rem;
   }
 }
