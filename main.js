@@ -87,7 +87,8 @@ function renderReport(data) {
     // Count totals for all statuses
     const totals = validData.reduce((acc, item) => {
         const val = String(item.todayValue);
-        if (['0', '1', '2'].includes(val)) acc[val]++;
+        if (['0', '1'].includes(val)) acc[val]++;
+        else if (val === '2' || val === 'גימלים') acc['2']++;
         else acc['other']++;
         return acc;
     }, { '1': 0, '0': 0, '2': 0, 'other': 0 });
@@ -100,7 +101,7 @@ function renderReport(data) {
         <span class="legend-title">מקראה:</span>
         <span class="legend-item s-1">🪖 בבסיס</span>
         <span class="legend-item s-0">🏠 בבית</span>
-        <span class="legend-item s-2">🤒 מחלה</span>
+        <span class="legend-item s-2">🤒 מחלה / גימלים</span>
         <span class="legend-item s-other">❓ אחר</span>
       </div>
       <div class="glass-card summary-card total-card">
@@ -109,7 +110,7 @@ function renderReport(data) {
         <div class="role-breakdown">
             <div class="role-item"><span>🪖 בבסיס</span> <span>${totals['1']}</span></div>
             <div class="role-item"><span>🏠 בבית</span> <span>${totals['0']}</span></div>
-            <div class="role-item"><span>🤒 מחלה</span> <span>${totals['2']}</span></div>
+            <div class="role-item"><span>🤒 מחלה / גימלים</span> <span>${totals['2']}</span></div>
             <div class="role-item"><span>❓ אחר</span> <span>${totals['other']}</span></div>
         </div>
       </div>
@@ -188,8 +189,10 @@ function processSummary(data) {
             acc[dept][role] = { '1': 0, '0': 0, '2': 0, 'other': 0 };
         }
 
-        if (['0', '1', '2'].includes(strValue)) {
+        if (strValue === '0' || strValue === '1') {
             acc[dept][role][strValue]++;
+        } else if (strValue === '2' || strValue === 'גימלים') {
+            acc[dept][role]['2']++;
         } else {
             acc[dept][role]['other']++;
         }
@@ -203,7 +206,8 @@ function getStatusLabel(value) {
     switch (strValue) {
         case '1': return 'בבסיס';
         case '0': return 'בבית';
-        case '2': return 'מחלה';
+        case '2':
+        case 'גימלים': return 'מחלה';
         default: return strValue || '---';
     }
 }
@@ -213,7 +217,8 @@ function getStatusClass(value) {
     switch (strValue) {
         case '1': return 'status-1';
         case '0': return 'status-0';
-        case '2': return 'status-2';
+        case '2':
+        case 'גימלים': return 'status-2';
         default: return 'status-other';
     }
 }
