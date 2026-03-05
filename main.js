@@ -86,8 +86,8 @@ function renderReport(data) {
 
     // Count totals for all statuses
     const totals = validData.reduce((acc, item) => {
-        const val = String(item.todayValue);
-        if (['0', '1'].includes(val)) acc[val]++;
+        const val = String(item.todayValue).trim();
+        if (['1', '0'].includes(val)) acc[val]++;
         else if (val === '2' || val === 'גימלים') acc['2']++;
         else acc['other']++;
         return acc;
@@ -182,7 +182,7 @@ function processSummary(data) {
     return data.reduce((acc, item) => {
         const dept = item.department || 'כללי';
         const role = item.role || 'אחר';
-        const strValue = String(item.todayValue);
+        const strValue = String(item.todayValue).trim();
 
         if (!acc[dept]) acc[dept] = {};
         if (!acc[dept][role]) {
@@ -202,7 +202,7 @@ function processSummary(data) {
 }
 
 function getStatusLabel(value) {
-    const strValue = String(value);
+    const strValue = String(value).trim();
     switch (strValue) {
         case '1': return 'בבסיס';
         case '0': return 'בבית';
@@ -213,7 +213,7 @@ function getStatusLabel(value) {
 }
 
 function getStatusClass(value) {
-    const strValue = String(value);
+    const strValue = String(value).trim();
     switch (strValue) {
         case '1': return 'status-1';
         case '0': return 'status-0';
