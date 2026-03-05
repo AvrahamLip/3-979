@@ -114,6 +114,35 @@ function renderReport(data) {
             <div class="role-item"><span>❓ אחר</span> <span>${totals['other']}</span></div>
         </div>
       </div>
+      <div class="glass-card summary-card total-card global-roles-card">
+        <h3>סה"כ לפי תפקידים</h3>
+        <div class="role-breakdown global-role-list">
+            ${Object.entries(validData.reduce((acc, item) => {
+        const role = item.role || 'אחר';
+        const val = String(item.todayValue).trim();
+        if (!acc[role]) acc[role] = { '1': 0, '0': 0, '2': 0, 'other': 0 };
+        if (['1', '0'].includes(val)) acc[role][val]++;
+        else if (val === '2' || val === 'גימלים') acc[role]['2']++;
+        else acc[role]['other']++;
+        return acc;
+    }, {})).map(([role, counts]) => {
+        const totalInRole = Object.values(counts).reduce((a, b) => a + b, 0);
+        return `
+                <div class="role-card-item">
+                    <div class="role-header">
+                        <span class="role-name">${role}</span>
+                        <span class="role-total">${counts['1']} / ${totalInRole}</span>
+                    </div>
+                    <div class="status-counts">
+                        <span class="s-1"><span class="si">🪖</span>${counts['1']}</span>
+                        <span class="s-0"><span class="si">🏠</span>${counts['0']}</span>
+                        <span class="s-2"><span class="si">🤒</span>${counts['2']}</span>
+                        <span class="s-other"><span class="si">❓</span>${counts['other']}</span>
+                    </div>
+                </div>`;
+    }).join('')}
+        </div>
+      </div>
     `;
 
     // Department cards
