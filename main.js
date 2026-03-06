@@ -4,6 +4,10 @@ const datePicker = document.getElementById('date-picker');
 const summarySection = document.getElementById('summary-section');
 const detailsSection = document.getElementById('details-section');
 const detailsBody = document.getElementById('details-body');
+const searchInput = document.getElementById('search-input');
+const deptFilter = document.getElementById('dept-filter');
+const roleFilter = document.getElementById('role-filter');
+const statusFilter = document.getElementById('status-filter');
 const loadingOverlay = document.getElementById('loading-overlay');
 const themeToggle = document.getElementById('theme-toggle');
 
@@ -169,9 +173,9 @@ function renderReport(data) {
             `}).join('');
 
         return `
-          <div class="glass-card summary-card" style="animation-delay: ${(index + 1) * 0.1}s">
-            <div class="dept-header">
-                <h3>${dept}</h3>
+          <div class="glass-card summary-card collapsed" style="animation-delay: ${(index + 1) * 0.1}s">
+            <div class="dept-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                <h3><span class="toggle-icon">▼</span> ${dept}</h3>
                 <div class="dept-value">${deptBaseTotal}</div>
             </div>
             <div class="role-breakdown">
@@ -184,11 +188,37 @@ function renderReport(data) {
     summarySection.innerHTML = summaryHtml;
 
     // 2. Process Details Table
+    renderDetailsTable(validData);
+
+    detailsSection.classList.remove('hidden');
+}
+
+function renderDetailsTable(validData) {
+    // Populate filters
+    const departments = [...new Set(validData.map(item => item.department || 'כללי'))].sort();
+    deptFilter.innerHTML = '<option value="">כל המחלקות</option>' +
+        departments.map(dept => `<option value="${dept}">${dept}</option>`).join('');
+
+    const roles = [...new Set(validData.map(item => item.role || 'אחר'))].sort();
+    roleFilter.innerHTML = '<option value="">כל התפקידים</option>' +
+        roles.map(role => `<option value="${role}">${role}</option>`).join('');
+
+    const statuses = [...new Set(validData.map(item => getStatusLabel(item.todayValue)))].sort();
+    statusFilter.innerHTML = '<option value="">כל הסטטוסים</option>' +
+        statuses.map(status => `<option value="${status}">${status}</option>`).join('');
+
     detailsBody.innerHTML = '';
+
+    // Render flat list
     validData.forEach((item, index) => {
         const row = document.createElement('tr');
+        row.className = 'fade-in-row details-row';
+        row.dataset.name = (item.name || '').toLowerCase();
+        row.dataset.role = (item.role || '').toLowerCase();
+        row.dataset.dept = item.department || 'כללי';
+        row.dataset.status = getStatusLabel(item.todayValue);
         row.style.animationDelay = `${index * 0.03}s`;
-        row.classList.add('fade-in-row');
+
         const statusClass = getStatusClass(item.todayValue);
         row.innerHTML = `
           <td data-label="שם">${item.name}</td>
@@ -203,8 +233,39 @@ function renderReport(data) {
         detailsBody.appendChild(row);
     });
 
-    detailsSection.classList.remove('hidden');
+    // Reset filters
+    searchInput.value = '';
+    deptFilter.value = '';
+    roleFilter.value = '';
+    statusFilter.value = '';
 }
+
+function applyFilters() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const filterDept = deptFilter.value;
+    const filterRole = roleFilter.value;
+    const filterStatus = statusFilter.value;
+
+    const rows = document.querySelectorAll('.details-row');
+
+    rows.forEach(row => {
+        const matchesDept = filterDept === '' || filterDept === row.dataset.dept;
+        const matchesRole = filterRole === '' || filterRole === row.dataset.role;
+        const matchesStatus = filterStatus === '' || filterStatus === row.dataset.status;
+        const matchesSearch = row.dataset.name.includes(searchTerm) || row.dataset.role.includes(searchTerm);
+
+        if (matchesDept && matchesRole && matchesStatus && matchesSearch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+searchInput.addEventListener('input', applyFilters);
+deptFilter.addEventListener('change', applyFilters);
+roleFilter.addEventListener('change', applyFilters);
+statusFilter.addEventListener('change', applyFilters);
 
 function processSummary(data) {
     // Group by Department -> Role -> { status0, status1, status2, statusOther }
