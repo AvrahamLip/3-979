@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דוח נוכחות - צמ"ה</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-glow"></div>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="header-content">
+                <h1>דוח נוכחות - צמ"ה</h1>
+                <div class="date-selector-wrapper">
+                    <label for="date-picker">בחר תאריך:</label>
+                    <input type="date" id="date-picker" class="glass-input">
+                    <button id="theme-toggle" class="theme-btn" title="החלף מצב תצוגה">🌙</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div id="departments-container">
+                <!-- Each department section will be injected here -->
+                <div class="placeholder-msg">בחר תאריך כדי להציג את הדוח</div>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            <p>&copy; 2026 מערכת Doch1</p>
+        </footer>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script type="module" src="./zama.js"></script>
+</body>
+
+</html>

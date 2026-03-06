@@ -6,6 +6,7 @@
  */
 
 const WEBHOOK_URL = 'https://151.145.89.228.sslip.io/webhook/Doch-1';
+const ZAMA_WEBHOOK_URL = 'https://151.145.89.228.sslip.io/webhook/Zama/Doch-1';
 
 /**
  * Converts a YYYY-MM-DD date string (from the HTML date input)
@@ -29,6 +30,27 @@ export async function fetchReport(isoDate) {
     return data;
   } catch (error) {
     console.error('Error fetching report:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches a report for a specific department (Zama API).
+ * @param {string} id - Department ID (e.g. "צרעה", "מפל\"ג")
+ * @param {string} isoDate - Date in YYYY-MM-DD format
+ */
+export async function fetchReportById(id, isoDate) {
+  const dateParam = formatDateForApi(isoDate);
+  const url = `${ZAMA_WEBHOOK_URL}?id=${encodeURIComponent(id)}&date=${dateParam}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const json = await response.json();
+    return json.data || json;
+  } catch (error) {
+    console.error('Error fetching report by ID:', error);
     throw error;
   }
 }

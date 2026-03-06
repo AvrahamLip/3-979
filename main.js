@@ -1,4 +1,4 @@
-import { fetchReport } from './api.js';
+import { fetchReport, fetchReportById } from './api.js';
 
 const datePicker = document.getElementById('date-picker');
 const summarySection = document.getElementById('summary-section');
@@ -10,6 +10,7 @@ const roleFilter = document.getElementById('role-filter');
 const statusFilter = document.getElementById('status-filter');
 const loadingOverlay = document.getElementById('loading-overlay');
 const themeToggle = document.getElementById('theme-toggle');
+const deptId = document.body.dataset.deptId;
 
 // ── Theme (cookie-persisted) ──────────────────────────────
 function getCookie(name) {
@@ -52,7 +53,9 @@ datePicker.addEventListener('change', (e) => {
 async function loadReport(date) {
     showLoading(true);
     try {
-        const data = await fetchReport(date);
+        const data = deptId
+            ? await fetchReportById(deptId, date)
+            : await fetchReport(date);
         renderReport(data);
     } catch (error) {
         summarySection.innerHTML = `<div class="placeholder-msg error">שגיאה בטעינת הנתונים: ${error.message}</div>`;
