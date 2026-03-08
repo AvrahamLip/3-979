@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design System — Doch! RTL Military Attendance */
+
+@layer base {
+  :root {
+    /* Core palette - Light mode */
+    --background: 216 22% 97%;
+    --foreground: 216 35% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 216 35% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 35% 12%;
+
+    --primary: 213 55% 24%;
+    --primary-foreground: 0 0% 100%;
+
+    --primary-light: 213 55% 30%;
+    --primary-glow: 213 55% 40%;
+
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 216 35% 15%;
+
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 38 96% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 213 55% 24%;
+
+    --radius: 0.75rem;
+
+    /* Status colors */
+    --status-base: 143 65% 35%;
+    --status-base-bg: 143 65% 94%;
+    --status-home: 213 75% 40%;
+    --status-home-bg: 213 75% 93%;
+    --status-sick: 0 72% 50%;
+    --status-sick-bg: 0 72% 94%;
+    --status-other: 215 14% 55%;
+    --status-other-bg: 215 14% 92%;
+
+    /* Sidebar */
+    --sidebar-background: 213 55% 22%;
+    --sidebar-foreground: 213 20% 90%;
+    --sidebar-primary: 38 96% 52%;
+    --sidebar-primary-foreground: 213 55% 15%;
+    --sidebar-accent: 213 45% 30%;
+    --sidebar-accent-foreground: 213 20% 95%;
+    --sidebar-border: 213 45% 18%;
+    --sidebar-ring: 213 55% 55%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(213, 55%, 20%), hsl(213, 60%, 32%));
+    --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%), hsl(216, 22%, 97%));
+    --shadow-card: 0 2px 12px -2px hsl(213 55% 24% / 0.12), 0 1px 3px hsl(213 55% 24% / 0.08);
+    --shadow-elevated: 0 8px 24px -4px hsl(213 55% 24% / 0.18), 0 2px 8px hsl(213 55% 24% / 0.10);
+  }
+
+  .dark {
+    --background: 213 40% 8%;
+    --foreground: 210 30% 93%;
+
+    --card: 213 40% 12%;
+    --card-foreground: 210 30% 93%;
+
+    --popover: 213 40% 12%;
+    --popover-foreground: 210 30% 93%;
+
+    --primary: 38 96% 52%;
+    --primary-foreground: 213 55% 10%;
+
+    --primary-light: 38 96% 58%;
+    --primary-glow: 38 96% 65%;
+
+    --secondary: 213 35% 18%;
+    --secondary-foreground: 210 30% 88%;
+
+    --muted: 213 35% 16%;
+    --muted-foreground: 215 20% 58%;
+
+    --accent: 38 96% 52%;
+    --accent-foreground: 213 55% 10%;
+
+    --destructive: 0 68% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 213 30% 20%;
+    --input: 213 30% 20%;
+    --ring: 38 96% 52%;
+
+    /* Status colors dark */
+    --status-base: 143 65% 45%;
+    --status-base-bg: 143 65% 12%;
+    --status-home: 213 75% 55%;
+    --status-home-bg: 213 75% 13%;
+    --status-sick: 0 72% 55%;
+    --status-sick-bg: 0 72% 12%;
+    --status-other: 215 14% 60%;
+    --status-other-bg: 215 14% 18%;
+
+    /* Sidebar */
+    --sidebar-background: 213 45% 10%;
+    --sidebar-foreground: 213 20% 88%;
+    --sidebar-primary: 38 96% 52%;
+    --sidebar-primary-foreground: 213 55% 10%;
+    --sidebar-accent: 213 40% 16%;
+    --sidebar-accent-foreground: 213 20% 95%;
+    --sidebar-border: 213 35% 16%;
+    --sidebar-ring: 38 96% 52%;
+
+    /* Gradients dark */
+    --gradient-hero: linear-gradient(135deg, hsl(213, 45%, 8%), hsl(213, 50%, 14%));
+    --gradient-card: linear-gradient(145deg, hsl(213, 40%, 12%), hsl(213, 40%, 10%));
+    --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.4), 0 1px 3px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 8px 24px -4px hsl(0 0% 0% / 0.5), 0 2px 8px hsl(0 0% 0% / 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    direction: rtl;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Heebo', 'Arial Hebrew', sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Heebo', 'Arial Hebrew', sans-serif;
+    font-weight: 700;
+  }
+}
+
+@layer utilities {
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
+  .status-base {
+    color: hsl(var(--status-base));
+    background: hsl(var(--status-base-bg));
+  }
+  .status-home {
+    color: hsl(var(--status-home));
+    background: hsl(var(--status-home-bg));
+  }
+  .status-sick {
+    color: hsl(var(--status-sick));
+    background: hsl(var(--status-sick-bg));
+  }
+  .status-other {
+    color: hsl(var(--status-other));
+    background: hsl(var(--status-other-bg));
+  }
+
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .elevated-shadow {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.6);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to { background-position: -200% center; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s ease-out both;
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
