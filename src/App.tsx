@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
+import Layout from "./components/Layout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,8 +24,10 @@ const App = () => (
       <HashRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
-          <Route path="/main" element={<MainPage />} />
-          <Route path="/zama" element={<ZamaPage />} />
+          <Route element={<Layout />}>
+            <Route path="/main" element={<MainPage />} />
+            <Route path="/zama" element={<ZamaPage />} />
+          </Route>
         </Routes>
       </HashRouter>
     </TooltipProvider>
