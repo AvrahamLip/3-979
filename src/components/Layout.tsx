@@ -77,8 +77,22 @@ export default function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-3 px-4 text-center text-xs text-muted-foreground">
-        <span>דוח-1 — מערכת נוכחות יומי</span>
+      <footer className="border-t border-border py-4 px-4 bg-muted/20">
+        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <span className="font-semibold text-foreground/80">דוח-1 — מערכת נוכחות יומי</span>
+            <span>כל הזכויות שמורות &copy; {new Date().getFullYear()}</span>
+          </div>
+
+          <div className="flex flex-col items-center md:items-center gap-1">
+            <span>ליצירת קשר: <a href="mailto:your-email@example.com" className="hover:text-primary transition-colors underline">your-email@example.com</a></span>
+          </div>
+
+          <div className="flex flex-col items-center md:items-end gap-1">
+            <span>גרסה: 1.1.0</span>
+            <span>עדכון אחרון: {new Date().toLocaleDateString('he-IL')}</span>
+          </div>
+        </div>
       </footer>
     </div>
   );
