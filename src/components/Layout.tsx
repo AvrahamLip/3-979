@@ -16,10 +16,10 @@ export default function Layout() {
             {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-accent-foreground font-black text-lg shadow">
-                ד!
+                ד-1
               </div>
               <span className="text-xl font-black text-primary-foreground tracking-wide hidden sm:block">
-                דוח!
+                דוח-1
               </span>
             </div>
 
@@ -78,7 +78,7 @@ export default function Layout() {
 
       {/* Footer */}
       <footer className="border-t border-border py-3 px-4 text-center text-xs text-muted-foreground">
-        <span>דוח! — מערכת נוכחות יומי</span>
+        <span>דוח-1 — מערכת נוכחות יומי</span>
       </footer>
     </div>
   );
