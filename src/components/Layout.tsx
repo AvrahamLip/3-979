@@ -15,10 +15,7 @@ export default function Layout() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-accent-foreground font-black text-lg shadow">
-                ד-1
-              </div>
-              <span className="text-xl font-black text-primary-foreground tracking-wide hidden sm:block">
+              <span className="text-xl font-black text-primary-foreground tracking-wide">
                 דוח-1
               </span>
             </div>
@@ -37,7 +34,7 @@ export default function Layout() {
                 }
               >
                 <FileText className="w-4 h-4" />
-                <span>דוח נוכחות</span>
+                <span>דוח נוכחות פלוגה ג'</span>
               </NavLink>
               <NavLink
                 to="/zama"
@@ -85,7 +82,7 @@ export default function Layout() {
           </div>
 
           <div className="flex flex-col items-center md:items-center gap-1">
-            <span>ליצירת קשר: <a href="mailto:your-email@example.com" className="hover:text-primary transition-colors underline">your-email@example.com</a></span>
+            <span>ליצירת קשר: <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-all duration-200 underline decoration-primary/30 underline-offset-4">lip.avi@gmail.com</a></span>
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-1">

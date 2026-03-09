@@ -32,7 +32,7 @@ export default function MainPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-primary-foreground">
-              דוח נוכחות יומי
+              דוח נוכחות פלוגה ג'
             </h1>
             <p className="text-primary-foreground/70 text-sm mt-1">
               {isLoading ? "טוען..." : `${records.length} אנשים`}
