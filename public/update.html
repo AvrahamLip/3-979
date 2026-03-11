@@ -289,15 +289,22 @@
                     <label for="search-input">חיפוש</label>
                     <input type="text" id="search-input" placeholder="חפש שם...">
                 </div>
+                <div class="input-group">
+                    <label for="dept-filter">מחלקה</label>
+                    <select id="dept-filter">
+                        <option value="">הכל</option>
+                    </select>
+                </div>
             </div>
             
             <div id="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 40%;">שם</th>
-                            <th style="width: 30%;">תפקיד</th>
-                            <th style="width: 30%;">סטטוס</th>
+                            <th style="width: 30%;">שם</th>
+                            <th style="width: 25%;">מחלקה</th>
+                            <th style="width: 20%;">תפקיד</th>
+                            <th style="width: 25%;">סטטוס</th>
                         </tr>
                     </thead>
                     <tbody id="attendance-body">
@@ -328,6 +335,7 @@
 
         const dateInput = document.getElementById('date-input');
         const searchInput = document.getElementById('search-input');
+        const deptFilter = document.getElementById('dept-filter');
         const attendanceBody = document.getElementById('attendance-body');
         const loadingOverlay = document.getElementById('loading-overlay');
         const emptyMessage = document.getElementById('empty-message');
@@ -356,6 +364,7 @@
         // Data Logic
         dateInput.addEventListener('change', fetchData);
         searchInput.addEventListener('input', renderTable);
+        deptFilter.addEventListener('change', renderTable);
 
         async function fetchData() {
             attendanceBody.innerHTML = '';
@@ -370,6 +379,7 @@
                 const data = await response.json();
                 allRecords = Array.isArray(data) ? data : (data.data || []);
                 
+                populateDeptFilter();
                 renderTable();
             } catch (err) {
                 console.error(err);
@@ -389,14 +399,32 @@
             return "3"; // אחר
         }
 
+        function populateDeptFilter() {
+            const depts = [...new Set(allRecords.map(r => r.department).filter(d => d))].sort();
+            const currentVal = deptFilter.value;
+            deptFilter.innerHTML = '<option value="">הכל</option>';
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                deptFilter.appendChild(opt);
+            });
+            if (depts.includes(currentVal)) deptFilter.value = currentVal;
+        }
+
         function renderTable() {
             const query = searchInput.value.toLowerCase().trim();
+            const selectedDept = deptFilter.value;
+
             const filtered = allRecords.filter(r => {
                 const nameValid = r.name && r.name.trim() !== "";
                 if (!nameValid) return false;
                 
-                return r.name.toLowerCase().includes(query) || 
-                       (r.role && r.role.toLowerCase().includes(query));
+                const matchesSearch = r.name.toLowerCase().includes(query) || 
+                                    (r.role && r.role.toLowerCase().includes(query));
+                const matchesDept = !selectedDept || r.department === selectedDept;
+
+                return matchesSearch && matchesDept;
             });
 
             attendanceBody.innerHTML = '';
@@ -417,8 +445,8 @@
                 tr.innerHTML = `
                     <td>
                         <div class="name-cell">${record.name}</div>
-                        <div class="role-cell">${record.department || ''}</div>
                     </td>
+                    <td class="role-cell">${record.department || ''}</td>
                     <td class="role-cell">${record.role || ''}</td>
                         <div style="display: flex; align-items: center;">
                             <select class="status-select status-${currentCode}" data-name="${record.name}">
