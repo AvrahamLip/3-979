@@ -1,12 +1,12 @@
-<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דוח-1 | פירוט שמי ועדכון</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <style>
         :root {
             --background: 216 22% 97%;
@@ -120,7 +120,6 @@
         input:focus {
             outline: none;
             border-color: hsl(var(--primary));
-            ring: 2px hsla(213, 55%, 24%, 0.1);
         }
 
         /* Table styles */
@@ -176,6 +175,8 @@
         .status-0 { background-color: #dbeafe; color: #1d4ed8; } /* בבית */
         .status-2 { background-color: #fee2e2; color: #b91c1c; } /* מחלה */
         .status-3 { background-color: #f3f4f6; color: #4b5563; } /* אחר */
+        .status-4 { background-color: #fef9c3; color: #854d0e; } /* פיצול */
+        .status-5 { background-color: #f5f3ff; color: #5b21b6; } /* שוחרר */
         .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; } /* ריק */
 
         .save-btn {
@@ -204,11 +205,11 @@
         /* Auth styling */
         .auth-box {
             background: white;
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             border-radius: var(--radius);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
             text-align: center;
         }
 
@@ -216,22 +217,20 @@
             margin-top: 0;
             color: hsl(var(--primary));
             font-weight: 800;
+            margin-bottom: 0.5rem;
         }
 
-        .btn {
-            background: hsl(var(--primary));
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: calc(var(--radius) / 2);
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
+        .auth-box p {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        #google-login-btn {
+            display: flex;
+            justify-content: center;
             margin-top: 1rem;
-            transition: transform 0.1s;
         }
-
-        .btn:active { transform: scale(0.98); }
 
         /* Helpers */
         .hidden { display: none !important; }
@@ -264,17 +263,37 @@
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-box">
             <h2>כניסה למערכת</h2>
-            <p>אנא הזן סיסמה להמשך</p>
-            <input type="password" id="password-input" placeholder="סיסמה" style="width: 100%; box-sizing: border-box; margin-top: 1rem;">
-            <button class="btn" id="auth-btn">כניסה</button>
-            <p id="auth-error" class="hidden" style="color: #b91c1c; font-size: 0.875rem; margin-top: 0.5rem;">סיסמה שגויה</p>
+            <p>התחבר עם חשבון Google כדי להמשיך</p>
+            
+            <div id="g_id_onload"
+                 data-client_id="435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+
+            <p id="auth-error" class="hidden" style="color: #b91c1c; font-size: 0.875rem; margin-top: 1.5rem; font-weight: 600;">אין לך הרשאה לגשת לדף זה</p>
+            <div id="auth-loading" class="hidden" style="margin-top: 1.5rem;">
+                <div class="loading-spinner"></div> בודק הרשאות...
+            </div>
         </div>
     </div>
 
     <header class="hidden" id="main-header">
         <div class="header-content">
             <h1>דוח-1 | עדכון פירוט שמי</h1>
-            <div id="user-status" style="font-size: 0.75rem; opacity: 0.8;">מחובר</div>
+            <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
+                <span id="user-name"></span>
+                <span style="opacity: 0.6;">|</span>
+                <span>מחובר</span>
+            </div>
         </div>
     </header>
 
@@ -322,16 +341,16 @@
     </main>
 
     <script>
-        const AUTH_PASSWORD = "3979";
+        const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
         const GET_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
         const POST_API = "https://151.145.89.228.sslip.io/webhook/update-status";
 
         const authOverlay = document.getElementById('auth-overlay');
         const mainHeader = document.getElementById('main-header');
         const mainContent = document.getElementById('main-content');
-        const passwordInput = document.getElementById('password-input');
-        const authBtn = document.getElementById('auth-btn');
         const authError = document.getElementById('auth-error');
+        const authLoading = document.getElementById('auth-loading');
+        const userNameSpan = document.getElementById('user-name');
 
         const dateInput = document.getElementById('date-input');
         const searchInput = document.getElementById('search-input');
@@ -345,21 +364,64 @@
         // Set default date to today
         dateInput.value = new Date().toISOString().split('T')[0];
 
-        // Auth Logic
-        authBtn.addEventListener('click', () => {
-            if (passwordInput.value === AUTH_PASSWORD) {
-                authOverlay.classList.add('hidden');
-                mainHeader.classList.remove('hidden');
-                mainContent.classList.remove('hidden');
-                fetchData();
-            } else {
-                authError.classList.remove('hidden');
-                passwordInput.value = '';
-                passwordInput.focus();
+        // Helper to decode JWT (Google ID Token) without special library
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
             }
-        });
+        }
 
-        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') authBtn.click(); });
+        // Auth Logic
+        async function handleCredentialResponse(response) {
+            authError.classList.add('hidden');
+            authLoading.classList.remove('hidden');
+
+            const payload = parseJwt(response.credential);
+            if (!payload || !payload.email) {
+                authError.textContent = 'שגיאה בפענוח נתוני המשתמש';
+                authError.classList.remove('hidden');
+                authLoading.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(VALIDATE_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: payload.email,
+                        roll: "update"
+                    })
+                });
+
+                if (res.status === 200) {
+                    authOverlay.classList.add('hidden');
+                    mainHeader.classList.remove('hidden');
+                    mainContent.classList.remove('hidden');
+                    userNameSpan.textContent = payload.name || payload.email;
+                    fetchData();
+                } else if (res.status === 401) {
+                    authError.textContent = 'אין לך הרשאה לגשת לדף זה';
+                    authError.classList.remove('hidden');
+                } else {
+                    authError.textContent = 'שגיאת שרת בבדיקת ההרשאות';
+                    authError.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Auth error:', err);
+                authError.textContent = 'שגיאה בתהליך ההתחברות';
+                authError.classList.remove('hidden');
+            } finally {
+                authLoading.classList.add('hidden');
+            }
+        }
 
         // Data Logic
         dateInput.addEventListener('change', fetchData);
@@ -395,6 +457,8 @@
             if (v === "V" || v === "1") return "1"; // בבסיס
             if (v === "0") return "0";  // בבית
             if (v === "2" || v === "גימלים") return "2"; // מחלה
+            if (v === "4" || v === "פיצול") return "4"; // פיצול
+            if (v === "5" || v === "שוחרר") return "5"; // שוחרר
             if (v === "") return "empty"; // ריק
             return "3"; // אחר
         }
@@ -448,17 +512,21 @@
                     </td>
                     <td class="role-cell">${record.department || ''}</td>
                     <td class="role-cell">${record.role || ''}</td>
+                    <td>
                         <div style="display: flex; align-items: center;">
                             <select class="status-select status-${currentCode}" data-name="${record.name}">
                                 <option value="empty" ${currentCode === "empty" ? "selected" : ""}>---</option>
                                 <option value="1" ${currentCode === "1" ? "selected" : ""}>בבסיס</option>
                                 <option value="0" ${currentCode === "0" ? "selected" : ""}>בבית</option>
                                 <option value="2" ${currentCode === "2" ? "selected" : ""}>מחלה</option>
+                                <option value="4" ${currentCode === "4" ? "selected" : ""}>פיצול</option>
+                                <option value="5" ${currentCode === "5" ? "selected" : ""}>שוחרר</option>
                                 <option value="3" ${currentCode === "3" ? "selected" : ""}>אחר</option>
                             </select>
                             <button class="save-btn" data-index="${index}">שמור</button>
                             <span class="status-feedback" id="feedback-${index}"></span>
                         </div>
+                    </td>
                 `;
 
                 const select = tr.querySelector('select');
@@ -482,18 +550,23 @@
             });
         }
 
-        async function updateStatus(name, newStatus, index) {
+        async function updateStatus(name, code, index) {
             const feedback = document.getElementById(`feedback-${index}`);
             const select = document.querySelector(`select[data-name="${name}"]`);
             
+            // Map numeric codes back to text values for specific statuses
+            let finalStatus = code;
+            if (code === "4") finalStatus = "פיצול";
+            if (code === "5") finalStatus = "שוחרר";
+
             // UI Update
-            select.className = `status-select status-${newStatus}`;
+            select.className = `status-select status-${code}`;
             feedback.innerHTML = '<div class="loading-spinner"></div>';
 
             const payload = {
                 name: name,
                 date: formatDateForApi(dateInput.value),
-                status: newStatus
+                status: finalStatus
             };
 
             try {
