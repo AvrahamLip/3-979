@@ -56,23 +56,20 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
 
   const SortIcon = ({ col }: { col: SortKey }) =>
     sortKey === col ? (
-      sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-    ) : (
-      <span className="w-3 h-3 inline-block" />
-    );
+      sortDir === "asc" ? <span className="text-[10px] leading-none opacity-70">▲</span> : <span className="text-[10px] leading-none opacity-70">▼</span>
+    ) : null;
 
   return (
     <div className="space-y-3">
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="חיפוש שם / תפקיד..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pr-9 pl-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring transition-all duration-200"
           />
         </div>
         <select
@@ -97,7 +94,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
           className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">כל הסטטוסים</option>
-          {["בבסיס", "בבית", "מחלה / גימלים", "אחר"].map((s) => (
+          {["בבסיס", "בבית", "מחלה / גימלים", "פיצול", "שחרור", "אחר"].map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
         </select>

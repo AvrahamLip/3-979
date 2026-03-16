@@ -28,12 +28,11 @@ export default function Layout() {
                   cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
                     isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
+                       ? "bg-accent text-accent-foreground shadow-md"
                       : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                   )
                 }
               >
-                <FileText className="w-4 h-4" />
                 <span>דוח נוכחות פלוגה ג'</span>
               </NavLink>
               <NavLink
@@ -42,14 +41,19 @@ export default function Layout() {
                   cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
                     isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
+                       ? "bg-accent text-accent-foreground shadow-md"
                       : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                   )
                 }
               >
-                <Truck className="w-4 h-4" />
                 <span>צמ&quot;ה</span>
               </NavLink>
+              <a
+                href="update.html"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+              >
+                <span>עדכן נתונים</span>
+              </a>
             </nav>
 
             {/* Theme toggle */}

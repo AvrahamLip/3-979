@@ -39,8 +39,8 @@ function ZamaDeptSection({
         className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors"
         onClick={() => setOpen((v) => !v)}
       >
-        <div className="flex items-center gap-2 text-muted-foreground">
-          {open ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        <div className="flex items-center gap-2 text-muted-foreground mr-1">
+          {open ? <span className="text-[10px]">▲</span> : <span className="text-[10px]">▼</span>}
         </div>
         <div className="flex-1 text-right mr-3">
           <div className="flex items-center gap-2 justify-end">
@@ -57,7 +57,6 @@ function ZamaDeptSection({
             </span>
           </div>
           <div className="flex items-center gap-1.5 justify-end mt-1">
-            <Building2 className="w-4 h-4 text-primary" />
             <span className="font-black text-base">{deptName}</span>
           </div>
         </div>
@@ -223,8 +222,7 @@ export default function ZamaPage() {
 
           {/* Total Summary Section */}
           <div className="bg-card border border-border rounded-2xl overflow-hidden card-shadow p-5 mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-2 mb-4 justify-end">
               <h2 className="text-lg font-black tracking-wide">סה״כ כללי צמ״ה</h2>
             </div>
             

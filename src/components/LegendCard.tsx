@@ -6,26 +6,37 @@ const STATUS_INFO: Record<
   { icon: string; className: string; description: string }
 > = {
   "בבסיס": {
-    icon: "✓",
+    icon: "🪖",
     className: "text-status-base bg-status-base-bg border border-status-base/20",
     description: 'נמצא בבסיס / V / "1"',
   },
   "בבית": {
-    icon: "⌂",
+    icon: "🏠",
     className: "text-status-home bg-status-home-bg border border-status-home/20",
     description: 'בבית / "" / "0"',
   },
   "מחלה / גימלים": {
-    icon: "⚕",
+    icon: "🤒",
     className: "text-status-sick bg-status-sick-bg border border-status-sick/20",
     description: '"2" / גימלים',
   },
+  "פיצול": {
+    icon: "⚖️",
+    className: "text-status-split bg-status-split-bg border border-status-split/20",
+    description: '"4" / פיצול',
+  },
+  "שחרור": {
+    icon: "🚪",
+    className: "text-status-released bg-status-released-bg border border-status-released/20",
+    description: '"5" / שחרור',
+  },
   "אחר": {
-    icon: "?",
+    icon: "❓",
     className: "text-status-other bg-status-other-bg border border-status-other/20",
     description: "ערך אחר",
   },
 };
+
 
 export default function LegendCard() {
   return (

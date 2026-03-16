@@ -75,9 +75,14 @@ export default {
           "home-bg": "hsl(var(--status-home-bg))",
           sick: "hsl(var(--status-sick))",
           "sick-bg": "hsl(var(--status-sick-bg))",
+          split: "hsl(var(--status-split))",
+          "split-bg": "hsl(var(--status-split-bg))",
+          released: "hsl(var(--status-released))",
+          "released-bg": "hsl(var(--status-released-bg))",
           other: "hsl(var(--status-other))",
           "other-bg": "hsl(var(--status-other-bg))",
         },
+
       },
       borderRadius: {
         lg: "var(--radius)",

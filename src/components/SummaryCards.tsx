@@ -34,9 +34,6 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
       {/* Total Company Card */}
       <div className="bg-card border border-border rounded-xl p-5 card-shadow">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg gradient-hero">
-            <Users className="w-4 h-4 text-primary-foreground" />
-          </div>
           <div>
             <h3 className="font-bold text-sm">סיכום כולל</h3>
             <p className="text-xs text-muted-foreground">
@@ -44,31 +41,13 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-2">
-          <StatPill
-            label="בבסיס"
-            value={totalCounts["בבסיס"]}
-            total={totalCounts.total}
-            colorClass="text-status-base bg-status-base-bg"
-          />
-          <StatPill
-            label="בבית"
-            value={totalCounts["בבית"]}
-            total={totalCounts.total}
-            colorClass="text-status-home bg-status-home-bg"
-          />
-          <StatPill
-            label="מחלה"
-            value={totalCounts["מחלה / גימלים"]}
-            total={totalCounts.total}
-            colorClass="text-status-sick bg-status-sick-bg"
-          />
-          <StatPill
-            label="אחר"
-            value={totalCounts["אחר"]}
-            total={totalCounts.total}
-            colorClass="text-status-other bg-status-other-bg"
-          />
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+          <StatPill label="בבסיס" value={totalCounts["בבסיס"]} total={totalCounts.total} colorClass="text-status-base bg-status-base-bg" />
+          <StatPill label="בבית" value={totalCounts["בבית"]} total={totalCounts.total} colorClass="text-status-home bg-status-home-bg" />
+          <StatPill label="מחלה" value={totalCounts["מחלה / גימלים"]} total={totalCounts.total} colorClass="text-status-sick bg-status-sick-bg" />
+          <StatPill label="פיצול" value={totalCounts["פיצול"]} total={totalCounts.total} colorClass="text-status-split bg-status-split-bg" />
+          <StatPill label="שחרור" value={totalCounts["שחרור"]} total={totalCounts.total} colorClass="text-status-released bg-status-released-bg" />
+          <StatPill label="אחר" value={totalCounts["אחר"]} total={totalCounts.total} colorClass="text-status-other bg-status-other-bg" />
         </div>
         {/* Total bar */}
         <div className="mt-4 space-y-1">
@@ -98,9 +77,6 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
       {/* Roles Breakdown Card */}
       <div className="bg-card border border-border rounded-xl p-5 card-shadow">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg gradient-hero">
-            <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
-          </div>
           <div>
             <h3 className="font-bold text-sm">פירוט לפי תפקיד</h3>
             <p className="text-xs text-muted-foreground">{roles.length} תפקידים</p>
