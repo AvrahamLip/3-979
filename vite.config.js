@@ -8,6 +8,7 @@ export default defineConfig({
             input: {
                 main: resolve(__dirname, 'index.html'),
                 zama: resolve(__dirname, 'zama.html'),
+                update: resolve(__dirname, 'update.html'),
             },
         },
     },

@@ -94,11 +94,11 @@ function renderReport(data) {
     // Count totals for all statuses
     const totals = validData.reduce((acc, item) => {
         const val = String(item.todayValue).trim();
-        if (['1', '0'].includes(val)) acc[val]++;
-        else if (val === '2' || val === 'גימלים') acc['2']++;
+        if (['1', '0', '2', '4', '5'].includes(val)) acc[val]++;
+        else if (val === 'גימלים') acc['2']++;
         else acc['other']++;
         return acc;
-    }, { '1': 0, '0': 0, '2': 0, 'other': 0 });
+    }, { '1': 0, '0': 0, '2': 0, '4': 0, '5': 0, 'other': 0 });
 
     const totalPeople = validData.length;
 
@@ -109,6 +109,8 @@ function renderReport(data) {
         <span class="legend-item s-1">🪖 בבסיס</span>
         <span class="legend-item s-0">🏠 בבית</span>
         <span class="legend-item s-2">🤒 מחלה / גימלים</span>
+        <span class="legend-item s-4">⚖️ פיצול</span>
+        <span class="legend-item s-5">🚪 שוחרר</span>
         <span class="legend-item s-other">❓ אחר</span>
       </div>
       <div class="glass-card summary-card total-card">
@@ -118,6 +120,8 @@ function renderReport(data) {
             <div class="role-item"><span>🪖 בבסיס</span> <span>${totals['1']}</span></div>
             <div class="role-item"><span>🏠 בבית</span> <span>${totals['0']}</span></div>
             <div class="role-item"><span>🤒 מחלה / גימלים</span> <span>${totals['2']}</span></div>
+            <div class="role-item"><span>⚖️ פיצול</span> <span>${totals['4']}</span></div>
+            <div class="role-item"><span>🚪 שוחרר</span> <span>${totals['5']}</span></div>
             <div class="role-item"><span>❓ אחר</span> <span>${totals['other']}</span></div>
         </div>
       </div>
@@ -127,8 +131,8 @@ function renderReport(data) {
             ${Object.entries(validData.reduce((acc, item) => {
         const role = item.role || 'אחר';
         const val = String(item.todayValue).trim();
-        if (!acc[role]) acc[role] = { '1': 0, '0': 0, '2': 0, 'other': 0 };
-        if (['1', '0'].includes(val)) acc[role][val]++;
+        if (!acc[role]) acc[role] = { '1': 0, '0': 0, '2': 0, '4': 0, '5': 0, 'other': 0 };
+        if (['1', '0', '4', '5'].includes(val)) acc[role][val]++;
         else if (val === '2' || val === 'גימלים') acc[role]['2']++;
         else acc[role]['other']++;
         return acc;
@@ -144,6 +148,8 @@ function renderReport(data) {
                         <span class="s-1"><span class="si">🪖</span>${counts['1']}</span>
                         <span class="s-0"><span class="si">🏠</span>${counts['0']}</span>
                         <span class="s-2"><span class="si">🤒</span>${counts['2']}</span>
+                        <span class="s-4"><span class="si">⚖️</span>${counts['4']}</span>
+                        <span class="s-5"><span class="si">🚪</span>${counts['5']}</span>
                         <span class="s-other"><span class="si">❓</span>${counts['other']}</span>
                     </div>
                 </div>`;
@@ -170,6 +176,8 @@ function renderReport(data) {
                         <span class="s-1"><span class="si">🪖</span>${statusCounts['1']}</span>
                         <span class="s-0"><span class="si">🏠</span>${statusCounts['0']}</span>
                         <span class="s-2"><span class="si">🤒</span>${statusCounts['2']}</span>
+                        <span class="s-4"><span class="si">⚖️</span>${statusCounts['4']}</span>
+                        <span class="s-5"><span class="si">🚪</span>${statusCounts['5']}</span>
                         <span class="s-other"><span class="si">❓</span>${statusCounts['other']}</span>
                     </div>
                 </div>
@@ -279,10 +287,10 @@ function processSummary(data) {
 
         if (!acc[dept]) acc[dept] = {};
         if (!acc[dept][role]) {
-            acc[dept][role] = { '1': 0, '0': 0, '2': 0, 'other': 0 };
+            acc[dept][role] = { '1': 0, '0': 0, '2': 0, '4': 0, '5': 0, 'other': 0 };
         }
 
-        if (strValue === '0' || strValue === '1') {
+        if (['0', '1', '4', '5'].includes(strValue)) {
             acc[dept][role][strValue]++;
         } else if (strValue === '2' || strValue === 'גימלים') {
             acc[dept][role]['2']++;
@@ -301,6 +309,8 @@ function getStatusLabel(value) {
         case '0': return 'בבית';
         case '2':
         case 'גימלים': return 'מחלה';
+        case '4': return 'פיצול';
+        case '5': return 'שוחרר';
         default: return strValue || '---';
     }
 }
@@ -312,6 +322,8 @@ function getStatusClass(value) {
         case '0': return 'status-0';
         case '2':
         case 'גימלים': return 'status-2';
+        case '4': return 'status-4';
+        case '5': return 'status-5';
         default: return 'status-other';
     }
 }

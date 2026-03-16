@@ -1,0 +1,598 @@
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דוח-1 | פירוט שמי ועדכון</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: 216 22% 97%;
+            --foreground: 216 35% 12%;
+            --primary: 213 55% 24%;
+            --primary-foreground: 0 0% 100%;
+            --accent: 38 96% 48%;
+            --accent-foreground: 0 0% 100%;
+            --muted: 210 20% 94%;
+            --muted-foreground: 215 16% 47%;
+            --border: 214 20% 88%;
+            --card: 0 0% 100%;
+            --radius: 0.75rem;
+            --gradient-hero: linear-gradient(135deg, hsl(213, 55%, 20%), hsl(213, 60%, 32%));
+            --shadow-card: 0 2px 12px -2px hsl(213 55% 24% / 0.12), 0 1px 3px hsl(213 55% 24% / 0.08);
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+            min-height: 100vh;
+        }
+
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: hsl(var(--background));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        header {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 1.5rem 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-card);
+            border-bottom: 4px solid hsl(var(--accent));
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.025em;
+        }
+
+        /* Card styles */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            border: 1px solid hsl(var(--border));
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem;
+            background: hsl(var(--muted) / 0.5);
+            border-bottom: 1px solid hsl(var(--border));
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Form elements */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: hsl(var(--primary));
+        }
+
+        input, select {
+            padding: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) / 2);
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: hsl(var(--primary));
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            text-align: right;
+            padding: 0.75rem 1rem;
+            background: hsl(var(--primary));
+            color: white;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        tr:nth-child(even) {
+            background: hsl(var(--muted) / 0.2);
+        }
+
+        tr:hover {
+            background: hsl(var(--muted) / 0.5);
+        }
+
+        .name-cell {
+            font-weight: 700;
+            color: hsl(var(--primary));
+        }
+
+        .role-cell {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* Status colors */
+        .status-select {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .status-1 { background-color: #dcfce7; color: #15803d; } /* בבסיס */
+        .status-0 { background-color: #dbeafe; color: #1d4ed8; } /* בבית */
+        .status-2 { background-color: #fee2e2; color: #b91c1c; } /* מחלה */
+        .status-3 { background-color: #f3f4f6; color: #4b5563; } /* אחר */
+        .status-4 { background-color: #fef9c3; color: #854d0e; } /* פיצול */
+        .status-5 { background-color: #f5f3ff; color: #5b21b6; } /* שוחרר */
+        .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; } /* ריק */
+
+        .save-btn {
+            background: hsl(var(--accent));
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s;
+        }
+
+        .save-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .save-btn:hover { background: hsl(var(--accent) / 0.9); }
+        .save-btn:active { transform: scale(0.95); }
+
+        /* Auth styling */
+        .auth-box {
+            background: white;
+            padding: 2.5rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-box h2 {
+            margin-top: 0;
+            color: hsl(var(--primary));
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-box p {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        #google-login-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        /* Helpers */
+        .hidden { display: none !important; }
+        .loading-spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #ddd;
+            border-top-color: hsl(var(--primary));
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .success-flash { color: #15803d; font-weight: bold; animation: fadeOut 2s forwards; }
+        .error-flash { color: #b91c1c; font-weight: bold; }
+
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        @media (max-width: 480px) {
+            .card-header { flex-direction: column; align-items: stretch; }
+            th:nth-child(2), td:nth-child(2) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-box">
+            <h2>כניסה למערכת</h2>
+            <p>התחבר עם חשבון Google כדי להמשיך</p>
+            
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+
+            <p id="auth-error" class="hidden" style="color: #b91c1c; font-size: 0.875rem; margin-top: 1.5rem; font-weight: 600;">אין לך הרשאה לגשת לדף זה</p>
+            <div id="auth-loading" class="hidden" style="margin-top: 1.5rem;">
+                <div class="loading-spinner"></div> בודק הרשאות...
+            </div>
+        </div>
+    </div>
+
+    <header class="hidden" id="main-header">
+        <div class="header-content">
+            <h1>דוח-1 | עדכון פירוט שמי</h1>
+            <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
+                <span id="user-name"></span>
+                <span style="opacity: 0.6;">|</span>
+                <span>מחובר</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container hidden" id="main-content">
+        <div class="card">
+            <div class="card-header">
+                <div class="input-group">
+                    <label for="date-input">תאריך</label>
+                    <input type="date" id="date-input">
+                </div>
+                <div class="input-group">
+                    <label for="search-input">חיפוש</label>
+                    <input type="text" id="search-input" placeholder="חפש שם...">
+                </div>
+                <div class="input-group">
+                    <label for="dept-filter">מחלקה</label>
+                    <select id="dept-filter">
+                        <option value="">הכל</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">שם</th>
+                            <th style="width: 25%;">מחלקה</th>
+                            <th style="width: 20%;">תפקיד</th>
+                            <th style="width: 25%;">סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-body">
+                        <!-- Filled by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="loading-overlay" class="hidden" style="padding: 2rem; text-align: center;">
+                    <div class="loading-spinner"></div> מעדכן נתונים...
+                </div>
+                <div id="empty-message" class="hidden" style="padding: 2rem; text-align: center; color: #666;">
+                    לא נמצאו נתונים לתאריך זה
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
+        const GET_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
+        const POST_API = "https://151.145.89.228.sslip.io/webhook/update-status";
+
+        const authOverlay = document.getElementById('auth-overlay');
+        const mainHeader = document.getElementById('main-header');
+        const mainContent = document.getElementById('main-content');
+        const authError = document.getElementById('auth-error');
+        const authLoading = document.getElementById('auth-loading');
+        const userNameSpan = document.getElementById('user-name');
+
+        const dateInput = document.getElementById('date-input');
+        const searchInput = document.getElementById('search-input');
+        const deptFilter = document.getElementById('dept-filter');
+        const attendanceBody = document.getElementById('attendance-body');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const emptyMessage = document.getElementById('empty-message');
+
+        let allRecords = [];
+
+        // Set default date to today
+        dateInput.value = new Date().toISOString().split('T')[0];
+
+        // Helper to decode JWT (Google ID Token) without special library
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Auth Logic
+        async function handleCredentialResponse(response) {
+            authError.classList.add('hidden');
+            authLoading.classList.remove('hidden');
+
+            const payload = parseJwt(response.credential);
+            if (!payload || !payload.email) {
+                authError.textContent = 'שגיאה בפענוח נתוני המשתמש';
+                authError.classList.remove('hidden');
+                authLoading.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(VALIDATE_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: payload.email,
+                        roll: "update"
+                    })
+                });
+
+                if (res.status === 200) {
+                    authOverlay.classList.add('hidden');
+                    mainHeader.classList.remove('hidden');
+                    mainContent.classList.remove('hidden');
+                    userNameSpan.textContent = payload.name || payload.email;
+                    fetchData();
+                } else if (res.status === 401) {
+                    authError.textContent = 'אין לך הרשאה לגשת לדף זה';
+                    authError.classList.remove('hidden');
+                } else {
+                    authError.textContent = 'שגיאת שרת בבדיקת ההרשאות';
+                    authError.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Auth error:', err);
+                authError.textContent = 'שגיאה בתהליך ההתחברות';
+                authError.classList.remove('hidden');
+            } finally {
+                authLoading.classList.add('hidden');
+            }
+        }
+
+        // Data Logic
+        dateInput.addEventListener('change', fetchData);
+        searchInput.addEventListener('input', renderTable);
+        deptFilter.addEventListener('change', renderTable);
+
+        async function fetchData() {
+            attendanceBody.innerHTML = '';
+            loadingOverlay.classList.remove('hidden');
+            emptyMessage.classList.add('hidden');
+
+            try {
+                const formattedDate = formatDateForApi(dateInput.value);
+                const response = await fetch(`${GET_API}?date=${encodeURIComponent(formattedDate)}`);
+                if (!response.ok) throw new Error('API Error');
+                
+                const data = await response.json();
+                allRecords = Array.isArray(data) ? data : (data.data || []);
+                
+                populateDeptFilter();
+                renderTable();
+            } catch (err) {
+                console.error(err);
+                emptyMessage.innerText = 'שגיאה בטעינת נתונים';
+                emptyMessage.classList.remove('hidden');
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function normalizeStatus(value) {
+            const v = String(value ?? "").trim();
+            if (v === "V" || v === "1") return "1"; // בבסיס
+            if (v === "0") return "0";  // בבית
+            if (v === "2" || v === "גימלים") return "2"; // מחלה
+            if (v === "4" || v === "פיצול") return "4"; // פיצול
+            if (v === "5" || v === "שוחרר") return "5"; // שוחרר
+            if (v === "") return "empty"; // ריק
+            return "3"; // אחר
+        }
+
+        function populateDeptFilter() {
+            const depts = [...new Set(allRecords.map(r => r.department).filter(d => d))].sort();
+            const currentVal = deptFilter.value;
+            deptFilter.innerHTML = '<option value="">הכל</option>';
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                deptFilter.appendChild(opt);
+            });
+            if (depts.includes(currentVal)) deptFilter.value = currentVal;
+        }
+
+        function renderTable() {
+            const query = searchInput.value.toLowerCase().trim();
+            const selectedDept = deptFilter.value;
+
+            const filtered = allRecords.filter(r => {
+                const nameValid = r.name && r.name.trim() !== "";
+                if (!nameValid) return false;
+                
+                const matchesSearch = r.name.toLowerCase().includes(query) || 
+                                    (r.role && r.role.toLowerCase().includes(query));
+                const matchesDept = !selectedDept || r.department === selectedDept;
+
+                return matchesSearch && matchesDept;
+            });
+
+            attendanceBody.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                emptyMessage.classList.remove('hidden');
+                return;
+            }
+
+            emptyMessage.classList.add('hidden');
+
+            filtered.forEach((record, index) => {
+                const tr = document.createElement('tr');
+                
+                // Use todayValue from API (normalized to our 0-3 codes)
+                const currentCode = normalizeStatus(record.todayValue);
+                
+                tr.innerHTML = `
+                    <td>
+                        <div class="name-cell">${record.name}</div>
+                    </td>
+                    <td class="role-cell">${record.department || ''}</td>
+                    <td class="role-cell">${record.role || ''}</td>
+                    <td>
+                        <div style="display: flex; align-items: center;">
+                            <select class="status-select status-${currentCode}" data-name="${record.name}">
+                                <option value="empty" ${currentCode === "empty" ? "selected" : ""}>---</option>
+                                <option value="1" ${currentCode === "1" ? "selected" : ""}>בבסיס</option>
+                                <option value="0" ${currentCode === "0" ? "selected" : ""}>בבית</option>
+                                <option value="2" ${currentCode === "2" ? "selected" : ""}>מחלה</option>
+                                <option value="4" ${currentCode === "4" ? "selected" : ""}>פיצול</option>
+                                <option value="5" ${currentCode === "5" ? "selected" : ""}>שוחרר</option>
+                                <option value="3" ${currentCode === "3" ? "selected" : ""}>אחר</option>
+                            </select>
+                            <button class="save-btn" data-index="${index}">שמור</button>
+                            <span class="status-feedback" id="feedback-${index}"></span>
+                        </div>
+                    </td>
+                `;
+
+                const select = tr.querySelector('select');
+                const saveBtn = tr.querySelector('.save-btn');
+                
+                select.addEventListener('change', (e) => {
+                    const newStatus = e.target.value;
+                    e.target.className = `status-select status-${newStatus}`;
+                    
+                    // Show save button if changed from original
+                    if (newStatus !== currentCode) {
+                        saveBtn.classList.add('visible');
+                    } else {
+                        saveBtn.classList.remove('visible');
+                    }
+                });
+
+                saveBtn.addEventListener('click', () => updateStatus(record.name, select.value, index));
+
+                attendanceBody.appendChild(tr);
+            });
+        }
+
+        async function updateStatus(name, code, index) {
+            const feedback = document.getElementById(`feedback-${index}`);
+            const select = document.querySelector(`select[data-name="${name}"]`);
+            
+            // Map numeric codes back to text values for specific statuses
+            let finalStatus = code;
+            if (code === "4") finalStatus = "פיצול";
+            if (code === "5") finalStatus = "שוחרר";
+
+            // UI Update
+            select.className = `status-select status-${code}`;
+            feedback.innerHTML = '<div class="loading-spinner"></div>';
+
+            const payload = {
+                name: name,
+                date: formatDateForApi(dateInput.value),
+                status: finalStatus
+            };
+
+            try {
+                const response = await fetch(POST_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    feedback.innerHTML = '<span class="success-flash">✓</span>';
+                    const saveBtn = document.querySelector(`.save-btn[data-index="${index}"]`);
+                    if (saveBtn) saveBtn.classList.remove('visible');
+                } else {
+                    feedback.innerHTML = '<span class="error-flash">✗</span>';
+                }
+            } catch (err) {
+                feedback.innerHTML = '<span class="error-flash">!</span>';
+            }
+        }
+
+        function formatDateForApi(isoDate) {
+            if (!isoDate) return '';
+            const [year, month, day] = isoDate.split("-");
+            return `${day}/${month}/${year}`;
+        }
+    </script>
+</body>
+</html>

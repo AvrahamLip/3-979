@@ -212,6 +212,14 @@ h1 {
   background: #f87171;
 }
 
+.legend-dot.s-4 {
+  background: #fbbf24;
+}
+
+.legend-dot.s-5 {
+  background: #a78bfa;
+}
+
 .legend-dot.s-other {
   background: #94a3b8;
 }
@@ -333,6 +341,14 @@ h1 {
   color: #f87171;
 }
 
+.legend-item.s-4 {
+  color: #fbbf24;
+}
+
+.legend-item.s-5 {
+  color: #a78bfa;
+}
+
 .legend-item.s-other {
   color: #94a3b8;
 }
@@ -359,6 +375,14 @@ h1 {
 
 .s-2::after {
   background: var(--danger);
+}
+
+.s-4 {
+  color: #fbbf24;
+}
+
+.s-5 {
+  color: #a78bfa;
 }
 
 .s-other {
@@ -441,6 +465,18 @@ tr:hover td {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-4 {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-5 {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .status-other {

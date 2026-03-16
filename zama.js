@@ -64,6 +64,8 @@ async function loadAllDepartments(date) {
         <span class="legend-item s-1">🪖 בבסיס</span>
         <span class="legend-item s-0">🏠 בבית</span>
         <span class="legend-item s-2">🤒 מחלה / גימלים</span>
+        <span class="legend-item s-4">⚖️ פיצול</span>
+        <span class="legend-item s-5">🚪 שוחרר</span>
         <span class="legend-item s-other">❓ אחר</span>
       </div>
     `;
@@ -100,7 +102,7 @@ function renderDepartmentSection(dept, data) {
     const val = normalizeStatus(item.todayValue);
     acc[val]++;
     return acc;
-  }, { '1': 0, '0': 0, '2': 0, 'other': 0 });
+  }, { '1': 0, '0': 0, '2': 0, '4': 0, '5': 0, 'other': 0 });
 
   const totalPeople = validData.length;
 
@@ -108,7 +110,7 @@ function renderDepartmentSection(dept, data) {
   const roleGroups = validData.reduce((acc, item) => {
     const role = item.role || 'אחר';
     const val = normalizeStatus(item.todayValue);
-    if (!acc[role]) acc[role] = { '1': 0, '0': 0, '2': 0, 'other': 0 };
+    if (!acc[role]) acc[role] = { '1': 0, '0': 0, '2': 0, '4': 0, '5': 0, 'other': 0 };
     acc[role][val]++;
     return acc;
   }, {});
@@ -125,6 +127,8 @@ function renderDepartmentSection(dept, data) {
               <span class="s-1"><span class="si">🪖</span>${counts['1']}</span>
               <span class="s-0"><span class="si">🏠</span>${counts['0']}</span>
               <span class="s-2"><span class="si">🤒</span>${counts['2']}</span>
+              <span class="s-4"><span class="si">⚖️</span>${counts['4']}</span>
+              <span class="s-5"><span class="si">🚪</span>${counts['5']}</span>
               <span class="s-other"><span class="si">❓</span>${counts['other']}</span>
             </div>
           </div>`;
@@ -154,7 +158,9 @@ function renderDepartmentSection(dept, data) {
           <div class="dept-totals">
             <div class="role-item"><span>🪖 בבסיס</span> <span>${totals['1']}</span></div>
             <div class="role-item"><span>🏠 בבית</span> <span>${totals['0']}</span></div>
-            <div class="role-item"><span>🤒 מחלה / גימלים</span> <span>${totals['2']}</span></div>
+            <div class="role-item"><span>🤒 מחלה</span> <span>${totals['2']}</span></div>
+            <div class="role-item"><span>⚖️ פיצול</span> <span>${totals['4']}</span></div>
+            <div class="role-item"><span>🚪 שוחרר</span> <span>${totals['5']}</span></div>
             <div class="role-item"><span>❓ אחר</span> <span>${totals['other']}</span></div>
           </div>
           <div class="role-breakdown">
@@ -193,8 +199,11 @@ function filterValidRows(data) {
 function normalizeStatus(value) {
   const v = String(value ?? '').trim().toUpperCase();
   if (v === 'V' || v === '1') return '1';
-  if (v === '' || v === '0') return '0';
+  if (v === '0') return '0';
   if (v === '2' || v === 'גימלים') return '2';
+  if (v === '4' || v === 'פיצול') return '4';
+  if (v === '5' || v === 'שוחרר') return '5';
+  if (v === '') return '0'; // Default empty to 'at home' if appropriate, or 'other'
   return 'other';
 }
 
@@ -203,6 +212,8 @@ function getStatusLabel(value) {
     case '1': return 'בבסיס';
     case '0': return 'בבית';
     case '2': return 'מחלה';
+    case '4': return 'פיצול';
+    case '5': return 'שוחרר';
     default: return String(value).trim() || '---';
   }
 }
@@ -212,6 +223,8 @@ function getStatusClass(value) {
     case '1': return 'status-1';
     case '0': return 'status-0';
     case '2': return 'status-2';
+    case '4': return 'status-4';
+    case '5': return 'status-5';
     default: return 'status-other';
   }
 }
