@@ -1,81 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דוח נוכחות - Doch!</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/3-979/assets/main-BBjjqIPh.js"></script>
-  <link rel="modulepreload" crossorigin href="/3-979/assets/api-D9CMZcsM.js">
-  <link rel="stylesheet" crossorigin href="/3-979/assets/api-BPpxjqmv.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>דוח-1 - דוח נוכחות יומי</title>
+  <meta name="description" content="מערכת דיווח נוכחות יומי - דוח-1">
+  <meta name="author" content="דוח-1" />
+
+
+
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <meta property="og:title" content="דוח-1 - דוח נוכחות יומי">
+  <meta name="twitter:title" content="דוח-1 - דוח נוכחות יומי">
+  <meta property="og:description" content="מערכת דיווח נוכחות יומי - דוח-1">
+  <meta name="twitter:description" content="מערכת דיווח נוכחות יומי - דוח-1">
+  <meta property="og:image"
+    content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b0142d99-01a7-49f9-9cb1-5bdd0ec1917d/id-preview-7877a199--61dc6470-6d67-46b3-94c2-da8de551e431.lovable.app-1772959127673.png">
+  <meta name="twitter:image"
+    content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b0142d99-01a7-49f9-9cb1-5bdd0ec1917d/id-preview-7877a199--61dc6470-6d67-46b3-94c2-da8de551e431.lovable.app-1772959127673.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="module" crossorigin src="/3-979/assets/main-A8_jIsJz.js"></script>
+  <link rel="modulepreload" crossorigin href="/3-979/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/3-979/assets/main-BLxW0xxI.css">
 </head>
 
 <body>
-    <div class="background-glow"></div>
-    <div class="app-container">
-        <header class="main-header">
-            <div class="header-content">
-                <h1>דוח נוכחות יומי</h1>
-                <div class="date-selector-wrapper">
-                    <label for="date-picker">בחר תאריך:</label>
-                    <input type="date" id="date-picker" class="glass-input">
-                    <button id="theme-toggle" class="theme-btn" title="החלף מצב תצוגה">🌙</button>
-                </div>
-            </div>
-        </header>
-
-        <main class="content-area">
-            <section id="summary-section" class="summary-grid">
-                <!-- Summary cards will be injected here -->
-                <div class="placeholder-msg">בחר תאריך כדי להציג את הדוח</div>
-            </section>
-
-            <section id="details-section" class="details-list glass-card hidden">
-                <div class="details-header">
-                    <h2>פירוט שמי</h2>
-                    <div class="filter-controls">
-                        <input type="text" id="search-input" class="glass-input" placeholder="חיפוש לפי שם או תפקיד...">
-                        <select id="dept-filter" class="glass-input">
-                            <option value="">כל המחלקות</option>
-                        </select>
-                        <select id="role-filter" class="glass-input">
-                            <option value="">כל התפקידים</option>
-                        </select>
-                        <select id="status-filter" class="glass-input">
-                            <option value="">כל הסטטוסים</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="table-wrapper">
-                    <table id="details-table">
-                        <thead>
-                            <tr>
-                                <th>שם</th>
-                                <th>מחלקה</th>
-                                <th>תפקיד</th>
-                                <th>סטטוס (todayValue)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="details-body">
-                            <!-- Rows will be injected here -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-
-        <footer class="main-footer">
-            <p>&copy; 2026 מערכת Doch1</p>
-        </footer>
-    </div>
-
-    <div id="loading-overlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-    </div>
-
+  <div id="root"></div>
 </body>
 
 </html>
