@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        {
+            "source": "/api-webhook/:path*",
+            "destination": "https://151.145.89.228.sslip.io/:path*"
+        }
+    ]
+}
