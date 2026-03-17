@@ -13,6 +13,7 @@ import DepartmentAccordion from "../components/DepartmentAccordion";
 import AttendanceTable from "../components/AttendanceTable";
 import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMessages";
 import { RefreshCw } from "lucide-react";
+import PWAInstallButton from "../components/PWAInstallButton";
 
 export default function MainPage() {
   const [date, setDate] = useState(getTodayIso());
@@ -50,6 +51,11 @@ export default function MainPage() {
             </button>
           </div>
         </div>
+      </div>
+      
+      {/* PWA Install Promo */}
+      <div className="flex justify-center">
+        <PWAInstallButton />
       </div>
 
       {/* Loading */}

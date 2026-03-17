@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",
-        start_url: "/3-979/",
+        start_url: ".",
         icons: [
           {
             src: "icon-192.png",
@@ -49,7 +49,11 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
+      devOptions: {
+        enabled: true,
+      },
     }),
+
   ].filter(Boolean),
 }));
 

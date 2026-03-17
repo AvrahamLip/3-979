@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck } from "lucide-react";
+import { Sun, Moon, FileText, Truck, Phone } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export default function Layout() {
@@ -50,6 +50,20 @@ export default function Layout() {
                 <Truck className="w-4 h-4 hidden xs:block" />
                 <span>צמ&quot;ה</span>
               </NavLink>
+              <NavLink
+                to="/contacts"
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                    isActive
+                       ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                  )
+                }
+              >
+                <Phone className="w-4 h-4 hidden xs:block" />
+                <span>טלפונים</span>
+              </NavLink>
               <a
                 href="update.html"
                 className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
@@ -95,7 +109,7 @@ export default function Layout() {
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-1">
-            <span>גרסה: 1.1.0</span>
+            <span>גרסה: 1.2.0</span>
             <span>עדכון אחרון: {new Date().toLocaleDateString('he-IL')}</span>
           </div>
         </div>

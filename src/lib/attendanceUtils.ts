@@ -41,6 +41,7 @@ export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
       role: (r.role ?? "").trim(),
       todayValue: String(r.todayValue ?? ""),
       status: normalizeStatus(r.todayValue),
+      personalNumber: String(r.personalNumber ?? ""),
     }));
 }
 
