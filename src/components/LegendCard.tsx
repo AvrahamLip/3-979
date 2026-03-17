@@ -1,5 +1,5 @@
-import type { StatusType } from "@/types/attendance";
-import { STATUS_LABELS } from "@/lib/attendanceUtils";
+import type { StatusType } from "../types/attendance";
+import { STATUS_LABELS } from "../lib/attendanceUtils";
 
 const STATUS_INFO: Record<
   StatusType,

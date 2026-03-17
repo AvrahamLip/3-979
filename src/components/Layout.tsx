@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Sun, Moon, FileText, Truck } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 export default function Layout() {
   const { theme, setTheme } = useTheme();
@@ -21,53 +21,58 @@ export default function Layout() {
             </div>
 
             {/* Nav links */}
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-2 -my-2 flex-nowrap shrink-0 max-w-[calc(100vw-140px)] sm:max-w-none">
               <NavLink
                 to="/main"
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
+                    "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
                        ? "bg-accent text-accent-foreground shadow-md"
                       : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                   )
                 }
               >
-                <span>דוח נוכחות פלוגה ג'</span>
+                <FileText className="w-4 h-4 hidden xs:block" />
+                <span>דוח נוכחות</span>
               </NavLink>
               <NavLink
                 to="/zama"
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
+                    "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
                        ? "bg-accent text-accent-foreground shadow-md"
                       : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                   )
                 }
               >
+                <Truck className="w-4 h-4 hidden xs:block" />
                 <span>צמ&quot;ה</span>
               </NavLink>
               <a
                 href="update.html"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
               >
                 <span>עדכן נתונים</span>
               </a>
             </nav>
 
-            {/* Theme toggle */}
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
+            {/* Theme toggle & Mobile menu placeholder */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+                ) : (
+                  <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+              </button>
+            </div>
+
           </div>
         </div>
       </header>

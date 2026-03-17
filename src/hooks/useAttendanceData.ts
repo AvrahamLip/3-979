@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import {
   processRecords,
   formatDateForApi,
-} from "@/lib/attendanceUtils";
-import type { AttendanceRecord } from "@/types/attendance";
-import type { RawRecord } from "@/types/attendance";
+} from "../lib/attendanceUtils";
+import type { AttendanceRecord } from "../types/attendance";
+import type { RawRecord } from "../types/attendance";
 
 const MAIN_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
 

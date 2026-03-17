@@ -1,4 +1,4 @@
-import type { StatusCounts } from "@/types/attendance";
+import type { StatusCounts } from "../types/attendance";
 
 interface StatusCountsRowProps {
   counts: StatusCounts;

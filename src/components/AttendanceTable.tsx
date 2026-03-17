@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import type { AttendanceRecord } from "@/types/attendance";
+import type { AttendanceRecord } from "../types/attendance";
 import StatusBadge from "./StatusBadge";
 import { Search, ChevronUp, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 interface AttendanceTableProps {
   records: AttendanceRecord[];
@@ -107,14 +107,17 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
             <thead>
               <tr className="gradient-hero text-primary-foreground">
                 {([
-                  { key: "name", label: "שם" },
-                  { key: "department", label: "מחלקה" },
-                  { key: "role", label: "תפקיד" },
-                  { key: "status", label: "סטטוס" },
-                ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
+                  { key: "name", label: "שם", className: "" },
+                  { key: "department", label: "מחלקה", className: "hidden sm:table-cell" },
+                  { key: "role", label: "תפקיד", className: "hidden md:table-cell" },
+                  { key: "status", label: "סטטוס", className: "" },
+                ] as { key: SortKey; label: string; className: string }[]).map(({ key, label, className }) => (
                   <th
                     key={key}
-                    className="text-right px-4 py-3 font-bold cursor-pointer select-none hover:bg-white/10 transition-colors"
+                    className={cn(
+                      "text-right px-4 py-3 font-bold cursor-pointer select-none hover:bg-white/10 transition-colors",
+                      className
+                    )}
                     onClick={() => handleSort(key)}
                   >
                     <div className="flex items-center gap-1 justify-end">
@@ -142,14 +145,15 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                     )}
                   >
                     <td className="px-4 py-3 font-semibold">{r.name}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.department}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.role}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{r.department}</td>
+                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{r.role}</td>
+                    <td className="px-4 py-3 text-right">
                       <StatusBadge status={r.status} />
                     </td>
                   </tr>
                 ))
               )}
+
             </tbody>
           </table>
         </div>

@@ -1,19 +1,19 @@
 import { useState, useMemo } from "react";
-import { useZamaAttendance, ZAMA_DEPTS } from "@/hooks/useAttendanceData";
+import { useZamaAttendance, ZAMA_DEPTS } from "../hooks/useAttendanceData";
 import {
   buildStatusCounts,
   buildRoleStats,
   getTodayIso,
-} from "@/lib/attendanceUtils";
-import type { AttendanceRecord } from "@/types/attendance";
-import DatePickerBar from "@/components/DatePickerBar";
-import LegendCard from "@/components/LegendCard";
-import { StatusCountsRow } from "@/components/StatusCountsRow";
-import StatusBadge from "@/components/StatusBadge";
-import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMessages";
+} from "../lib/attendanceUtils";
+import type { AttendanceRecord } from "../types/attendance";
+import DatePickerBar from "../components/DatePickerBar";
+import LegendCard from "../components/LegendCard";
+import { StatusCountsRow } from "../components/StatusCountsRow";
+import StatusBadge from "../components/StatusBadge";
+import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMessages";
 import { ChevronDown, ChevronUp, Building2, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 function ZamaDeptSection({
   deptName,

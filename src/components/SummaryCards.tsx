@@ -1,4 +1,4 @@
-import type { StatusCounts, RoleStats } from "@/types/attendance";
+import type { StatusCounts, RoleStats } from "../types/attendance";
 import { StatusCountsRow } from "./StatusCountsRow";
 import { Users, CheckCircle2 } from "lucide-react";
 

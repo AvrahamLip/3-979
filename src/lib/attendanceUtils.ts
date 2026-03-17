@@ -5,7 +5,7 @@ import type {
   StatusCounts,
   RoleStats,
   DepartmentStats,
-} from "@/types/attendance";
+} from "../types/attendance";
 
 export function normalizeStatus(value: string | number | undefined | null): StatusType {
   const v = String(value ?? "").trim();

@@ -1,17 +1,17 @@
 import { useState, useMemo } from "react";
-import { useMainAttendance } from "@/hooks/useAttendanceData";
+import { useMainAttendance } from "../hooks/useAttendanceData";
 import {
   buildStatusCounts,
   buildRoleStats,
   buildDepartmentStats,
   getTodayIso,
-} from "@/lib/attendanceUtils";
-import DatePickerBar from "@/components/DatePickerBar";
-import LegendCard from "@/components/LegendCard";
-import SummaryCards from "@/components/SummaryCards";
-import DepartmentAccordion from "@/components/DepartmentAccordion";
-import AttendanceTable from "@/components/AttendanceTable";
-import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMessages";
+} from "../lib/attendanceUtils";
+import DatePickerBar from "../components/DatePickerBar";
+import LegendCard from "../components/LegendCard";
+import SummaryCards from "../components/SummaryCards";
+import DepartmentAccordion from "../components/DepartmentAccordion";
+import AttendanceTable from "../components/AttendanceTable";
+import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMessages";
 import { RefreshCw } from "lucide-react";
 
 export default function MainPage() {

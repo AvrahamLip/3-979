@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Building2 } from "lucide-react";
-import type { DepartmentStats } from "@/types/attendance";
+import type { DepartmentStats } from "../types/attendance";
 import { StatusCountsRow } from "./StatusCountsRow";
 import { motion, AnimatePresence } from "framer-motion";
 

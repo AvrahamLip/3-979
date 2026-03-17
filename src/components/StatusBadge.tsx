@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import type { StatusType } from "@/types/attendance";
+import { cn } from "../lib/utils";
+import type { StatusType } from "../types/attendance";
 
 interface StatusBadgeProps {
   status: StatusType;
