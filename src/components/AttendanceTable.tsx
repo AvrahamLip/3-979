@@ -115,9 +115,10 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                   <th
                     key={key}
                     className={cn(
-                      "text-right px-4 py-3 font-bold cursor-pointer select-none hover:bg-white/10 transition-colors",
+                      "text-right px-2 sm:px-4 py-3 font-bold cursor-pointer select-none hover:bg-white/10 transition-colors",
                       className
                     )}
+
                     onClick={() => handleSort(key)}
                   >
                     <div className="flex items-center gap-1 justify-end">
@@ -144,12 +145,13 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                       idx % 2 === 0 ? "bg-card" : "bg-background"
                     )}
                   >
-                    <td className="px-4 py-3 font-semibold">{r.name}</td>
+                    <td className="px-2 sm:px-4 py-3 font-semibold">{r.name}</td>
                     <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{r.department}</td>
                     <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{r.role}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-2 sm:px-4 py-3 text-right">
                       <StatusBadge status={r.status} />
                     </td>
+
                   </tr>
                 ))
               )}
