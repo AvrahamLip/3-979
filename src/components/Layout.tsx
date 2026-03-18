@@ -106,8 +106,15 @@ export default function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-3 px-4 text-center text-xs text-muted-foreground">
-        <span>דוח! — מערכת נוכחות יומי</span>
+      <footer className="border-t border-border py-4 px-4 text-center text-xs text-muted-foreground bg-muted/30">
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-4">
+            <a href="https://wa.me/972545806654" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
+            <span className="opacity-30">|</span>
+            <span className="font-mono">גרסה 1.2.2</span>
+          </div>
+          <span className="opacity-70 font-medium">דוח! — מערכת נוכחות יומי</span>
+        </div>
       </footer>
     </div>
   );
