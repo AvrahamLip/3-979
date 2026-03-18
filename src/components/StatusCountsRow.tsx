@@ -1,4 +1,4 @@
-import type { StatusCounts } from "../types/attendance";
+import type { StatusCounts } from "@/types/attendance";
 
 interface StatusCountsRowProps {
   counts: StatusCounts;
@@ -21,16 +21,6 @@ export function StatusCountsRow({ counts, compact = false }: StatusCountsRowProp
       label: "מחלה",
       value: counts["מחלה / גימלים"],
       className: "text-status-sick bg-status-sick-bg",
-    },
-    {
-      label: "פיצול",
-      value: counts["פיצול"],
-      className: "text-status-split bg-status-split-bg",
-    },
-    {
-      label: "שחרור",
-      value: counts["שחרור"],
-      className: "text-status-released bg-status-released-bg",
     },
     {
       label: "אחר",

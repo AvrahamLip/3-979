@@ -4,6 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from "vite-plugin-pwa";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -16,9 +20,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    tsconfigPaths(),
     react(),
     mode === "development" && componentTagger(),
-    tsconfigPaths(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
@@ -53,7 +57,17 @@ export default defineConfig(({ mode }) => ({
         enabled: true,
       },
     }),
-
   ].filter(Boolean),
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
 }));
+
+
+
+
+
+
 

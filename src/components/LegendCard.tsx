@@ -1,46 +1,35 @@
-import type { StatusType } from "../types/attendance";
-import { STATUS_LABELS } from "../lib/attendanceUtils";
+import type { StatusType } from "@/types/attendance";
+import { STATUS_LABELS } from "@/lib/attendanceUtils";
 
 const STATUS_INFO: Record<
   StatusType,
   { icon: string; className: string; description: string }
 > = {
   "בבסיס": {
-    icon: "🪖",
+    icon: "✓",
     className: "text-status-base bg-status-base-bg border border-status-base/20",
     description: 'נמצא בבסיס / V / "1"',
   },
   "בבית": {
-    icon: "🏠",
+    icon: "⌂",
     className: "text-status-home bg-status-home-bg border border-status-home/20",
     description: 'בבית / "" / "0"',
   },
   "מחלה / גימלים": {
-    icon: "🤒",
+    icon: "⚕",
     className: "text-status-sick bg-status-sick-bg border border-status-sick/20",
     description: '"2" / גימלים',
   },
-  "פיצול": {
-    icon: "⚖️",
-    className: "text-status-split bg-status-split-bg border border-status-split/20",
-    description: '"4" / פיצול',
-  },
-  "שחרור": {
-    icon: "🚪",
-    className: "text-status-released bg-status-released-bg border border-status-released/20",
-    description: '"5" / שחרור',
-  },
   "אחר": {
-    icon: "❓",
+    icon: "?",
     className: "text-status-other bg-status-other-bg border border-status-other/20",
     description: "ערך אחר",
   },
 };
 
-
 export default function LegendCard() {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+    <div className="bg-card border border-border rounded-xl p-4 card-shadow">
       <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
         מקרא סטטוסים
       </h3>

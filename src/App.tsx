@@ -1,12 +1,10 @@
-import { Toaster } from "./components/ui/toaster";
-import { Toaster as Sonner } from "./components/ui/sonner";
-import { TooltipProvider } from "./components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
-import ContactPage from "./pages/ContactPage";
-import Layout from "./components/Layout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,16 +20,13 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <HashRouter>
+      <BrowserRouter basename="/3-979/">
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
-          <Route element={<Layout />}>
-            <Route path="/main" element={<MainPage />} />
-            <Route path="/zama" element={<ZamaPage />} />
-            <Route path="/contacts" element={<ContactPage />} />
-          </Route>
+          <Route path="/main" element={<MainPage />} />
+          <Route path="/zama" element={<ZamaPage />} />
         </Routes>
-      </HashRouter>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

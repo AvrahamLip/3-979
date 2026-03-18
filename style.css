@@ -4,24 +4,28 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --text-color: #f8fafc;
   --text-muted: #94a3b8;
-  --primary-glow: #6366f1;
-  --secondary-glow: #a855f7;
-  --accent-color: #818cf8;
-  --success: #10b981;
-  --warning: #f59e0b;
+  --primary-glow: #3896f0;
+  --secondary-glow: #fbbf24;
+  --accent-color: #fbbf24;
+  --success: #15803d;
+  --warning: #fbbf24;
   --danger: #ef4444;
-  --font-family: 'Assistant', sans-serif;
+  --font-family: 'Heebo', 'Assistant', sans-serif;
+
+  /* Navy palette */
+  --primary-navy: #0f172a;
+  --accent-amber: #fbbf24;
 }
 
 /* ── Light Mode ── */
 body.light-mode {
-  --bg-color: #f1f5f9;
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --text-color: #1e293b;
+  --bg-color: #f8fafc;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --text-color: #0f172a;
   --text-muted: #64748b;
-  --accent-color: #6366f1;
-  --primary-glow: #818cf8;
+  --accent-color: #fbbf24;
+  --primary-glow: #0f172a;
 }
 
 body.light-mode .background-glow {
@@ -450,40 +454,41 @@ tr:hover td {
 }
 
 .status-1 {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: hsla(143, 65%, 94%, 0.8);
+  color: hsl(143, 65%, 35%);
+  border: 1px solid hsla(143, 65%, 35%, 0.3);
 }
 
 .status-0 {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: hsla(213, 75%, 93%, 0.8);
+  color: hsl(213, 75%, 40%);
+  border: 1px solid hsla(213, 75%, 40%, 0.3);
 }
 
 .status-2 {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: hsla(0, 72%, 94%, 0.8);
+  color: hsl(0, 72%, 50%);
+  border: 1px solid hsla(0, 72%, 50%, 0.3);
 }
 
 .status-4 {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: hsla(38, 96%, 94%, 0.8);
+  color: hsl(38, 96%, 48%);
+  border: 1px solid hsla(38, 96%, 48%, 0.3);
 }
 
 .status-5 {
-  background: rgba(139, 92, 246, 0.15);
-  color: #a78bfa;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: hsla(262, 83%, 94%, 0.8);
+  color: hsl(262, 83%, 58%);
+  border: 1px solid hsla(262, 83%, 58%, 0.3);
 }
 
 .status-other {
-  background: rgba(148, 163, 184, 0.15);
-  color: #cbd5e1;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: hsla(215, 14%, 92%, 0.8);
+  color: hsl(215, 14%, 55%);
+  border: 1px solid hsla(215, 14%, 55%, 0.3);
 }
+
 
 .hidden {
   display: none !important;

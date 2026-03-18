@@ -5,16 +5,13 @@ import type {
   StatusCounts,
   RoleStats,
   DepartmentStats,
-} from "../types/attendance";
+} from "@/types/attendance";
 
 export function normalizeStatus(value: string | number | undefined | null): StatusType {
   const v = String(value ?? "").trim();
   if (v === "V" || v === "1") return "בבסיס";
-  if (v === "0") return "בבית";
+  if (v === "" || v === "0") return "בבית";
   if (v === "2" || v === "גימלים") return "מחלה / גימלים";
-  if (v === "4" || v === "פיצול") return "פיצול";
-  if (v === "5" || v === "שחרור" || v === "שוחרר" || v === "שחרורר") return "שחרור";
-  if (v === "") return "בבית"; // Usually empty means home in this flow, but check logic
   return "אחר";
 }
 
@@ -41,7 +38,6 @@ export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
       role: (r.role ?? "").trim(),
       todayValue: String(r.todayValue ?? ""),
       status: normalizeStatus(r.todayValue),
-      personalNumber: String(r.personalNumber ?? ""),
     }));
 }
 
@@ -50,8 +46,6 @@ export function buildStatusCounts(records: AttendanceRecord[]): StatusCounts {
     "בבסיס": 0,
     "בבית": 0,
     "מחלה / גימלים": 0,
-    "פיצול": 0,
-    "שחרור": 0,
     "אחר": 0,
     total: records.length,
   };
@@ -94,8 +88,6 @@ export const STATUS_LABELS: StatusType[] = [
   "בבסיס",
   "בבית",
   "מחלה / גימלים",
-  "פיצול",
-  "שחרור",
   "אחר",
 ];
 
@@ -103,17 +95,12 @@ export const STATUS_COLORS: Record<StatusType, string> = {
   "בבסיס": "status-base",
   "בבית": "status-home",
   "מחלה / גימלים": "status-sick",
-  "פיצול": "status-split",
-  "שחרור": "status-released",
   "אחר": "status-other",
 };
 
 export const STATUS_ICONS: Record<StatusType, string> = {
-  "בבסיס": "🪖",
-  "בבית": "🏠",
-  "מחלה / גימלים": "🤒",
-  "פיצול": "⚖️",
-  "שחרור": "🚪",
-  "אחר": "❓",
+  "בבסיס": "✓",
+  "בבית": "⌂",
+  "מחלה / גימלים": "⚕",
+  "אחר": "?",
 };
-

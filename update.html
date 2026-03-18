@@ -27,6 +27,16 @@
             --radius: 0.75rem;
             --gradient-hero: linear-gradient(135deg, hsl(213, 55%, 20%), hsl(213, 60%, 32%));
             --shadow-card: 0 2px 12px -2px hsl(213 55% 24% / 0.12), 0 1px 3px hsl(213 55% 24% / 0.08);
+
+            /* New Status Colors */
+            --status-base: 143 65% 35%;
+            --status-base-bg: 143 65% 94%;
+            --status-home: 213 75% 40%;
+            --status-home-bg: 213 75% 93%;
+            --status-sick: 0 72% 50%;
+            --status-sick-bg: 0 72% 94%;
+            --status-other: 215 14% 55%;
+            --status-other-bg: 215 14% 92%;
         }
 
         body {
@@ -176,13 +186,14 @@
             transition: all 0.2s;
         }
 
-        .status-1 { background-color: #dcfce7; color: #15803d; } /* בבסיס */
-        .status-0 { background-color: #dbeafe; color: #1d4ed8; } /* בבית */
-        .status-2 { background-color: #fee2e2; color: #b91c1c; } /* מחלה */
-        .status-3 { background-color: #f3f4f6; color: #4b5563; } /* אחר */
-        .status-4 { background-color: #fef9c3; color: #854d0e; } /* פיצול */
-        .status-5 { background-color: #f5f3ff; color: #5b21b6; } /* שוחרר */
-        .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; } /* ריק */
+        .status-1 { background-color: hsl(var(--status-base-bg)); color: hsl(var(--status-base)); }
+        .status-0 { background-color: hsl(var(--status-home-bg)); color: hsl(var(--status-home)); }
+        .status-2 { background-color: hsl(var(--status-sick-bg)); color: hsl(var(--status-sick)); }
+        .status-3 { background-color: hsl(var(--status-other-bg)); color: hsl(var(--status-other)); }
+        .status-4 { background-color: hsl(var(--status-home-bg)); color: hsl(var(--status-home)); }
+        .status-5 { background-color: #f5f3ff; color: #5b21b6; }
+        .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; }
+
 
         .save-btn {
             background: hsl(var(--accent));
@@ -298,13 +309,23 @@
 
     <header class="hidden" id="main-header">
         <div class="header-content">
-            <h1>דוח-1 | עדכון פירוט שמי</h1>
-            <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
-                <span id="user-name"></span>
-                <span style="opacity: 0.6;">|</span>
-                <span>מחובר</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="/3-979/" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+                    <div style="width: 2rem; height: 2rem; background: hsl(var(--accent)); color: white; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem;">ד!</div>
+                    <span>דוח-1</span>
+                </a>
+                <h1>עדכון פירוט שמי</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button id="pwa-install-btn" class="hidden" style="background: white; color: hsl(var(--primary)); border: none; padding: 0.4rem 1rem; border-radius: 2rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">התקן אפליקציה ⬇️</button>
+                <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
+                    <span id="user-name"></span>
+                    <span style="opacity: 0.6;">|</span>
+                    <span>מחובר</span>
+                </div>
             </div>
         </div>
+
     </header>
 
     <main class="container hidden" id="main-content">
@@ -597,6 +618,29 @@
                 feedback.innerHTML = '<span class="error-flash">!</span>';
             }
         }
+
+        // PWA Install Logic
+        let deferredPrompt;
+        const pwaBtn = document.getElementById('pwa-install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            pwaBtn.classList.remove('hidden');
+        });
+
+        pwaBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    pwaBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            } else {
+                alert('כדי להתקין: לחץ על 3 הנקודות בדפדפן ובחר "התקן אפליקציה"');
+            }
+        });
 
         function formatDateForApi(isoDate) {
             if (!isoDate) return '';

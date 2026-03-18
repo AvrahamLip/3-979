@@ -25,11 +25,9 @@
     "strict": false,
     "target": "ES2020",
     "types": [
-      "vitest/globals",
-      "vite-plugin-pwa/client"
+      "vitest/globals"
     ],
     "useDefineForClassFields": true
-
   },
   "include": [
     "src"

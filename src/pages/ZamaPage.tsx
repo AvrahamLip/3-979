@@ -1,20 +1,19 @@
 import { useState, useMemo } from "react";
-import { useZamaAttendance, ZAMA_DEPTS } from "../hooks/useAttendanceData";
+import { useZamaAttendance, ZAMA_DEPTS } from "@/hooks/useAttendanceData";
 import {
   buildStatusCounts,
   buildRoleStats,
   getTodayIso,
-} from "../lib/attendanceUtils";
-import type { AttendanceRecord } from "../types/attendance";
-import DatePickerBar from "../components/DatePickerBar";
-import LegendCard from "../components/LegendCard";
-import { StatusCountsRow } from "../components/StatusCountsRow";
-import StatusBadge from "../components/StatusBadge";
-import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMessages";
+} from "@/lib/attendanceUtils";
+import type { AttendanceRecord } from "@/types/attendance";
+import DatePickerBar from "@/components/DatePickerBar";
+import LegendCard from "@/components/LegendCard";
+import { StatusCountsRow } from "@/components/StatusCountsRow";
+import StatusBadge from "@/components/StatusBadge";
+import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMessages";
 import { ChevronDown, ChevronUp, Building2, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "../lib/utils";
-import PWAInstallButton from "../components/PWAInstallButton";
+import { cn } from "@/lib/utils";
 
 function ZamaDeptSection({
   deptName,
@@ -32,15 +31,16 @@ function ZamaDeptSection({
 
   return (
     <div
-      className="bg-card border border-border rounded-2xl overflow-hidden shadow-card animate-fade-in"
-      style={{ animationDelay: `${index * 80}ms` }}>
+      className="bg-card border border-border rounded-2xl overflow-hidden card-shadow animate-fade-in"
+      style={{ animationDelay: `${index * 80}ms` }}
+    >
       {/* Dept Header */}
       <button
         className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors"
         onClick={() => setOpen((v) => !v)}
       >
-        <div className="flex items-center gap-2 text-muted-foreground mr-1">
-          {open ? <span className="text-[10px]">▲</span> : <span className="text-[10px]">▼</span>}
+        <div className="flex items-center gap-2 text-muted-foreground">
+          {open ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </div>
         <div className="flex-1 text-right mr-3">
           <div className="flex items-center gap-2 justify-end">
@@ -57,6 +57,7 @@ function ZamaDeptSection({
             </span>
           </div>
           <div className="flex items-center gap-1.5 justify-end mt-1">
+            <Building2 className="w-4 h-4 text-primary" />
             <span className="font-black text-base">{deptName}</span>
           </div>
         </div>
@@ -122,7 +123,7 @@ function ZamaDeptSection({
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="bg-primary text-primary-foreground text-right font-bold">
+                        <tr className="gradient-hero text-primary-foreground text-right">
                           <th className="px-4 py-2.5 font-bold">שם</th>
                           <th className="px-4 py-2.5 font-bold">תפקיד</th>
                           <th className="px-4 py-2.5 font-bold">סטטוס</th>
@@ -141,7 +142,7 @@ function ZamaDeptSection({
                               key={`${r.name}-${idx}`}
                               className={cn(
                                 "border-t border-border hover:bg-muted/40 transition-colors",
-                                "odd:bg-muted/20 even:bg-card"
+                                idx % 2 === 0 ? "bg-card" : "bg-background"
                               )}
                             >
                               <td className="px-4 py-2.5 font-semibold">{r.name}</td>
@@ -182,9 +183,9 @@ export default function ZamaPage() {
     Object.values(data).every((recs) => recs.length === 0);
 
   return (
-    <div className="container max-w-4xl mx-auto py-6 space-y-6 animate-fade-in">
+    <div className="container mx-auto py-6 space-y-6 animate-fade-in">
       {/* Page Header */}
-      <div className="gradient-hero rounded-2xl p-6 shadow-card header-accent-border">
+      <div className="gradient-hero rounded-2xl p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-primary-foreground">
@@ -208,11 +209,6 @@ export default function ZamaPage() {
         </div>
       </div>
 
-      {/* PWA Install Promo */}
-      <div className="flex justify-center">
-        <PWAInstallButton />
-      </div>
-
       {isLoading && <LoadingOverlay />}
 
       {isError && !isLoading && (
@@ -221,54 +217,9 @@ export default function ZamaPage() {
 
       {isEmpty && <EmptyState date={date} />}
 
-    {!isLoading && !isError && data && totalRecords > 0 && (
+      {!isLoading && !isError && data && totalRecords > 0 && (
         <>
           <LegendCard />
-
-          {/* Total Summary Section */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card p-5 mb-6">
-            <div className="flex items-center gap-2 mb-4 justify-end">
-              <h2 className="text-lg font-black tracking-wide">סה״כ כללי צמ״ה</h2>
-            </div>
-            
-            <div className="space-y-5">
-              {/* Overall Total Counts */}
-              <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                  סיכום מצבות כולל
-                </p>
-                <StatusCountsRow
-                  counts={buildStatusCounts(Object.values(data).flat())}
-                />
-              </div>
-
-              {/* Overall Role Breakdown */}
-              {buildRoleStats(Object.values(data).flat()).length > 0 && (
-                <div>
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                    פירוט תפקידים כולל
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {buildRoleStats(Object.values(data).flat()).map((role) => (
-                      <div
-                        key={`total-role-${role.role}`}
-                        className="flex items-center justify-between bg-muted/40 rounded-lg px-3 py-2"
-                      >
-                        <StatusCountsRow counts={role.counts} compact />
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            {role.counts["בבסיס"]}/{role.counts.total}
-                          </span>
-                          <span className="text-sm font-semibold">{role.role}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
           <div className="space-y-4">
             {ZAMA_DEPTS.map((dept, idx) => (
               <ZamaDeptSection

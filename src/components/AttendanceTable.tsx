@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import type { AttendanceRecord } from "../types/attendance";
+import type { AttendanceRecord } from "@/types/attendance";
 import StatusBadge from "./StatusBadge";
 import { Search, ChevronUp, ChevronDown } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn } from "@/lib/utils";
 
 interface AttendanceTableProps {
   records: AttendanceRecord[];
@@ -56,20 +56,23 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
 
   const SortIcon = ({ col }: { col: SortKey }) =>
     sortKey === col ? (
-      sortDir === "asc" ? <span className="text-[10px] leading-none opacity-70">▲</span> : <span className="text-[10px] leading-none opacity-70">▼</span>
-    ) : null;
+      sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+    ) : (
+      <span className="w-3 h-3 inline-block" />
+    );
 
   return (
     <div className="space-y-3">
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="relative">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="חיפוש שם / תפקיד..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring transition-all duration-200"
+            className="w-full pr-9 pl-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
         <select
@@ -94,31 +97,27 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
           className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">כל הסטטוסים</option>
-          {["בבסיס", "בבית", "מחלה / גימלים", "פיצול", "שחרור", "אחר"].map((s) => (
+          {["בבסיס", "בבית", "מחלה / גימלים", "אחר"].map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
+      <div className="border border-border rounded-xl overflow-hidden card-shadow">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
+          <table className="w-full text-sm">
             <thead>
-              <tr className="bg-primary text-primary-foreground">
+              <tr className="gradient-hero text-primary-foreground">
                 {([
-                  { key: "name", label: "שם", className: "" },
-                  { key: "department", label: "מחלקה", className: "hidden sm:table-cell" },
-                  { key: "role", label: "תפקיד", className: "hidden md:table-cell" },
-                  { key: "status", label: "סטטוס", className: "" },
-                ] as { key: SortKey; label: string; className: string }[]).map(({ key, label, className }) => (
+                  { key: "name", label: "שם" },
+                  { key: "department", label: "מחלקה" },
+                  { key: "role", label: "תפקיד" },
+                  { key: "status", label: "סטטוס" },
+                ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
                   <th
                     key={key}
-                    className={cn(
-                      "text-right px-2 sm:px-4 py-3 font-bold cursor-pointer select-none hover:bg-white/10 transition-colors",
-                      className
-                    )}
-
+                    className="text-right px-4 py-3 font-bold cursor-pointer select-none hover:bg-white/10 transition-colors"
                     onClick={() => handleSort(key)}
                   >
                     <div className="flex items-center gap-1 justify-end">
@@ -142,20 +141,18 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                     key={`${r.name}-${idx}`}
                     className={cn(
                       "border-t border-border transition-colors hover:bg-muted/50",
-                      "odd:bg-muted/20 even:bg-card"
+                      idx % 2 === 0 ? "bg-card" : "bg-background"
                     )}
                   >
-                    <td className="px-2 sm:px-4 py-3 font-semibold">{r.name}</td>
-                    <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{r.department}</td>
-                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{r.role}</td>
-                    <td className="px-2 sm:px-4 py-3 text-right">
+                    <td className="px-4 py-3 font-semibold">{r.name}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{r.department}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{r.role}</td>
+                    <td className="px-4 py-3">
                       <StatusBadge status={r.status} />
                     </td>
-
                   </tr>
                 ))
               )}
-
             </tbody>
           </table>
         </div>

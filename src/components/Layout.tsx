@@ -1,7 +1,8 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck, Phone } from "lucide-react";
-import { cn } from "../lib/utils";
+import { Sun, Moon, FileText, Truck, Edit } from "lucide-react";
+import { cn } from "@/lib/utils";
+import PWAInstallButton from "./PWAInstallButton";
 
 export default function Layout() {
   const { theme, setTheme } = useTheme();
@@ -10,83 +11,80 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 gradient-hero header-accent-border shadow-card py-4">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <header className="sticky top-0 z-50 gradient-hero border-b border-primary/20 shadow-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <span className="text-xl font-black text-primary-foreground tracking-wide">
-                דוח-1
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-accent-foreground font-black text-lg shadow">
+                ד!
+              </div>
+              <span className="text-xl font-black text-primary-foreground tracking-wide hidden sm:block">
+                דוח!
               </span>
             </div>
 
             {/* Nav links */}
-            <nav className="flex items-center gap-4 py-1">
+            <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-2">
               <NavLink
                 to="/main"
                 className={({ isActive }) =>
                   cn(
-                    "text-sm font-bold transition-all duration-200 whitespace-nowrap",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
-                       ? "text-white underline underline-offset-8 decoration-white decoration-2"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                   )
                 }
               >
-                <span>דוח נוכחות</span>
+                <FileText className="w-4 h-4" />
+                <span className="hidden sm:inline">דוח נוכחות</span>
               </NavLink>
               <NavLink
                 to="/zama"
                 className={({ isActive }) =>
                   cn(
-                    "text-sm font-bold transition-all duration-200 whitespace-nowrap",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
-                       ? "text-white underline underline-offset-8 decoration-white decoration-2"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                   )
                 }
               >
-                <span>צמ&quot;ה</span>
-              </NavLink>
-              <NavLink
-                to="/contacts"
-                className={({ isActive }) =>
-                  cn(
-                    "text-sm font-bold transition-all duration-200 whitespace-nowrap",
-                    isActive
-                       ? "text-white underline underline-offset-8 decoration-white decoration-2"
-                      : "text-white/70 hover:text-white"
-                  )
-                }
-              >
-                <span>טלפונים</span>
+                <Truck className="w-4 h-4" />
+                <span className="hidden sm:inline">צמ&quot;ה</span>
               </NavLink>
               <a
-                href="update.html"
-                className="text-sm font-bold text-white/70 hover:text-white transition-all duration-200 whitespace-nowrap"
+                href="/3-979/update.html"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 whitespace-nowrap"
               >
-                עדכן נתונים
+                <Edit className="w-4 h-4" />
+                <span className="hidden sm:inline">עדכון נתונים</span>
               </a>
             </nav>
 
-            {/* Theme toggle & Mobile menu placeholder */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2">
+              {/* PWA Install Button */}
+              <div className="hidden md:block">
+                <PWAInstallButton />
+              </div>
+
+              {/* Theme toggle */}
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
-                  <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
-                )}
-              </button>
-            </div>
-
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
       {/* Page content */}
       <main className="flex-1">
@@ -94,22 +92,8 @@ export default function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-4 px-4 bg-muted/20">
-        <div className="container max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <div className="flex flex-col items-center md:items-start gap-1">
-            <span className="font-semibold text-foreground/80">דוח-1 — מערכת נוכחות יומי</span>
-            <span>כל הזכויות שמורות &copy; {new Date().getFullYear()}</span>
-          </div>
-
-          <div className="flex flex-col items-center md:items-center gap-1">
-            <span>ליצירת קשר: <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-all duration-200 underline decoration-primary/30 underline-offset-4">lip.avi@gmail.com</a></span>
-          </div>
-
-          <div className="flex flex-col items-center md:items-end gap-1">
-            <span>גרסה: 1.2.2</span>
-            <span>עדכון אחרון: {new Date().toLocaleDateString('he-IL')}</span>
-          </div>
-        </div>
+      <footer className="border-t border-border py-3 px-4 text-center text-xs text-muted-foreground">
+        <span>דוח! — מערכת נוכחות יומי</span>
       </footer>
     </div>
   );

@@ -16,14 +16,22 @@
     <div class="app-container">
         <header class="main-header">
             <div class="header-content">
-                <h1>דוח נוכחות - צמ"ה</h1>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="/3-979/" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+                        <div style="width: 2.5rem; height: 2.5rem; background: var(--accent-color); color: white; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; font-size: 1.2rem;">ד!</div>
+                        <span>דוח-1</span>
+                    </a>
+                    <h1>דוח נוכחות - צמ"ה</h1>
+                </div>
                 <div class="date-selector-wrapper">
-                    <label for="date-picker">בחר תאריך:</label>
+                    <button id="pwa-install-btn" class="theme-btn hidden" style="font-size: 0.8rem; font-weight: 800; padding: 0.5rem 1rem;">התקינו אפליקציה ⬇️</button>
+                    <label for="date-picker">תאריך:</label>
                     <input type="date" id="date-picker" class="glass-input">
                     <button id="theme-toggle" class="theme-btn" title="החלף מצב תצוגה">🌙</button>
                 </div>
             </div>
         </header>
+
 
         <main class="content-area">
             <div id="departments-container">
