@@ -61,7 +61,7 @@ export default function Layout() {
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
                       ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
                   )
                 }
               >
