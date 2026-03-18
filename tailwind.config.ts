@@ -78,6 +78,10 @@ export default {
           other: "hsl(var(--status-other))",
           "other-bg": "hsl(var(--status-other-bg))",
         },
+        overlay: {
+          DEFAULT: "hsl(var(--overlay-foreground))",
+          muted: "hsl(var(--overlay-foreground-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

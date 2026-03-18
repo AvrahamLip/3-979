@@ -15,11 +15,11 @@ export default function Layout() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-accent-foreground font-black text-lg shadow">
+            <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 group" aria-label="Go to home">
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-accent-foreground font-black text-lg shadow-md group-hover:shadow-accent/20">
                 ד!
               </div>
-              <span className="text-xl font-black text-primary-foreground tracking-wide hidden sm:block">
+              <span className="text-xl font-black text-overlay tracking-wide hidden sm:block">
                 דוח!
               </span>
             </Link>
@@ -33,7 +33,7 @@ export default function Layout() {
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
                       ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
                   )
                 }
               >
@@ -47,7 +47,7 @@ export default function Layout() {
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
                     isActive
                       ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
                   )
                 }
               >
@@ -70,7 +70,7 @@ export default function Layout() {
               </NavLink>
               <a
                 href="/3-979/update.html"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 whitespace-nowrap"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
               >
                 <Edit className="w-4 h-4" />
                 <span className="hidden sm:inline">עדכון נתונים</span>
@@ -84,13 +84,13 @@ export default function Layout() {
               {/* Theme toggle */}
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center justify-center w-9 h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
-                aria-label="Toggle theme"
+                className="flex items-center justify-center w-9 h-9 rounded-lg text-overlay/80 hover:text-overlay hover:bg-white/10 transition-all duration-200"
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {theme === "dark" ? (
-                  <Sun className="w-5 h-5" />
+                  <Sun className="w-5 h-5 transition-transform group-hover:rotate-12" />
                 ) : (
-                  <Moon className="w-5 h-5" />
+                  <Moon className="w-5 h-5 transition-transform group-hover:-rotate-12" />
                 )}
               </button>
             </div>

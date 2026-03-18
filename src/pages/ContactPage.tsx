@@ -46,10 +46,10 @@ export default function ContactPage() {
     <AuthGuard>
       <div className="container max-w-4xl mx-auto py-6 space-y-6 animate-fade-in">
         {/* Header Section */}
-        <div className="gradient-hero rounded-2xl p-6 sm:p-8 shadow-card text-primary-foreground relative overflow-hidden header-accent-border">
+        <div className="gradient-hero rounded-2xl p-6 sm:p-8 shadow-card text-overlay relative overflow-hidden header-accent-border">
           <div className="relative z-10">
             <h1 className="text-3xl sm:text-4xl font-black mb-2">אנשי קשר</h1>
-            <p className="text-primary-foreground/80 text-sm sm:text-base font-medium">
+            <p className="text-overlay/80 text-sm sm:text-base font-medium">
               חיפוש מהיר של טלפונים וקישורי וואטסאפ
             </p>
           </div>

@@ -35,7 +35,7 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
       <div className="bg-card border border-border rounded-xl p-5 card-shadow">
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg gradient-hero">
-            <Users className="w-4 h-4 text-primary-foreground" />
+            <Users className="w-4 h-4 text-overlay" />
           </div>
           <div>
             <h3 className="font-bold text-sm">סיכום כולל</h3>
@@ -99,7 +99,7 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
       <div className="bg-card border border-border rounded-xl p-5 card-shadow">
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg gradient-hero">
-            <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
+            <CheckCircle2 className="w-4 h-4 text-overlay" />
           </div>
           <div>
             <h3 className="font-bold text-sm">פירוט לפי תפקיד</h3>

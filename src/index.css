@@ -65,6 +65,10 @@
     --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%), hsl(216, 22%, 97%));
     --shadow-card: 0 2px 12px -2px hsl(213 55% 24% / 0.12), 0 1px 3px hsl(213 55% 24% / 0.08);
     --shadow-elevated: 0 8px 24px -4px hsl(213 55% 24% / 0.18), 0 2px 8px hsl(213 55% 24% / 0.10);
+
+    /* Text on gradients/dark backgrounds */
+    --overlay-foreground: 0 0% 100%;
+    --overlay-foreground-muted: 0 0% 100% / 0.7;
   }
 
   .dark {
@@ -99,15 +103,15 @@
     --input: 213 30% 20%;
     --ring: 38 96% 52%;
 
-    /* Status colors dark */
-    --status-base: 143 65% 45%;
-    --status-base-bg: 143 65% 12%;
-    --status-home: 213 75% 55%;
-    --status-home-bg: 213 75% 13%;
-    --status-sick: 0 72% 55%;
-    --status-sick-bg: 0 72% 12%;
-    --status-other: 215 14% 60%;
-    --status-other-bg: 215 14% 18%;
+    /* Status colors dark - more vibrant for accessibility */
+    --status-base: 142 76% 45%;
+    --status-base-bg: 142 76% 12%;
+    --status-home: 213 90% 65%;
+    --status-home-bg: 213 90% 15%;
+    --status-sick: 0 84% 60%;
+    --status-sick-bg: 0 84% 12%;
+    --status-other: 215 14% 70%;
+    --status-other-bg: 215 14% 20%;
 
     /* Sidebar */
     --sidebar-background: 213 45% 10%;
@@ -124,6 +128,10 @@
     --gradient-card: linear-gradient(145deg, hsl(213, 40%, 12%), hsl(213, 40%, 10%));
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.4), 0 1px 3px hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 8px 24px -4px hsl(0 0% 0% / 0.5), 0 2px 8px hsl(0 0% 0% / 0.4);
+
+    /* Text on gradients/dark backgrounds - gold in dark mode for contrast */
+    --overlay-foreground: 38 96% 75%;
+    --overlay-foreground-muted: 38 96% 75% / 0.7;
   }
 }
 

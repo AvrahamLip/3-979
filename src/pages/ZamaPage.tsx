@@ -123,7 +123,7 @@ function ZamaDeptSection({
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="gradient-hero text-primary-foreground text-right">
+                        <tr className="gradient-hero text-overlay text-right">
                           <th className="px-4 py-2.5 font-bold">שם</th>
                           <th className="px-4 py-2.5 font-bold">תפקיד</th>
                           <th className="px-4 py-2.5 font-bold">סטטוס</th>
@@ -188,10 +188,10 @@ export default function ZamaPage() {
       <div className="gradient-hero rounded-2xl p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-primary-foreground">
+            <h1 className="text-2xl sm:text-3xl font-black text-overlay">
               דוח נוכחות — צמ&quot;ה
             </h1>
-            <p className="text-primary-foreground/70 text-sm mt-1">
+            <p className="text-overlay/70 text-sm mt-1">
               {isLoading ? "טוען..." : `${totalRecords} אנשים ב-${ZAMA_DEPTS.length} יחידות`}
             </p>
           </div>
@@ -200,7 +200,8 @@ export default function ZamaPage() {
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-primary-foreground transition-colors disabled:opacity-50"
+              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-overlay transition-colors disabled:opacity-50"
+              aria-label="רענן"
               title="רענן"
             >
               <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
