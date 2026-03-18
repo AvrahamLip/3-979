@@ -31,9 +31,8 @@ function ZamaDeptSection({
 
   return (
     <div
-      className="bg-card border border-border rounded-2xl overflow-hidden card-shadow animate-fade-in"
-      style={{ animationDelay: `${index * 80}ms` }}
-    >
+      className="bg-card border border-border rounded-2xl overflow-hidden shadow-card animate-fade-in"
+      style={{ animationDelay: `${index * 80}ms` }}>
       {/* Dept Header */}
       <button
         className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors"
@@ -122,7 +121,7 @@ function ZamaDeptSection({
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="gradient-hero text-primary-foreground text-right">
+                        <tr className="bg-primary text-primary-foreground text-right font-bold">
                           <th className="px-4 py-2.5 font-bold">שם</th>
                           <th className="px-4 py-2.5 font-bold">תפקיד</th>
                           <th className="px-4 py-2.5 font-bold">סטטוס</th>
@@ -141,7 +140,7 @@ function ZamaDeptSection({
                               key={`${r.name}-${idx}`}
                               className={cn(
                                 "border-t border-border hover:bg-muted/40 transition-colors",
-                                idx % 2 === 0 ? "bg-card" : "bg-background"
+                                "odd:bg-muted/20 even:bg-card"
                               )}
                             >
                               <td className="px-4 py-2.5 font-semibold">{r.name}</td>
@@ -184,7 +183,7 @@ export default function ZamaPage() {
   return (
     <div className="container mx-auto py-6 space-y-6 animate-fade-in">
       {/* Page Header */}
-      <div className="gradient-hero rounded-2xl p-6 elevated-shadow">
+      <div className="gradient-hero rounded-2xl p-6 shadow-card header-accent-border">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-primary-foreground">
@@ -221,7 +220,7 @@ export default function ZamaPage() {
           <LegendCard />
 
           {/* Total Summary Section */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden card-shadow p-5 mb-6">
+          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card p-5 mb-6">
             <div className="flex items-center gap-2 mb-4 justify-end">
               <h2 className="text-lg font-black tracking-wide">סה״כ כללי צמ״ה</h2>
             </div>
