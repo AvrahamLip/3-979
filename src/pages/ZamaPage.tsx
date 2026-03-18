@@ -14,6 +14,7 @@ import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMe
 import { ChevronDown, ChevronUp, Building2, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
+import PWAInstallButton from "../components/PWAInstallButton";
 
 function ZamaDeptSection({
   deptName,
@@ -205,6 +206,11 @@ export default function ZamaPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* PWA Install Promo */}
+      <div className="flex justify-center">
+        <PWAInstallButton />
       </div>
 
       {isLoading && <LoadingOverlay />}

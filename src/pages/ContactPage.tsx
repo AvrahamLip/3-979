@@ -5,6 +5,7 @@ import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMe
 import { Search, Phone, MessageSquare, User, Filter } from "lucide-react";
 import { cn } from "../lib/utils";
 import AuthGuard from "../components/AuthGuard";
+import PWAInstallButton from "../components/PWAInstallButton";
 
 export default function ContactPage() {
   const [search, setSearch] = useState("");
@@ -54,6 +55,11 @@ export default function ContactPage() {
           </div>
           {/* Decorative background element */}
           <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+        </div>
+
+        {/* PWA Install Promo */}
+        <div className="flex justify-center">
+          <PWAInstallButton />
         </div>
 
         {/* Search & Filters */}
