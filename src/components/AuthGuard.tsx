@@ -52,10 +52,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
         if (res.status === 200) {
           const data = await res.json();
-          if (data.authorized) {
-            setIsAuthenticated(true);
-          } else {
+          // If the backend returns authorized: false explicitly, reject.
+          // Otherwise, if status is 200, we consider it authorized (matches update.html behavior)
+          if (data.authorized === false) {
             setError(data.error || "אין לך הרשאה לגשת לדף זה");
+          } else {
+            setIsAuthenticated(true);
           }
         } else if (res.status === 401 || res.status === 403) {
           setError("אין לך הרשאה לגשת לדף זה");
