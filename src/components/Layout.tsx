@@ -86,19 +86,19 @@ export default function Layout() {
               {/* Theme toggle */}
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
+                className="flex items-center justify-center w-9 h-9 rounded-lg text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-all duration-200"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
       {/* Page content */}
       <main className="flex-1">
@@ -109,9 +109,9 @@ export default function Layout() {
       <footer className="border-t border-border py-4 px-4 text-center text-xs text-muted-foreground bg-muted/30">
         <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-4 flex-wrap justify-center">
-            <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
+            <a href="mailto:[EMAIL_ADDRESS]" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
             <span className="opacity-30">|</span>
-            <a href="tel:0508853348" className="hover:text-primary transition-colors font-bold">050-8853348</a>
+            <a href="tel:[PHONE_NUMBER]" className="hover:text-primary transition-colors font-bold">[PHONE_NUMBER]</a>
             <span className="opacity-30">|</span>
             <span className="font-mono">גרסה 1.2.2</span>
           </div>
