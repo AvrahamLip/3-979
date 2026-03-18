@@ -108,8 +108,10 @@ export default function Layout() {
       {/* Footer */}
       <footer className="border-t border-border py-4 px-4 text-center text-xs text-muted-foreground bg-muted/30">
         <div className="flex flex-col items-center gap-2">
-          <div className="flex items-center gap-4">
-            <a href="https://wa.me/972545806654" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
+          <div className="flex items-center gap-4 flex-wrap justify-center">
+            <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
+            <span className="opacity-30">|</span>
+            <a href="tel:0508853348" className="hover:text-primary transition-colors font-bold">050-8853348</a>
             <span className="opacity-30">|</span>
             <span className="font-mono">גרסה 1.2.2</span>
           </div>
