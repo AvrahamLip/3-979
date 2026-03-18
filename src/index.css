@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +8,9 @@
 
 @layer base {
   :root {
+    font-family: 'Heebo', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
     /* Core palette - Light mode (Glassmorphic) */
     --background: 216 22% 97%;
     --foreground: 216 35% 12%;
