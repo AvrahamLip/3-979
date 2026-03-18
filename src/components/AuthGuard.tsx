@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { LoadingOverlay, ErrorMessage } from "./StatusMessages";
 import { cn } from "../lib/utils";
 
-const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate-email";
+const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
 const CLIENT_ID = "435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com";
 
 interface AuthGuardProps {
@@ -44,6 +44,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            email: parseJwt(response.credential)?.email,
+            role: "phone",
             credential: response.credential,
           }),
         });
