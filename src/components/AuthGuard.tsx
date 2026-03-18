@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { LoadingOverlay, ErrorMessage } from "./StatusMessages";
 import { cn } from "../lib/utils";
 
-const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
+const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate-email";
 const CLIENT_ID = "435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com";
 
 interface AuthGuardProps {
@@ -39,26 +39,23 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       setError(null);
       setIsLoading(true);
 
-      const payload = parseJwt(response.credential);
-      if (!payload || !payload.email) {
-        setError("שגיאה בפענוח נתוני המשתמש");
-        setIsLoading(false);
-        return;
-      }
-
       try {
         const res = await fetch(VALIDATE_API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email: payload.email,
-            roll: "phone",
+            credential: response.credential,
           }),
         });
 
         if (res.status === 200) {
-          setIsAuthenticated(true);
-        } else if (res.status === 401) {
+          const data = await res.json();
+          if (data.authorized) {
+            setIsAuthenticated(true);
+          } else {
+            setError(data.error || "אין לך הרשאה לגשת לדף זה");
+          }
+        } else if (res.status === 401 || res.status === 403) {
           setError("אין לך הרשאה לגשת לדף זה");
         } else {
           setError("שגיאת שרת בבדיקת ההרשאות");

@@ -4,26 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דוח-1 | פירוט שמי ועדכון</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
- :root {
-            /* Core palette - Light mode (Glassmorphic) */
+        :root {
+            /* Core palette - Doch! RTL Military Attendance */
             --background: 216 22% 97%;
             --foreground: 216 35% 12%;
-            --primary: 231 77% 62%;
+            --primary: 213 55% 24%;
             --primary-foreground: 0 0% 100%;
-            --accent: 262 83% 58%;
+            --accent: 38 96% 48%;
             --accent-foreground: 0 0% 100%;
-            --muted: 215 25% 95%;
+            --muted: 210 20% 94%;
             --muted-foreground: 215 16% 47%;
-            --border: 214 20% 88% / 0.5;
-            --card: 0 0% 100% / 0.85;
-            --radius: 1rem;
-            --gradient-hero: linear-gradient(135deg, #6366f1, #a855f7);
-            --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+            --border: 214 20% 88%;
+            --card: 0 0% 100%;
+            --radius: 0.75rem;
+            --gradient-hero: linear-gradient(135deg, hsl(213, 55%, 20%), hsl(213, 60%, 32%));
+            --shadow-card: 0 2px 12px -2px hsl(213 55% 24% / 0.12), 0 1px 3px hsl(213 55% 24% / 0.08);
+
+            /* Status colors */
+            --status-base: 143 65% 35%;
+            --status-base-bg: 143 65% 94%;
+            --status-home: 213 75% 40%;
+            --status-home-bg: 213 75% 93%;
+            --status-sick: 0 72% 50%;
+            --status-sick-bg: 0 72% 94%;
+            --status-other: 215 14% 55%;
+            --status-other-bg: 215 14% 92%;
         }
 
         body {
@@ -122,7 +135,7 @@
         input:focus {
             outline: none;
             border-color: hsl(var(--primary));
-            ring: 2px hsla(213, 55%, 24%, 0.1);
+            box-shadow: 0 0 0 2px hsla(213, 55%, 24%, 0.1);
         }
 
         /* Table styles */
@@ -167,20 +180,20 @@
         .status-select {
             padding: 0.25rem 0.5rem;
             border-radius: 9999px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.75rem;
             border: none;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .status-1 { background-color: #dcfce7; color: #15803d; } /* בבסיס */
-        .status-0 { background-color: #fef3c7; color: #b45309; } /* בבית */
-        .status-2 { background-color: #fee2e2; color: #b91c1c; } /* מחלה */
-        .status-4 { background-color: #fef3c7; color: #b45309; } /* פיצול */
-        .status-5 { background-color: #ede9fe; color: #6d28d9; } /* שחרור */
-        .status-3 { background-color: #f3f4f6; color: #4b5563; } /* אחר */
-        .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; } /* ריק */
+        .status-1 { background-color: hsl(var(--status-base-bg)); color: hsl(var(--status-base)); border: 1px solid hsla(var(--status-base), 0.2); }
+        .status-0 { background-color: hsl(var(--status-home-bg)); color: hsl(var(--status-home)); border: 1px solid hsla(var(--status-home), 0.2); }
+        .status-2 { background-color: hsl(var(--status-sick-bg)); color: hsl(var(--status-sick)); border: 1px solid hsla(var(--status-sick), 0.2); }
+        .status-4 { background-color: hsl(var(--status-home-bg)); color: hsl(var(--status-home)); border: 1px solid hsla(var(--status-home), 0.2); }
+        .status-5 { background-color: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
+        .status-3 { background-color: hsl(var(--status-other-bg)); color: hsl(var(--status-other)); border: 1px solid hsla(var(--status-other), 0.2); }
+        .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; }
 
         .save-btn {
             background: hsl(var(--accent));
@@ -208,11 +221,11 @@
         /* Auth styling */
         .auth-box {
             background: white;
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             border-radius: var(--radius);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
             text-align: center;
         }
 
@@ -220,22 +233,14 @@
             margin-top: 0;
             color: hsl(var(--primary));
             font-weight: 800;
+            margin-bottom: 0.5rem;
         }
 
-        .btn {
-            background: hsl(var(--primary));
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: calc(var(--radius) / 2);
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 1rem;
-            transition: transform 0.1s;
+        .auth-box p {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
         }
-
-        .btn:active { transform: scale(0.98); }
 
         /* Helpers */
         .hidden { display: none !important; }
@@ -261,6 +266,11 @@
         @media (max-width: 480px) {
             .card-header { flex-direction: column; align-items: stretch; }
             th:nth-child(2), td:nth-child(2) { display: none; }
+            th:nth-child(3), td:nth-child(3) { display: none; }
+            th:nth-child(1) { width: 55% !important; }
+            th:nth-child(4) { width: 45% !important; }
+            td { padding: 0.75rem 0.5rem; }
+            .status-select { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
         }
     </style>
 </head>
@@ -293,16 +303,20 @@
 
     <header class="hidden" id="main-header">
         <div class="header-content">
-            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                <h1>דוח-1 | עדכון פירוט שמי</h1>
-                <a href="index.html" style="color: white; text-decoration: none; font-size: 0.8rem; font-weight: 600; opacity: 0.8; display: flex; align-items: center; gap: 0.25rem;">
-                    <span>→</span> חזור לדוח הראשי
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="/3-979/" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+                    <div style="width: 2rem; height: 2rem; background: hsl(var(--accent)); color: white; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem;">ד!</div>
+                    <span>דוח-1</span>
                 </a>
+                <h1>עדכון פירוט שמי</h1>
             </div>
-            <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
-                <span id="user-name"></span>
-                <span style="opacity: 0.6;">|</span>
-                <span>מחובר</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button id="pwa-install-btn" class="hidden" style="background: white; color: hsl(var(--primary)); border: none; padding: 0.4rem 1rem; border-radius: 2rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">התקן אפליקציה ⬇️</button>
+                <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
+                    <span id="user-name"></span>
+                    <span style="opacity: 0.6;">|</span>
+                    <span>מחובר</span>
+                </div>
             </div>
         </div>
     </header>
@@ -330,10 +344,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 30%;">שם</th>
+                            <th style="width: 35%;">שם</th>
                             <th style="width: 25%;">מחלקה</th>
                             <th style="width: 20%;">תפקיד</th>
-                            <th style="width: 25%;">סטטוס</th>
+                            <th style="width: 20%;">סטטוס</th>
                         </tr>
                     </thead>
                     <tbody id="attendance-body">
@@ -349,6 +363,19 @@
             </div>
         </div>
     </main>
+
+    <footer style="border-top: 1px solid hsl(var(--border)); padding: 1.5rem 1rem; text-align: center; font-size: 0.75rem; color: hsl(var(--muted-foreground)); background: hsl(var(--muted) / 0.3); margin-top: 2rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: center;">
+                <a href="mailto:lip.avi@gmail.com" style="color: inherit; font-weight: bold; text-decoration: underline; text-decoration-style: dotted;">צור קשר</a>
+                <span style="opacity: 0.3;">|</span>
+                <a href="tel:0508853348" style="color: inherit; font-weight: bold;">050-8853348</a>
+                <span style="opacity: 0.3;">|</span>
+                <span>גרסה 1.2.2</span>
+            </div>
+            <span>דוח! — מערכת נוכחות יומי</span>
+        </div>
+    </footer>
 
     <script>
         const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
@@ -407,7 +434,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         email: payload.email,
-                        roll: "update"
+                        role: "update",
+                        credential: response.credential
                     })
                 });
 
@@ -468,7 +496,7 @@
             if (v === "0") return "0";  // בבית
             if (v === "2" || v === "גימלים") return "2"; // מחלה
             if (v === "4" || v === "פיצול") return "4"; // פיצול
-            if (v === "5" || v === "שוחרר" || v === "שחרור" || v === "שחרורר") return "5"; // שחרור
+            if (v === "5" || v === "שוחרר" || v === "שחרור") return "5"; // שחרור
             if (v === "") return "empty"; // ריק
             return "3"; // אחר
         }
@@ -495,7 +523,7 @@
                 if (!nameValid) return false;
                 
                 const matchesSearch = r.name.toLowerCase().includes(query) || 
-                                    (r.role && r.role.toLowerCase().includes(query));
+                                     (r.role && r.role.toLowerCase().includes(query));
                 const matchesDept = !selectedDept || r.department === selectedDept;
 
                 return matchesSearch && matchesDept;
@@ -512,8 +540,6 @@
 
             filtered.forEach((record, index) => {
                 const tr = document.createElement('tr');
-                
-                // Use todayValue from API (normalized to our 0-3 codes)
                 const currentCode = normalizeStatus(record.todayValue);
                 
                 tr.innerHTML = `
@@ -545,8 +571,6 @@
                 select.addEventListener('change', (e) => {
                     const newStatus = e.target.value;
                     e.target.className = `status-select status-${newStatus}`;
-                    
-                    // Show save button if changed from original
                     if (newStatus !== currentCode) {
                         saveBtn.classList.add('visible');
                     } else {
@@ -555,7 +579,6 @@
                 });
 
                 saveBtn.addEventListener('click', () => updateStatus(record.name, select.value, index));
-
                 attendanceBody.appendChild(tr);
             });
         }
@@ -563,13 +586,10 @@
         async function updateStatus(name, code, index) {
             const feedback = document.getElementById(`feedback-${index}`);
             const select = document.querySelector(`select[data-name="${name}"]`);
-            
-            // Map numeric codes back to text values for specific statuses
             let finalStatus = code;
             if (code === "4") finalStatus = "פיצול";
             if (code === "5") finalStatus = "שחרור";
 
-            // UI Update
             select.className = `status-select status-${code}`;
             feedback.innerHTML = '<div class="loading-spinner"></div>';
 
@@ -585,7 +605,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 if (response.ok) {
                     feedback.innerHTML = '<span class="success-flash">✓</span>';
                     const saveBtn = document.querySelector(`.save-btn[data-index="${index}"]`);
@@ -603,6 +622,29 @@
             const [year, month, day] = isoDate.split("-");
             return `${day}/${month}/${year}`;
         }
+
+        // PWA Install Logic
+        let deferredPrompt;
+        const pwaBtn = document.getElementById('pwa-install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            pwaBtn.classList.remove('hidden');
+        });
+
+        pwaBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    pwaBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            } else {
+                alert('כדי להתקין: לחץ על 3 הנקודות בדפדפן ובחר "התקן אפליקציה"');
+            }
+        });
     </script>
 </body>
 </html>

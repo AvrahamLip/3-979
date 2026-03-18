@@ -4,7 +4,7 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --text-color: #f8fafc;
   --text-muted: #94a3b8;
-  --primary-glow: #3896f0;
+  --primary-glow: #1e40af;
   --secondary-glow: #fbbf24;
   --accent-color: #fbbf24;
   --success: #15803d;
@@ -13,7 +13,7 @@
   --font-family: 'Heebo', 'Assistant', sans-serif;
 
   /* Navy palette */
-  --primary-navy: #0f172a;
+  --primary-navy: #1e3a8a;
   --accent-amber: #fbbf24;
 }
 
@@ -30,8 +30,8 @@ body.light-mode {
 
 body.light-mode .background-glow {
   background:
-    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+    radial-gradient(circle at 20% 20%, rgba(30, 58, 138, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 40%);
 }
 
 body.light-mode .glass-card {
@@ -49,7 +49,7 @@ body.light-mode tr:hover td {
 }
 
 body.light-mode .total-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.08), rgba(245, 158, 11, 0.08));
 }
 
 body.light-mode .glass-input {
@@ -104,8 +104,8 @@ body {
   height: 100%;
   z-index: -1;
   background:
-    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+    radial-gradient(circle at 20% 20%, rgba(30, 58, 138, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 40%);
 }
 
 .app-container {
@@ -133,7 +133,7 @@ body {
 h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(to right, #818cf8, #c084fc);
+  background: linear-gradient(to right, #1e3a8a, #f59e0b);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -558,8 +558,8 @@ tr:hover td {
 
 /* Total Card */
 .total-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
-  border-color: rgba(129, 140, 248, 0.3);
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.15), rgba(245, 158, 11, 0.15));
+  border-color: rgba(30, 58, 138, 0.3);
 }
 
 .total-of {
