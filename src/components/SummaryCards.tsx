@@ -32,10 +32,10 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Total Company Card */}
-      <div className="bg-card border border-border rounded-xl p-5 card-shadow">
+      <div className="bg-card border border-border rounded-xl p-5 shadow-card">
         <div className="flex items-center gap-2 mb-4">
           <div>
-            <h3 className="font-bold text-sm">סיכום כולל</h3>
+            <h3 className="font-bold text-base text-primary">סיכום כולל</h3>
             <p className="text-xs text-muted-foreground">
               {totalCounts["בבסיס"]}/{totalCounts.total} בבסיס
             </p>
@@ -75,10 +75,10 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
       </div>
 
       {/* Roles Breakdown Card */}
-      <div className="bg-card border border-border rounded-xl p-5 card-shadow">
+      <div className="bg-card border border-border rounded-xl p-5 shadow-card">
         <div className="flex items-center gap-2 mb-4">
           <div>
-            <h3 className="font-bold text-sm">פירוט לפי תפקיד</h3>
+            <h3 className="font-bold text-base text-primary">פירוט לפי תפקיד</h3>
             <p className="text-xs text-muted-foreground">{roles.length} תפקידים</p>
           </div>
         </div>

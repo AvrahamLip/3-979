@@ -101,11 +101,11 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
       </div>
 
       {/* Table */}
-      <div className="border border-border rounded-xl overflow-hidden card-shadow">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="gradient-hero text-primary-foreground">
+              <tr className="bg-primary text-primary-foreground">
                 {([
                   { key: "name", label: "שם", className: "" },
                   { key: "department", label: "מחלקה", className: "hidden sm:table-cell" },
@@ -142,7 +142,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                     key={`${r.name}-${idx}`}
                     className={cn(
                       "border-t border-border transition-colors hover:bg-muted/50",
-                      idx % 2 === 0 ? "bg-card" : "bg-background"
+                      "odd:bg-muted/20 even:bg-card"
                     )}
                   >
                     <td className="px-2 sm:px-4 py-3 font-semibold">{r.name}</td>

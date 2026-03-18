@@ -45,7 +45,7 @@ export default function ContactPage() {
     <AuthGuard>
       <div className="container mx-auto py-6 space-y-6 animate-fade-in">
         {/* Header Section */}
-        <div className="gradient-hero rounded-3xl p-6 sm:p-8 elevated-shadow text-primary-foreground relative overflow-hidden">
+        <div className="gradient-hero rounded-2xl p-6 sm:p-8 shadow-card text-primary-foreground relative overflow-hidden header-accent-border">
           <div className="relative z-10">
             <h1 className="text-3xl sm:text-4xl font-black mb-2">אנשי קשר</h1>
             <p className="text-primary-foreground/80 text-sm sm:text-base font-medium">
@@ -57,13 +57,13 @@ export default function ContactPage() {
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-card/50 backdrop-blur-md border border-border rounded-2xl p-4 card-shadow sticky top-20 z-40 transition-all duration-300">
+        <div className="bg-card border border-border rounded-2xl p-4 shadow-card sticky top-20 z-40 transition-all duration-300">
           <div className="relative group">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               placeholder="חפש לפי שם, מספר אישי או תפקיד..."
-              className="w-full h-12 pr-12 pl-4 rounded-xl bg-background/50 border border-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200 font-medium"
+              className="w-full h-12 pr-12 pl-4 rounded-xl bg-background border border-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200 font-medium"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -94,7 +94,7 @@ export default function ContactPage() {
             {contacts.map((contact, idx) => (
               <div
                 key={`${contact.name}-${idx}`}
-                className="group bg-card hover:bg-card/80 border border-border hover:border-primary/30 rounded-2xl p-5 card-shadow transition-all duration-300 animate-fade-in-up"
+                className="group bg-card border border-border hover:border-primary/30 rounded-2xl p-5 shadow-card transition-all duration-300 animate-fade-in-up"
                 style={{ animationDelay: `${idx * 30}ms` }}
               >
                 <div className="flex items-start justify-between mb-4">

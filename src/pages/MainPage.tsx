@@ -29,7 +29,7 @@ export default function MainPage() {
   return (
     <div className="container mx-auto py-6 space-y-6 animate-fade-in">
       {/* Page Header */}
-      <div className="gradient-hero rounded-2xl p-6 elevated-shadow">
+      <div className="gradient-hero rounded-2xl p-6 shadow-card">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-primary-foreground">

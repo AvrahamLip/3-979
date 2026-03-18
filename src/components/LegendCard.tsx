@@ -40,7 +40,7 @@ const STATUS_INFO: Record<
 
 export default function LegendCard() {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 card-shadow">
+    <div className="bg-card border border-border rounded-xl p-4 shadow-card">
       <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
         מקרא סטטוסים
       </h3>

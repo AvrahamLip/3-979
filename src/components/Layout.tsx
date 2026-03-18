@@ -10,7 +10,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 gradient-hero border-b border-primary/20 shadow-lg">
+      <header className="sticky top-0 z-50 gradient-hero header-accent-border shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
