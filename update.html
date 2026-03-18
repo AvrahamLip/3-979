@@ -1,32 +1,29 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דוח-1 | פירוט שמי ועדכון</title>
-    <link rel="manifest" href="manifest.webmanifest">
-
-    <meta name="theme-color" content="#ffffff">
-    <link rel="apple-touch-icon" href="/3-979/icon-192.png">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
-        :root {
+ :root {
+            /* Core palette - Light mode (Glassmorphic) */
             --background: 216 22% 97%;
             --foreground: 216 35% 12%;
-            --primary: 213 55% 24%;
+            --primary: 231 77% 62%;
             --primary-foreground: 0 0% 100%;
-            --accent: 38 96% 48%;
+            --accent: 262 83% 58%;
             --accent-foreground: 0 0% 100%;
-            --muted: 210 20% 94%;
+            --muted: 215 25% 95%;
             --muted-foreground: 215 16% 47%;
-            --border: 214 20% 88%;
-            --card: 0 0% 100%;
-            --radius: 0.75rem;
-            --gradient-hero: linear-gradient(135deg, hsl(213, 55%, 20%), hsl(213, 60%, 32%));
-            --shadow-card: 0 2px 12px -2px hsl(213 55% 24% / 0.12), 0 1px 3px hsl(213 55% 24% / 0.08);
+            --border: 214 20% 88% / 0.5;
+            --card: 0 0% 100% / 0.85;
+            --radius: 1rem;
+            --gradient-hero: linear-gradient(135deg, #6366f1, #a855f7);
+            --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
         }
 
         body {
@@ -125,6 +122,7 @@
         input:focus {
             outline: none;
             border-color: hsl(var(--primary));
+            ring: 2px hsla(213, 55%, 24%, 0.1);
         }
 
         /* Table styles */
@@ -177,11 +175,11 @@
         }
 
         .status-1 { background-color: #dcfce7; color: #15803d; } /* בבסיס */
-        .status-0 { background-color: #dbeafe; color: #1d4ed8; } /* בבית */
+        .status-0 { background-color: #fef3c7; color: #b45309; } /* בבית */
         .status-2 { background-color: #fee2e2; color: #b91c1c; } /* מחלה */
+        .status-4 { background-color: #fef3c7; color: #b45309; } /* פיצול */
+        .status-5 { background-color: #ede9fe; color: #6d28d9; } /* שחרור */
         .status-3 { background-color: #f3f4f6; color: #4b5563; } /* אחר */
-        .status-4 { background-color: #fef9c3; color: #854d0e; } /* פיצול */
-        .status-5 { background-color: #f5f3ff; color: #5b21b6; } /* שוחרר */
         .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; } /* ריק */
 
         .save-btn {
@@ -210,11 +208,11 @@
         /* Auth styling */
         .auth-box {
             background: white;
-            padding: 2.5rem 2rem;
+            padding: 2rem;
             border-radius: var(--radius);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
             text-align: center;
         }
 
@@ -222,20 +220,22 @@
             margin-top: 0;
             color: hsl(var(--primary));
             font-weight: 800;
-            margin-bottom: 0.5rem;
         }
 
-        .auth-box p {
-            color: hsl(var(--muted-foreground));
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        #google-login-btn {
-            display: flex;
-            justify-content: center;
+        .btn {
+            background: hsl(var(--primary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: calc(var(--radius) / 2);
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
             margin-top: 1rem;
+            transition: transform 0.1s;
         }
+
+        .btn:active { transform: scale(0.98); }
 
         /* Helpers */
         .hidden { display: none !important; }
@@ -261,11 +261,6 @@
         @media (max-width: 480px) {
             .card-header { flex-direction: column; align-items: stretch; }
             th:nth-child(2), td:nth-child(2) { display: none; }
-            th:nth-child(3), td:nth-child(3) { display: none; }
-            th:nth-child(1) { width: 55% !important; }
-            th:nth-child(4) { width: 45% !important; }
-            td { padding: 0.75rem 0.5rem; }
-            .status-select { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
         }
     </style>
 </head>
@@ -298,7 +293,12 @@
 
     <header class="hidden" id="main-header">
         <div class="header-content">
-            <h1>דוח-1 | עדכון פירוט שמי</h1>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <h1>דוח-1 | עדכון פירוט שמי</h1>
+                <a href="index.html" style="color: white; text-decoration: none; font-size: 0.8rem; font-weight: 600; opacity: 0.8; display: flex; align-items: center; gap: 0.25rem;">
+                    <span>→</span> חזור לדוח הראשי
+                </a>
+            </div>
             <div id="user-info" style="font-size: 0.75rem; opacity: 0.9; display: flex; align-items: center; gap: 0.5rem;">
                 <span id="user-name"></span>
                 <span style="opacity: 0.6;">|</span>
@@ -330,10 +330,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 35%;">שם</th>
+                            <th style="width: 30%;">שם</th>
                             <th style="width: 25%;">מחלקה</th>
                             <th style="width: 20%;">תפקיד</th>
-                            <th style="width: 20%;">סטטוס</th>
+                            <th style="width: 25%;">סטטוס</th>
                         </tr>
                     </thead>
                     <tbody id="attendance-body">
@@ -468,7 +468,7 @@
             if (v === "0") return "0";  // בבית
             if (v === "2" || v === "גימלים") return "2"; // מחלה
             if (v === "4" || v === "פיצול") return "4"; // פיצול
-            if (v === "5" || v === "שוחרר") return "5"; // שוחרר
+            if (v === "5" || v === "שוחרר" || v === "שחרור" || v === "שחרורר") return "5"; // שחרור
             if (v === "") return "empty"; // ריק
             return "3"; // אחר
         }
@@ -530,7 +530,7 @@
                                 <option value="0" ${currentCode === "0" ? "selected" : ""}>בבית</option>
                                 <option value="2" ${currentCode === "2" ? "selected" : ""}>מחלה</option>
                                 <option value="4" ${currentCode === "4" ? "selected" : ""}>פיצול</option>
-                                <option value="5" ${currentCode === "5" ? "selected" : ""}>שוחרר</option>
+                                <option value="5" ${currentCode === "5" ? "selected" : ""}>שחרור</option>
                                 <option value="3" ${currentCode === "3" ? "selected" : ""}>אחר</option>
                             </select>
                             <button class="save-btn" data-index="${index}">שמור</button>
@@ -567,7 +567,7 @@
             // Map numeric codes back to text values for specific statuses
             let finalStatus = code;
             if (code === "4") finalStatus = "פיצול";
-            if (code === "5") finalStatus = "שוחרר";
+            if (code === "5") finalStatus = "שחרור";
 
             // UI Update
             select.className = `status-select status-${code}`;
