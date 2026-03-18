@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useLocation, Link } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Sun, Moon, FileText, Truck, Edit, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,14 +15,14 @@ export default function Layout() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
               <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-accent-foreground font-black text-lg shadow">
                 ד!
               </div>
               <span className="text-xl font-black text-primary-foreground tracking-wide hidden sm:block">
                 דוח!
               </span>
-            </div>
+            </Link>
 
             {/* Nav links */}
             <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-2">
@@ -79,9 +79,7 @@ export default function Layout() {
 
             <div className="flex items-center gap-2">
               {/* PWA Install Button */}
-              <div className="hidden md:block">
-                <PWAInstallButton />
-              </div>
+              <PWAInstallButton variant="header" />
 
               {/* Theme toggle */}
               <button
@@ -109,9 +107,9 @@ export default function Layout() {
       <footer className="border-t border-border py-4 px-4 text-center text-xs text-muted-foreground bg-muted/30">
         <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-4 flex-wrap justify-center">
-            <a href="mailto:[EMAIL_ADDRESS]" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
+            <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
             <span className="opacity-30">|</span>
-            <a href="tel:[PHONE_NUMBER]" className="hover:text-primary transition-colors font-bold">[PHONE_NUMBER]</a>
+            <a href="tel:050-88533548" className="hover:text-primary transition-colors font-bold">050-0000000</a>
             <span className="opacity-30">|</span>
             <span className="font-mono">גרסה 1.2.2</span>
           </div>

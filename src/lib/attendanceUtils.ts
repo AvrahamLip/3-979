@@ -33,9 +33,10 @@ export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
   return raw
     .filter((r) => r.name && r.name.trim() !== "")
     .map((r) => ({
-      name: r.name.trim(),
+      name: r.name ? r.name.trim() : "",
       department: (r.department ?? "").trim(),
       role: (r.role ?? "").trim(),
+      personalNumber: String(r.personalNumber ?? ""),
       todayValue: String(r.todayValue ?? ""),
       status: normalizeStatus(r.todayValue),
     }));

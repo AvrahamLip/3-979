@@ -623,28 +623,7 @@
             return `${day}/${month}/${year}`;
         }
 
-        // PWA Install Logic
-        let deferredPrompt;
-        const pwaBtn = document.getElementById('pwa-install-btn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            pwaBtn.classList.remove('hidden');
-        });
-
-        pwaBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    pwaBtn.classList.add('hidden');
-                }
-                deferredPrompt = null;
-            } else {
-                alert('כדי להתקין: לחץ על 3 הנקודות בדפדפן ובחר "התקן אפליקציה"');
-            }
-        });
     </script>
+    <script src="pwa-helper.js"></script>
 </body>
 </html>

@@ -117,24 +117,37 @@ export default function ContactPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60 bg-muted px-2 py-1 rounded-md">
-                    #{contact.personalNumber}
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground/80 bg-muted/50 px-2 py-1 rounded-lg">
+                    <Phone className="w-3 h-3" />
+                    <span>{contact.personalNumber ? formatPhone(contact.personalNumber) : "ללא מספר"}</span>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
                   <a
-                    href={`tel:${formatPhone(contact.personalNumber)}`}
-                    className="flex-1 h-11 flex items-center justify-center gap-2 rounded-xl bg-secondary text-secondary-foreground font-bold text-sm hover:bg-secondary/80 transition-all active:scale-95"
+                    href={contact.personalNumber ? `tel:${formatPhone(contact.personalNumber)}` : "#"}
+                    onClick={(e) => !contact.personalNumber && e.preventDefault()}
+                    className={cn(
+                      "flex-1 h-11 flex items-center justify-center gap-2 rounded-xl font-bold text-sm transition-all active:scale-95",
+                      contact.personalNumber 
+                        ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" 
+                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                    )}
                   >
                     <Phone className="w-4 h-4" />
                     <span>שיחה</span>
                   </a>
                   <a
-                    href={getWhatsAppLink(contact.personalNumber)}
-                    target="_blank"
+                    href={contact.personalNumber ? getWhatsAppLink(contact.personalNumber) : "#"}
+                    target={contact.personalNumber ? "_blank" : undefined}
                     rel="noopener noreferrer"
-                    className="flex-1 h-11 flex items-center justify-center gap-2 rounded-xl bg-status-base text-white font-bold text-sm hover:opacity-90 transition-all active:scale-95 shadow-sm shadow-status-base/20"
+                    onClick={(e) => !contact.personalNumber && e.preventDefault()}
+                    className={cn(
+                      "flex-1 h-11 flex items-center justify-center gap-2 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-sm",
+                      contact.personalNumber
+                        ? "bg-status-base text-white hover:opacity-90 shadow-status-base/20"
+                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                    )}
                   >
                     <MessageSquare className="w-4 h-4" />
                     <span>WhatsApp</span>

@@ -4,6 +4,7 @@ export interface RawRecord {
   name: string;
   department: string;
   role: string;
+  personalNumber: string | number;
   todayValue: string | number;
 }
 
@@ -11,6 +12,7 @@ export interface AttendanceRecord {
   name: string;
   department: string;
   role: string;
+  personalNumber: string;
   todayValue: string;
   status: StatusType;
 }

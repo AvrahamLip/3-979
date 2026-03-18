@@ -43,31 +43,6 @@ themeToggle.addEventListener('click', () => {
 const today = new Date().toISOString().split('T')[0];
 datePicker.value = today;
 
-// ── PWA Install Logic ─────────────────────────────────────────
-let deferredPrompt;
-const pwaBtn = document.getElementById('pwa-install-btn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  if (pwaBtn) pwaBtn.classList.remove('hidden');
-});
-
-if (pwaBtn) {
-  pwaBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        pwaBtn.classList.add('hidden');
-      }
-      deferredPrompt = null;
-    } else {
-      alert('כדי להתקין: לחץ על 3 הנקודות בדפדפן ובחר "התקן אפליקציה"');
-    }
-  });
-}
-
 datePicker.addEventListener('change', (e) => {
   if (e.target.value) loadAllDepartments(e.target.value);
 });
