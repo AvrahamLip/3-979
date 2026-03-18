@@ -16,9 +16,8 @@ function DeptCard({ dept, index }: { dept: DepartmentStats; index: number }) {
 
   return (
     <div
-      className="bg-card border border-border rounded-xl overflow-hidden card-shadow animate-fade-in"
-      style={{ animationDelay: `${index * 50}ms` }}
-    >
+      className="bg-card border border-border rounded-xl overflow-hidden shadow-card animate-fade-in"
+      style={{ animationDelay: `${index * 50}ms` }}>
       {/* Header */}
       <button
         className="w-full flex items-center justify-between p-4 hover:bg-muted/40 transition-colors"

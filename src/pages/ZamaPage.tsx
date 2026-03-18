@@ -182,7 +182,7 @@ export default function ZamaPage() {
     Object.values(data).every((recs) => recs.length === 0);
 
   return (
-    <div className="container mx-auto py-6 space-y-6 animate-fade-in">
+    <div className="container max-w-4xl mx-auto py-6 space-y-6 animate-fade-in">
       {/* Page Header */}
       <div className="gradient-hero rounded-2xl p-6 shadow-card header-accent-border">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

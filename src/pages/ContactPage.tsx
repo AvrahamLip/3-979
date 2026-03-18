@@ -44,7 +44,7 @@ export default function ContactPage() {
 
   return (
     <AuthGuard>
-      <div className="container mx-auto py-6 space-y-6 animate-fade-in">
+      <div className="container max-w-4xl mx-auto py-6 space-y-6 animate-fade-in">
         {/* Header Section */}
         <div className="gradient-hero rounded-2xl p-6 sm:p-8 shadow-card text-primary-foreground relative overflow-hidden header-accent-border">
           <div className="relative z-10">
