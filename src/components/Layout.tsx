@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck, Edit } from "lucide-react";
+import { Sun, Moon, FileText, Truck, Edit, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "./PWAInstallButton";
 
@@ -53,6 +53,20 @@ export default function Layout() {
               >
                 <Truck className="w-4 h-4" />
                 <span className="hidden sm:inline">צמ&quot;ה</span>
+              </NavLink>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                  )
+                }
+              >
+                <Phone className="w-4 h-4" />
+                <span className="hidden sm:inline">טלפונים</span>
               </NavLink>
               <a
                 href="/3-979/update.html"

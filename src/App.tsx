@@ -7,6 +7,8 @@ import Layout from "./components/Layout";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
 
+import ContactPage from "./pages/ContactPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -27,12 +29,14 @@ const App = () => (
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="/main" element={<MainPage />} />
             <Route path="/zama" element={<ZamaPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
+
 
 
 export default App;
