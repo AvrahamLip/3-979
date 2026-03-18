@@ -109,7 +109,7 @@ export default function Layout() {
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-1">
-            <span>גרסה: 1.2.1</span>
+            <span>גרסה: 1.2.2</span>
             <span>עדכון אחרון: {new Date().toLocaleDateString('he-IL')}</span>
           </div>
         </div>
