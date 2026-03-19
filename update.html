@@ -571,12 +571,20 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         email: payload.email,
-                        role: "update",
+                        roll: "update",
                         credential: response.credential
                     })
                 });
 
                 if (res.status === 200) {
+                    const data = await res.json();
+                    // If backend sends 'authorized: false' explicitly
+                    if (data.authorized === false) {
+                        authError.textContent = data.error || 'אין לך הרשאה לגשת לדף זה';
+                        authError.classList.remove('hidden');
+                        return;
+                    }
+                    
                     authOverlay.classList.add('hidden');
                     mainHeader.classList.remove('hidden');
                     document.getElementById('sub-header').classList.remove('hidden');
