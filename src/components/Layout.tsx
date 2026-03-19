@@ -24,58 +24,60 @@ export default function Layout() {
               </span>
             </Link>
 
-            {/* Nav links */}
-            <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-2">
-              <NavLink
-                to="/main"
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">דוח נוכחות</span>
-              </NavLink>
-              <NavLink
-                to="/zama"
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <Truck className="w-4 h-4" />
-                <span className="hidden sm:inline">צמ&quot;ה</span>
-              </NavLink>
-              <NavLink
-                to="/contact"
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <Phone className="w-4 h-4" />
-                <span className="hidden sm:inline">טלפונים</span>
-              </NavLink>
-              <a
-                href="/3-979/update.html"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
-              >
-                <Edit className="w-4 h-4" />
-                <span className="hidden sm:inline">עדכון נתונים</span>
-              </a>
-            </nav>
+            {/* Nav links - Only show on main page */}
+            { (location.pathname === "/main" || location.pathname === "/") && (
+              <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-2">
+                <NavLink
+                  to="/main"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
+                >
+                  <FileText className="w-4 h-4" />
+                  <span className="hidden sm:inline">דוח נוכחות</span>
+                </NavLink>
+                <NavLink
+                  to="/zama"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
+                >
+                  <Truck className="w-4 h-4" />
+                  <span className="hidden sm:inline">צמ&quot;ה</span>
+                </NavLink>
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="hidden sm:inline">טלפונים</span>
+                </NavLink>
+                <a
+                  href="/3-979/update.html"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span className="hidden sm:inline">עדכון נתונים</span>
+                </a>
+              </nav>
+            )}
 
             <div className="flex items-center gap-2">
               {/* PWA Install Button */}
