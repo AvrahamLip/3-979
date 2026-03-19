@@ -45,7 +45,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: parseJwt(response.credential)?.email,
-            roll: "phone", // Changed from role to roll to match backend
+            role: "phone",
             credential: response.credential,
           }),
         });

@@ -60,11 +60,11 @@ describe("AuthGuard", () => {
     
     await handleCredentialResponse({ credential: dummyToken });
 
-    // Verify fetch was called with "roll"
+    // Verify fetch was called with "role"
     expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("webhook/validate"),
         expect.objectContaining({
-            body: expect.stringContaining('"roll":"phone"')
+            body: expect.stringContaining('"role":"phone"')
         })
     );
     
