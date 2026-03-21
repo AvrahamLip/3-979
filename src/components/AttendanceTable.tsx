@@ -8,7 +8,7 @@ interface AttendanceTableProps {
   records: AttendanceRecord[];
 }
 
-type SortKey = "name" | "department" | "role" | "status";
+type SortKey = "name" | "department" | "role" | "status" | "vacationStatus";
 
 export default function AttendanceTable({ records }: AttendanceTableProps) {
   const [search, setSearch] = useState("");
@@ -43,6 +43,13 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
     return [...out].sort((a, b) => {
       const va = a[sortKey] ?? "";
       const vb = b[sortKey] ?? "";
+
+      if (sortKey === "vacationStatus") {
+        const na = Number(va || 0);
+        const nb = Number(vb || 0);
+        return sortDir === "asc" ? na - nb : nb - na;
+      }
+
       return sortDir === "asc"
         ? String(va).localeCompare(String(vb), "he")
         : String(vb).localeCompare(String(va), "he");
@@ -113,6 +120,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                   { key: "name", label: "שם" },
                   { key: "department", label: "מחלקה" },
                   { key: "role", label: "תפקיד" },
+                  { key: "vacationStatus", label: "% בית" },
                   { key: "status", label: "סטטוס" },
                 ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
                   <th
@@ -131,7 +139,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-10 text-muted-foreground">
+                  <td colSpan={5} className="text-center py-10 text-muted-foreground">
                     לא נמצאו תוצאות
                   </td>
                 </tr>
@@ -147,6 +155,33 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                     <td className="px-4 py-3 font-semibold">{r.name}</td>
                     <td className="px-4 py-3 text-muted-foreground">{r.department}</td>
                     <td className="px-4 py-3 text-muted-foreground">{r.role}</td>
+                    <td className="px-4 py-3 font-medium text-center">
+                      {r.vacationStatus != null && r.vacationStatus !== "" ? (() => {
+                        const raw = Number(r.vacationStatus);
+                        const pct = Math.round(raw * 100);
+                        return (
+                          <div className="flex flex-col items-center gap-1">
+                            <span className={cn(
+                              "text-xs px-1.5 py-0.5 rounded-full bg-muted/50",
+                              pct > 80 ? "text-red-600 font-bold" : "text-foreground"
+                            )}>
+                              {pct}%
+                            </span>
+                            <div className="w-12 h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
+                              <div 
+                                className={cn(
+                                  "h-full rounded-full",
+                                  pct > 80 ? "bg-red-500" : "bg-primary/60"
+                                )} 
+                                style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} 
+                              />
+                            </div>
+                          </div>
+                        );
+                      })() : (
+                        <span className="text-muted-foreground/30">-</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={r.status} />
                     </td>

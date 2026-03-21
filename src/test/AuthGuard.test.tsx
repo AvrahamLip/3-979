@@ -86,14 +86,37 @@ describe("AuthGuard", () => {
     // Mock 401 Unauthorized
     (global.fetch as any).mockResolvedValueOnce({
       status: 401,
-      json: async () => ({ authorized: false }),
+      json: async () => ({}),
     });
 
     const dummyToken = "header.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0=.signature";
     await handleCredentialResponse({ credential: dummyToken });
 
     await waitFor(() => {
-        expect(screen.getByText(/אין לך הרשאה לגשת לדף זה/i)).toBeInTheDocument();
+        expect(screen.getByText(/קוד: 401/i)).toBeInTheDocument();
+    });
+  });
+
+  it("should show error on 200 response with authorized: false", async () => {
+    render(
+      <AuthGuard>
+        <div data-testid="protected-content">Protected content</div>
+      </AuthGuard>
+    );
+
+    const handleCredentialResponse = (window as any).handleCredentialResponse;
+
+    // Mock 200 OK but authorized: false
+    (global.fetch as any).mockResolvedValueOnce({
+      status: 200,
+      json: async () => ({ authorized: false, error: "תפקיד שגוי" }),
+    });
+
+    const dummyToken = "header.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0=.signature";
+    await handleCredentialResponse({ credential: dummyToken });
+
+    await waitFor(() => {
+        expect(screen.getByText(/תפקיד שגוי/i)).toBeInTheDocument();
     });
   });
 });

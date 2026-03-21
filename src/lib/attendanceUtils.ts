@@ -39,6 +39,7 @@ export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
       personalNumber: String(r.personalNumber ?? ""),
       todayValue: String(r.todayValue ?? ""),
       status: normalizeStatus(r.todayValue),
+      vacationStatus: r.VacationStatus,
     }));
 }
 

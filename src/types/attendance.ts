@@ -6,6 +6,7 @@ export interface RawRecord {
   role: string;
   personalNumber: string | number;
   todayValue: string | number;
+  VacationStatus?: number | string;
 }
 
 export interface AttendanceRecord {
@@ -15,6 +16,7 @@ export interface AttendanceRecord {
   personalNumber: string;
   todayValue: string;
   status: StatusType;
+  vacationStatus?: number | string;
 }
 
 export interface StatusCounts {
