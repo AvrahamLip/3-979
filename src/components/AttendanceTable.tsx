@@ -83,12 +83,12 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
           {pct}%
         </span>
         <div className="w-10 h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
-          <div 
+          <div
             className={cn(
               "h-full rounded-full",
               pct > 80 ? "bg-red-500" : "bg-primary/60"
-            )} 
-            style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} 
+            )}
+            style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
           />
         </div>
       </div>
@@ -199,22 +199,22 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
         </div>
       </div>
 
-      {/* Mobile Card Layout */}
-      <div className="md:hidden space-y-2">
+      {/* Mobile Compact List */}
+      <div className="md:hidden">
         {/* Sort control for mobile */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-muted-foreground font-semibold">מיון:</span>
+        <div className="flex items-center gap-1.5 flex-wrap mb-2">
+          <span className="text-[11px] text-muted-foreground font-semibold">מיון:</span>
           {([
             { key: "name" as SortKey, label: "שם" },
             { key: "department" as SortKey, label: "מחלקה" },
             { key: "status" as SortKey, label: "סטטוס" },
-            { key: "vacationStatus" as SortKey, label: "% בית" },
+            { key: "vacationStatus" as SortKey, label: "%" },
           ]).map(({ key, label }) => (
             <button
               key={key}
               onClick={() => handleSort(key)}
               className={cn(
-                "text-xs px-2 py-1 rounded-md border transition-colors",
+                "text-[11px] px-1.5 py-0.5 rounded border transition-colors",
                 sortKey === key
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-muted/50 text-muted-foreground border-border hover:bg-muted"
@@ -222,42 +222,47 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
             >
               {label}
               {sortKey === key && (
-                <span className="mr-0.5">{sortDir === "asc" ? " ↑" : " ↓"}</span>
+                <span className="mr-0.5">{sortDir === "asc" ? "↑" : "↓"}</span>
               )}
             </button>
           ))}
         </div>
 
         {filtered.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground bg-card border border-border rounded-xl">
+          <div className="text-center py-8 text-muted-foreground bg-card border border-border rounded-xl text-sm">
             לא נמצאו תוצאות
           </div>
         ) : (
-          filtered.map((r, idx) => (
-            <div
-              key={`mobile-${r.name}-${idx}`}
-              className={cn(
-                "bg-card border border-border rounded-xl p-3 card-shadow transition-colors",
-                idx % 2 === 0 ? "bg-card" : "bg-background"
-              )}
-            >
-              {/* Row 1: Name + Status */}
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <StatusBadge status={r.status} size="sm" />
-                <span className="font-bold text-sm truncate flex-1 text-right">{r.name}</span>
+          <div className="border border-border rounded-xl overflow-hidden card-shadow">
+            {filtered.map((r, idx) => (
+              <div
+                key={`mobile-${r.name}-${idx}`}
+                className={cn(
+                  "flex items-center gap-2 px-2.5 py-1.5",
+                  idx > 0 && "border-t border-border",
+                  idx % 2 === 0 ? "bg-card" : "bg-background"
+                )}
+              >
+                {/* RTL order: Name first (rightmost in RTL) → Dept → Role → % → Status (leftmost) */}
+                <span className="font-semibold text-sm truncate flex-1 text-right">{r.name}</span>
+                <span className="text-[11px] text-muted-foreground truncate max-w-16 shrink-0 text-center">{r.department}</span>
+                <span className="text-[11px] text-muted-foreground truncate max-w-14 shrink-0 text-center">{r.role}</span>
+                <span className={cn(
+                  "text-[11px] w-8 text-center shrink-0",
+                  r.vacationStatus != null && r.vacationStatus !== "" && Math.round(Number(r.vacationStatus) * 100) > 80
+                    ? "text-red-600 font-bold"
+                    : "text-muted-foreground"
+                )}>
+                  {r.vacationStatus != null && r.vacationStatus !== ""
+                    ? `${Math.round(Number(r.vacationStatus) * 100)}%`
+                    : "-"}
+                </span>
+                <StatusBadge status={r.status} size="sm" showIcon={false} />
               </div>
-              {/* Row 2: Details */}
-              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                <VacationDisplay value={r.vacationStatus} />
-                <div className="flex items-center gap-2 flex-wrap justify-end">
-                  <span className="bg-muted/50 px-1.5 py-0.5 rounded">{r.role}</span>
-                  <span className="bg-muted/50 px-1.5 py-0.5 rounded">{r.department}</span>
-                </div>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
-        <div className="text-center text-xs text-muted-foreground py-2">
+        <div className="text-center text-[11px] text-muted-foreground py-1.5">
           מציג {filtered.length} מתוך {records.length} רשומות
         </div>
       </div>
