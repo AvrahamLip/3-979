@@ -39,7 +39,7 @@ export default function DatePickerBar({ value, onChange, label }: DatePickerBarP
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted transition-colors"
           >
             <Calendar className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold min-w-[180px] text-center">
+            <span className="text-xs sm:text-sm font-semibold text-center">
               {display}
             </span>
           </button>

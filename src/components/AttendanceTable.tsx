@@ -68,11 +68,38 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
       <span className="w-3 h-3 inline-block" />
     );
 
+  const VacationDisplay = ({ value }: { value: string | number | null | undefined }) => {
+    if (value == null || value === "") {
+      return <span className="text-muted-foreground/30">-</span>;
+    }
+    const raw = Number(value);
+    const pct = Math.round(raw * 100);
+    return (
+      <div className="flex items-center gap-1.5">
+        <span className={cn(
+          "text-xs px-1.5 py-0.5 rounded-full bg-muted/50",
+          pct > 80 ? "text-red-600 font-bold" : "text-foreground"
+        )}>
+          {pct}%
+        </span>
+        <div className="w-10 h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
+          <div 
+            className={cn(
+              "h-full rounded-full",
+              pct > 80 ? "bg-red-500" : "bg-primary/60"
+            )} 
+            style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} 
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-3">
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-        <div className="relative">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="relative col-span-2 sm:col-span-1">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -110,8 +137,8 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="border border-border rounded-xl overflow-hidden card-shadow">
+      {/* Desktop Table - hidden on mobile */}
+      <div className="hidden md:block border border-border rounded-xl overflow-hidden card-shadow">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -156,31 +183,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
                     <td className="px-4 py-3 text-muted-foreground">{r.department}</td>
                     <td className="px-4 py-3 text-muted-foreground">{r.role}</td>
                     <td className="px-4 py-3 font-medium text-center">
-                      {r.vacationStatus != null && r.vacationStatus !== "" ? (() => {
-                        const raw = Number(r.vacationStatus);
-                        const pct = Math.round(raw * 100);
-                        return (
-                          <div className="flex flex-col items-center gap-1">
-                            <span className={cn(
-                              "text-xs px-1.5 py-0.5 rounded-full bg-muted/50",
-                              pct > 80 ? "text-red-600 font-bold" : "text-foreground"
-                            )}>
-                              {pct}%
-                            </span>
-                            <div className="w-12 h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
-                              <div 
-                                className={cn(
-                                  "h-full rounded-full",
-                                  pct > 80 ? "bg-red-500" : "bg-primary/60"
-                                )} 
-                                style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} 
-                              />
-                            </div>
-                          </div>
-                        );
-                      })() : (
-                        <span className="text-muted-foreground/30">-</span>
-                      )}
+                      <VacationDisplay value={r.vacationStatus} />
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={r.status} />
@@ -192,6 +195,69 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
           </table>
         </div>
         <div className="border-t border-border px-4 py-2 bg-muted/30 text-xs text-muted-foreground text-left">
+          מציג {filtered.length} מתוך {records.length} רשומות
+        </div>
+      </div>
+
+      {/* Mobile Card Layout */}
+      <div className="md:hidden space-y-2">
+        {/* Sort control for mobile */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-muted-foreground font-semibold">מיון:</span>
+          {([
+            { key: "name" as SortKey, label: "שם" },
+            { key: "department" as SortKey, label: "מחלקה" },
+            { key: "status" as SortKey, label: "סטטוס" },
+            { key: "vacationStatus" as SortKey, label: "% בית" },
+          ]).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => handleSort(key)}
+              className={cn(
+                "text-xs px-2 py-1 rounded-md border transition-colors",
+                sortKey === key
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-muted/50 text-muted-foreground border-border hover:bg-muted"
+              )}
+            >
+              {label}
+              {sortKey === key && (
+                <span className="mr-0.5">{sortDir === "asc" ? " ↑" : " ↓"}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="text-center py-10 text-muted-foreground bg-card border border-border rounded-xl">
+            לא נמצאו תוצאות
+          </div>
+        ) : (
+          filtered.map((r, idx) => (
+            <div
+              key={`mobile-${r.name}-${idx}`}
+              className={cn(
+                "bg-card border border-border rounded-xl p-3 card-shadow transition-colors",
+                idx % 2 === 0 ? "bg-card" : "bg-background"
+              )}
+            >
+              {/* Row 1: Name + Status */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <StatusBadge status={r.status} size="sm" />
+                <span className="font-bold text-sm truncate flex-1 text-right">{r.name}</span>
+              </div>
+              {/* Row 2: Details */}
+              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                <VacationDisplay value={r.vacationStatus} />
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  <span className="bg-muted/50 px-1.5 py-0.5 rounded">{r.role}</span>
+                  <span className="bg-muted/50 px-1.5 py-0.5 rounded">{r.department}</span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+        <div className="text-center text-xs text-muted-foreground py-2">
           מציג {filtered.length} מתוך {records.length} רשומות
         </div>
       </div>

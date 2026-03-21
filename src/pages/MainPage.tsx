@@ -26,9 +26,9 @@ export default function MainPage() {
   const departments = useMemo(() => buildDepartmentStats(records), [records]);
 
   return (
-    <div className="container mx-auto py-6 space-y-6 animate-fade-in">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 animate-fade-in">
       {/* Page Header */}
-      <div className="gradient-hero rounded-2xl p-6 elevated-shadow">
+      <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-overlay">

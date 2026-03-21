@@ -44,11 +44,11 @@ export default function ContactPage() {
 
   return (
     <AuthGuard>
-      <div className="container max-w-4xl mx-auto py-6 space-y-6 animate-fade-in">
+      <div className="container max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 animate-fade-in">
         {/* Header Section */}
-        <div className="gradient-hero rounded-2xl p-6 sm:p-8 shadow-card text-overlay relative overflow-hidden header-accent-border">
+        <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-card text-overlay relative overflow-hidden header-accent-border">
           <div className="relative z-10">
-            <h1 className="text-3xl sm:text-4xl font-black mb-2">אנשי קשר</h1>
+            <h1 className="text-2xl sm:text-4xl font-black mb-2">אנשי קשר</h1>
             <p className="text-overlay/80 text-sm sm:text-base font-medium">
               חיפוש מהיר של טלפונים וקישורי וואטסאפ
             </p>
@@ -63,7 +63,7 @@ export default function ContactPage() {
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-card border border-border rounded-2xl p-4 shadow-card sticky top-20 z-40 transition-all duration-300">
+        <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-card sticky top-14 sm:top-20 z-40 transition-all duration-300">
           <div className="relative group">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
@@ -100,7 +100,7 @@ export default function ContactPage() {
             {contacts.map((contact, idx) => (
               <div
                 key={`${contact.name}-${idx}`}
-                className="group bg-card border border-border hover:border-primary/30 rounded-2xl p-5 shadow-card transition-all duration-300 animate-fade-in-up"
+                className="group bg-card border border-border hover:border-primary/30 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-card transition-all duration-300 animate-fade-in-up"
                 style={{ animationDelay: `${idx * 30}ms` }}
               >
                 <div className="flex items-start justify-between mb-4">

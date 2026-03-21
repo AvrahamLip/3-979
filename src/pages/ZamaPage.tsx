@@ -31,12 +31,12 @@ function ZamaDeptSection({
 
   return (
     <div
-      className="bg-card border border-border rounded-2xl overflow-hidden card-shadow animate-fade-in"
+      className="bg-card border border-border rounded-xl sm:rounded-2xl overflow-hidden card-shadow animate-fade-in"
       style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Dept Header */}
       <button
-        className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors"
+        className="w-full flex items-center justify-between p-3 sm:p-5 hover:bg-muted/30 transition-colors"
         onClick={() => setOpen((v) => !v)}
       >
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -80,7 +80,7 @@ function ZamaDeptSection({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <div className="p-5 border-t border-border space-y-5">
+            <div className="p-3 sm:p-5 border-t border-border space-y-4 sm:space-y-5">
               {/* Overview counts */}
               <div>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
@@ -183,9 +183,9 @@ export default function ZamaPage() {
     Object.values(data).every((recs) => recs.length === 0);
 
   return (
-    <div className="container mx-auto py-6 space-y-6 animate-fade-in">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 animate-fade-in">
       {/* Page Header */}
-      <div className="gradient-hero rounded-2xl p-6 elevated-shadow">
+      <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-overlay">
