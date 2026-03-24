@@ -185,6 +185,10 @@
     box-shadow: var(--shadow-elevated);
   }
 
+  .elevated-shadow-left {
+    box-shadow: 4px 0 12px -4px hsl(213 55% 24% / 0.15);
+  }
+
   .gradient-hero {
     background: var(--gradient-hero);
   }

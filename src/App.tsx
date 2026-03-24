@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
+import WorkPlanPage from "./pages/WorkPlanPage";
 
 import ContactPage from "./pages/ContactPage";
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/main" element={<MainPage />} />
             <Route path="/zama" element={<ZamaPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/workplan" element={<WorkPlanPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

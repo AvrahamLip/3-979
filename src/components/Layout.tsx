@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, useLocation, Link } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X } from "lucide-react";
+import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "./PWAInstallButton";
 
@@ -10,7 +10,7 @@ export default function Layout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const showNav = location.pathname === "/main" || location.pathname === "/";
+  const showNav = location.pathname === "/main" || location.pathname === "/" || location.pathname === "/workplan";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -58,6 +58,20 @@ export default function Layout() {
                 >
                   <Truck className="w-4 h-4" />
                   <span>צמ&quot;ה</span>
+                </NavLink>
+                <NavLink
+                  to="/workplan"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  <span>תוכנית עבודה</span>
                 </NavLink>
                 <NavLink
                   to="/contact"
@@ -145,6 +159,21 @@ export default function Layout() {
               >
                 <Truck className="w-5 h-5" />
                 <span>צמ&quot;ה</span>
+              </NavLink>
+              <NavLink
+                to="/workplan"
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                  )
+                }
+              >
+                <CalendarDays className="w-5 h-5" />
+                <span>תוכנית עבודה</span>
               </NavLink>
               <NavLink
                 to="/contact"
