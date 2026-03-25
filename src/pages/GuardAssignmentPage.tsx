@@ -616,7 +616,9 @@ export default function GuardAssignmentPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-overlay">שיבוץ שוויוני (ניקוד)</h1>
-              <p className="text-overlay/70 text-sm mt-0.5">חפ"ק = 3 | לילה = 2 | יום = 1</p>
+              <p className="text-overlay/70 text-sm mt-0.5">
+                {isAuthenticated ? 'חפ"ק = 3 | לילה = 2 | יום = 1' : 'רשימת שמירות ושיבוצי חפ"ק'}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -693,49 +695,53 @@ export default function GuardAssignmentPage() {
             </div>
 
             {/* Burden Ledger (Top 10) */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
-              <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
-                <h3 className="font-black text-sm flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  טבלת עומס (ניקוד מצטבר)
-                </h3>
-                <button onClick={handleResetHistory} title="אפס הכל" className="text-muted-foreground hover:text-red-500 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="p-1 max-h-[600px] overflow-y-auto">
-                {sortedHistory.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-muted-foreground">אין נתונים היסטוריים</div>
-                ) : (
-                  sortedHistory.map((p) => (
-                    <div key={p.name} className="flex items-center justify-between p-2.5 border-b border-border last:border-0">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{p.name}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {p.isPermanent ? "מהגליון" : "בסשן זה"}
+            {isAuthenticated && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
+                <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                  <h3 className="font-black text-sm flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    טבלת עומס (ניקוד מצטבר)
+                  </h3>
+                  <button onClick={handleResetHistory} title="אפס הכל" className="text-muted-foreground hover:text-red-500 transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-1 max-h-[600px] overflow-y-auto">
+                  {sortedHistory.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-muted-foreground">אין נתונים היסטוריים</div>
+                  ) : (
+                    sortedHistory.map((p) => (
+                      <div key={p.name} className="flex items-center justify-between p-2.5 border-b border-border last:border-0">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{p.name}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {p.isPermanent ? "מהגליון" : "בסשן זה"}
+                          </span>
+                        </div>
+                        <span className={cn(
+                          "text-xs font-bold px-2 py-0.5 rounded-full",
+                          p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
+                        )}>
+                          {p.total} נק'
                         </span>
                       </div>
-                      <span className={cn(
-                        "text-xs font-bold px-2 py-0.5 rounded-full",
-                        p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
-                      )}>
-                        {p.total} נק'
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
-              <div className="flex gap-2 text-primary">
-                <Info className="w-5 h-5 shrink-0" />
-                <div className="text-xs space-y-1">
-                  <p className="font-bold">איך זה עובד?</p>
-                  <p>המערכת מחשבת מי שמר הכי פחות לפי הניקוד המצטבר ומתעדפת אותו בשיבוץ הבא.</p>
+                    ))
+                  )}
                 </div>
               </div>
-            </div>
+            )}
+
+            {isAuthenticated && (
+              <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                <div className="flex gap-2 text-primary">
+                  <Info className="w-5 h-5 shrink-0" />
+                  <div className="text-xs space-y-1">
+                    <p className="font-bold">איך זה עובד?</p>
+                    <p>המערכת מחשבת מי שמר הכי פחות לפי הניקוד המצטבר ומתעדפת אותו בשיבוץ הבא.</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Assignments */}
@@ -815,7 +821,7 @@ export default function GuardAssignmentPage() {
                     <tr className="text-right">
                       <th className="px-5 py-3 font-black text-muted-foreground">שעה</th>
                       <th className="px-5 py-3 font-black text-muted-foreground">שומר</th>
-                      {!isExporting && <th className="px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
+                      {(!isExporting && isAuthenticated) && <th className="px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -842,7 +848,7 @@ export default function GuardAssignmentPage() {
                             readonly={!isAuthenticated}
                           />
                         </td>
-                        {!isExporting && (
+                        {(!isExporting && isAuthenticated) && (
                           <td className="px-5 py-3">
                             <span className={cn(
                               "text-[10px] px-2 py-0.5 rounded-full font-bold",
