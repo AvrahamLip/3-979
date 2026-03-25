@@ -1,0 +1,516 @@
+{
+  "name": "Guard Assignment API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "save-guards",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        3024,
+        912
+      ],
+      "id": "66819d26-aa56-41b2-9e90-38cab0b7be4c",
+      "name": "Webhook Save",
+      "webhookId": "31f085b7-a07c-44a7-b8c4-75f90f2a3a98"
+    },
+    {
+      "parameters": {
+        "path": "load-guards",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        2352,
+        496
+      ],
+      "id": "c468441e-d48f-4555-96bc-e2e3a1666d6f",
+      "name": "Webhook Load",
+      "webhookId": "e5cdf848-4f9f-414e-8de5-ce165d67e6ec"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2067761001,
+          "mode": "list",
+          "cachedResultName": "שיבוץ שמירות",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI/edit#gid=2067761001"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2576,
+        496
+      ],
+      "id": "e6edcb1f-b9ad-4857-92ec-6777208bb211",
+      "name": "Read Assignments",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gc1kEdz83WlO5i4v",
+          "name": "Google Sheets MP 3 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const queryDate = $('Webhook Load').first().json.query.date;\n\nconst norm = (s) => {\n  if (!s) return \"\";\n  const parts = String(s).split('/');\n  if (parts.length < 3) return String(s);\n  const d = parseInt(parts[0]);\n  const m = parseInt(parts[1]);\n  let y = String(parts[2]).trim();\n  if (y.length === 4) y = y.slice(-2);\n  return `${d}/${m}/${y}`;\n};\n\nconst qNorm = norm(queryDate);\nconst match = $input.all().find(item => {\n  const rowDate = item.json.date || item.json[\"תאריך\"] || item.json[\"Date\"];\n  return norm(rowDate) === qNorm;\n});\n\nif (match) {\n  let assignment = match.json.assignment || match.json[\"שיבוץ\"] || match.json[\"Assignment\"];\n  \n  if (typeof assignment === 'string' && assignment.trim() !== '') {\n    try { \n      assignment = JSON.parse(assignment); \n    } catch(e) {\n      assignment = { error: \"invalid_json_in_sheet\", raw: assignment };\n    }\n  }\n\n  return [{ json: (typeof assignment === 'object' && assignment !== null) ? assignment : { data: assignment } }];\n} else {\n  return [{ json: { status: \"not_found\", requested_date: queryDate } }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        496
+      ],
+      "id": "8126dba6-ba92-4d74-a2ea-445a1ea1eca4",
+      "name": "Filter by Date"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.assignment || $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3024,
+        496
+      ],
+      "id": "d6595091-8795-484a-9f44-14646aeded85",
+      "name": "Respond Load"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "confirm-guards",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        2352,
+        720
+      ],
+      "id": "f0802a36-16c4-4612-8aa3-690493f3c4fc",
+      "name": "Webhook Confirm",
+      "webhookId": "e6a50bb8-0b1f-424c-91b7-5db373af70a4"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2067761001,
+          "mode": "list",
+          "cachedResultName": "שיבוץ שמירות",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI/edit#gid=2067761001"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "תאריך": "={{ $json.body.date }}",
+            "שיבוץ": "={{ $json.body.assignment }}"
+          },
+          "matchingColumns": [
+            "תאריך"
+          ],
+          "schema": [
+            {
+              "id": "תאריך",
+              "displayName": "תאריך",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "שיבוץ",
+              "displayName": "שיבוץ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3248,
+        912
+      ],
+      "id": "bb5b031a-1491-4ded-8b65-de7d80e47fba",
+      "name": "Append Assignment",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gc1kEdz83WlO5i4v",
+          "name": "Google Sheets MP 3 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const { updates } = $input.first().json.body;\n// updates is expected to be array of { name: string, points_to_add: number }\nreturn updates.map(u => ({ json: u }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        720
+      ],
+      "id": "bc343ad1-1f53-40fa-b786-c5bd411ae675",
+      "name": "Prepare Updates"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\":\"success\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3472,
+        816
+      ],
+      "id": "d9cabede-6b6a-4523-9af6-2eeb5b7719ad",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2800,
+        1136
+      ],
+      "id": "6f536d51-7434-4007-a680-728aca7d4e5e",
+      "name": "Respond Load1"
+    },
+    {
+      "parameters": {
+        "path": "hapak-eligible",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        2352,
+        1136
+      ],
+      "id": "f1660638-e730-47e7-b83c-4af79e4ac2ff",
+      "name": "Webhook hapak",
+      "webhookId": "a5281f20-e2a8-4a09-9053-501574b658c7"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 173918376,
+          "mode": "list",
+          "cachedResultName": "חפקים",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI/edit#gid=173918376"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "a:f"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2576,
+        1136
+      ],
+      "id": "ca55b3e0-d283-4d6e-883a-5ce305f5ccc5",
+      "name": "Get hapak-eligible",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gc1kEdz83WlO5i4v",
+          "name": "Google Sheets MP 3 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1351842338,
+          "mode": "list",
+          "cachedResultName": "יומן פעילות",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wKMVEUvH2WldLqESaIDHztikf0e5c9i2LgwcyFifqzI/edit#gid=1351842338"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "תאריך": "={{ $json.date }}",
+            "שם": "={{ $json.name }}",
+            "תפקיד": "={{ $json.role }}",
+            "סוג משימה": "={{ $json.type }}",
+            "שעות": "={{ $json.hours }}",
+            "ניקוד": "={{ $json.points }}"
+          },
+          "matchingColumns": [
+            "תאריך",
+            "שם"
+          ],
+          "schema": [
+            {
+              "id": "תאריך",
+              "displayName": "תאריך",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "שם",
+              "displayName": "שם",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "תפקיד",
+              "displayName": "תפקיד",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "סוג משימה",
+              "displayName": "סוג משימה",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "שעות",
+              "displayName": "שעות",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ניקוד",
+              "displayName": "ניקוד",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2800,
+        720
+      ],
+      "id": "2f009bb6-c680-489b-92f9-31aebd40bf8f",
+      "name": "Append Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gc1kEdz83WlO5i4v",
+          "name": "Google Sheets MP 3 979"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Save": {
+      "main": [
+        [
+          {
+            "node": "Append Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Load": {
+      "main": [
+        [
+          {
+            "node": "Read Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Assignments": {
+      "main": [
+        [
+          {
+            "node": "Filter by Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter by Date": {
+      "main": [
+        [
+          {
+            "node": "Respond Load",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Confirm": {
+      "main": [
+        [
+          {
+            "node": "Prepare Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Assignment": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Updates": {
+      "main": [
+        [
+          {
+            "node": "Append Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook hapak": {
+      "main": [
+        [
+          {
+            "node": "Get hapak-eligible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get hapak-eligible": {
+      "main": [
+        [
+          {
+            "node": "Respond Load1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Log": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "68d17d5a-91fd-4dee-80c8-ba00b078c3c4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3d58c928056a8a686ed6f51eff3debe7d6dc6b96afa5deea546dcfb5b172f4fa"
+  },
+  "id": "YNRTHrb8a4uPgFyz",
+  "tags": []
+}

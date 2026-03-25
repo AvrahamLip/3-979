@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, useLocation, Link } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays } from "lucide-react";
+import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "./PWAInstallButton";
 
@@ -10,7 +10,7 @@ export default function Layout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const showNav = location.pathname === "/main" || location.pathname === "/" || location.pathname === "/workplan";
+  const showNav = location.pathname === "/main" || location.pathname === "/" || location.pathname === "/workplan" || location.pathname === "/guards";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -72,6 +72,20 @@ export default function Layout() {
                 >
                   <CalendarDays className="w-4 h-4" />
                   <span>תוכנית עבודה</span>
+                </NavLink>
+                <NavLink
+                  to="/guards"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>שיבוץ שמירות</span>
                 </NavLink>
                 <NavLink
                   to="/contact"
@@ -174,6 +188,21 @@ export default function Layout() {
               >
                 <CalendarDays className="w-5 h-5" />
                 <span>תוכנית עבודה</span>
+              </NavLink>
+              <NavLink
+                to="/guards"
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                  )
+                }
+              >
+                <Shield className="w-5 h-5" />
+                <span>שיבוץ שמירות</span>
               </NavLink>
               <NavLink
                 to="/contact"

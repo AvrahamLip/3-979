@@ -7,6 +7,7 @@ export interface RawRecord {
   personalNumber: string | number;
   todayValue: string | number;
   VacationStatus?: number | string;
+  burdenPoints?: number | string;
 }
 
 export interface AttendanceRecord {
@@ -17,6 +18,7 @@ export interface AttendanceRecord {
   todayValue: string;
   status: StatusType;
   vacationStatus?: number | string;
+  burdenPoints?: number;
 }
 
 export interface StatusCounts {

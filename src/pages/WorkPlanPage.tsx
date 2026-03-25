@@ -4,9 +4,13 @@ import { formatDateForApi, processRecords, getTodayIso } from "@/lib/attendanceU
 import type { AttendanceRecord, StatusType } from "@/types/attendance";
 import StatusBadge from "@/components/StatusBadge";
 import { LoadingOverlay } from "@/components/StatusMessages";
-import { CalendarDays, RefreshCw, Search, Users, Building2, Briefcase } from "lucide-react";
+import { CalendarDays, RefreshCw, Search, Users, Building2, Briefcase, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DatePickerBar from "@/components/DatePickerBar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
@@ -91,7 +95,7 @@ export default function WorkPlanPage() {
   const [baseDate, setBaseDate] = useState(getTodayIso());
   const [search, setSearch] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusType | "">("");
 
   const days: DayInfo[] = useMemo(
@@ -164,8 +168,8 @@ export default function WorkPlanPage() {
       // 2. Dept
       if (deptFilter && basic.department !== deptFilter) return false;
 
-      // 3. Role
-      if (roleFilter && basic.role !== roleFilter) return false;
+      // 3. Role (Multi-select)
+      if (roleFilter.length > 0 && !roleFilter.includes(basic.role)) return false;
 
       // 4. Status (Check if person has this status on the anchor day)
       if (statusFilter) {
@@ -239,15 +243,63 @@ export default function WorkPlanPage() {
         </div>
 
         <div className="relative">
-          <Briefcase className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full pr-9 pl-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring appearance-none"
-          >
-            <option value="">כל התפקידים</option>
-            {roles.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-between text-sm font-normal pr-9",
+                  roleFilter.length === 0 && "text-muted-foreground"
+                )}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Briefcase className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  {roleFilter.length === 0
+                    ? "כל התפקידים"
+                    : roleFilter.length === 1
+                    ? roleFilter[0]
+                    : `${roleFilter.length} תפקידים`}
+                </div>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+              <ScrollArea className="h-[300px] p-2">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 px-1 py-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-[11px] px-2 w-full justify-start"
+                      onClick={() => setRoleFilter([])}
+                    >
+                      נקה בחירה
+                    </Button>
+                  </div>
+                  <div className="h-px bg-border mx-1" />
+                  {roles.map((r) => (
+                    <div
+                      key={r}
+                      className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer"
+                      onClick={() => {
+                        setRoleFilter(prev =>
+                          prev.includes(r)
+                            ? prev.filter((it) => it !== r)
+                            : [...prev, r]
+                        );
+                      }}
+                    >
+                      <Checkbox
+                        checked={roleFilter.includes(r)}
+                        onCheckedChange={() => {}} // handled by div click for better mobile UX
+                      />
+                      <span className="text-xs truncate">{r}</span>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="relative">

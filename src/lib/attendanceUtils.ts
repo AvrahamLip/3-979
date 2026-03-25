@@ -16,9 +16,12 @@ export function normalizeStatus(value: string | number | undefined | null): Stat
 }
 
 export function formatDateForApi(isoDate: string): string {
-  // YYYY-MM-DD → DD/MM/YYYY
-  const [year, month, day] = isoDate.split("-");
-  return `${day}/${month}/${year}`;
+  // YYYY-MM-DD → D/M/YY
+  const date = new Date(isoDate);
+  const d = date.getDate();
+  const m = date.getMonth() + 1;
+  const y = String(date.getFullYear()).slice(-2);
+  return `${d}/${m}/${y}`;
 }
 
 export function getTodayIso(): string {
@@ -40,6 +43,7 @@ export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
       todayValue: String(r.todayValue ?? ""),
       status: normalizeStatus(r.todayValue),
       vacationStatus: r.VacationStatus,
+      burdenPoints: Number(r.burdenPoints) || 0,
     }));
 }
 

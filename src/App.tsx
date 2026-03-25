@@ -7,7 +7,7 @@ import Layout from "./components/Layout";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
 import WorkPlanPage from "./pages/WorkPlanPage";
-
+import GuardAssignmentPage from "./pages/GuardAssignmentPage";
 import ContactPage from "./pages/ContactPage";
 
 const queryClient = new QueryClient({
@@ -32,6 +32,7 @@ const App = () => (
             <Route path="/zama" element={<ZamaPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/workplan" element={<WorkPlanPage />} />
+            <Route path="/guards" element={<GuardAssignmentPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
