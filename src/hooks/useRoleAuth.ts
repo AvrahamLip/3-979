@@ -27,6 +27,31 @@ export function useRoleAuth(role: string, buttonContainerId: string = "google-si
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const cachedAuthKey = `auth_${role}`;
+    
+    // 1. Check for cached session
+    const cached = localStorage.getItem(cachedAuthKey);
+    if (cached) {
+      try {
+        const { credential } = JSON.parse(cached);
+        const payload = parseJwt(credential);
+        const now = Date.now();
+        
+        // Google JWTs expire after 1 hour. If it's still physically valid, we trust our previous validation.
+        // We could also enforce a custom max session length using validatedAt if we wanted to.
+        if (payload && payload.exp * 1000 > now) {
+          setIsAuthenticated(true);
+          setIsLoading(false);
+          return; // Skip rendering google signin button entirely
+        } else {
+          localStorage.removeItem(cachedAuthKey); // Expired
+        }
+      } catch (e) {
+        localStorage.removeItem(cachedAuthKey);
+      }
+    }
+
+    // 2. Setup Google Sign In
     // @ts-ignore
     window.handleCredentialResponse = async (response: any) => {
       setError(null);
@@ -56,6 +81,11 @@ export function useRoleAuth(role: string, buttonContainerId: string = "google-si
           if (data.authorized === false) {
             setError(data.error || `אין לך הרשאה למחלקה זו (תפקיד חסר או שגוי)`);
           } else {
+            // Caching successful validation
+            localStorage.setItem(cachedAuthKey, JSON.stringify({
+              credential: response.credential,
+              validatedAt: Date.now()
+            }));
             setIsAuthenticated(true);
           }
         } else {
