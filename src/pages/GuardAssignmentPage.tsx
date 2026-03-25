@@ -440,13 +440,18 @@ export default function GuardAssignmentPage() {
           setAssignments(saved);
           setIsSaved(true);
         } else {
-          setAssignments(generateAssignment(data, history, hapakData));
-          setIsSaved(false);
+          if (isAuthenticated) {
+            setAssignments(generateAssignment(data, history, hapakData));
+            setIsSaved(false);
+          } else {
+            setAssignments(null);
+            setIsSaved(true);
+          }
         }
       }
     };
     init();
-  }, [data, history, date, hapakData]);
+  }, [data, history, date, hapakData, isAuthenticated]);
 
   const handleGenerate = () => {
     if (data) {
@@ -644,6 +649,16 @@ export default function GuardAssignmentPage() {
 
       {(isLoading || isGenerating) && <LoadingOverlay />}
       {isError && !isLoading && !isGenerating && <ErrorMessage message={(error as Error)?.message ?? "שגיאה לא ידועה"} />}
+
+      {!isLoading && !isGenerating && !isError && !assignments && !isAuthenticated && (
+        <div className="flex flex-col items-center justify-center p-12 bg-card rounded-2xl border border-border shadow-sm animate-fade-in-up">
+          <Shield className="w-16 h-16 text-muted-foreground/30 mb-4" />
+          <h2 className="text-xl font-black text-foreground mb-2">טרם שובצו שמירות</h2>
+          <p className="text-muted-foreground text-center max-w-sm">
+            לא נמצא שיבוץ שמור לתאריך זה. רק משתמש מורשה יכול לג'נרט ולשמור לוח שמירות חדש. התחבר למעלה לתחילת עבודה.
+          </p>
+        </div>
+      )}
 
       {!isLoading && !isGenerating && !isError && assignments && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
