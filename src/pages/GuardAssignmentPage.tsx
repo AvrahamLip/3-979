@@ -6,7 +6,7 @@ import { getTodayIso, formatDateForApi } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMessages";
-import { RefreshCw, Shield, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera } from "lucide-react";
+import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, UserX, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -69,6 +69,7 @@ const POINTS = {
 };
 
 const STORAGE_KEY = "guard_burden_points";
+const BLOCKED_STORAGE_KEY = "guard_blocked_names";
 
 // ─── Logic ────────────────────────────────────────────────────────────────────
 
@@ -78,9 +79,9 @@ function getPointsForHour(hour: number): number {
 
 const normalizeNameStr = (name: string) => name.replace(/\s+/g, ' ').trim();
 
-function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[]): AssignmentData {
+function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>): AssignmentData {
   const hapakAssignments: HapakMission[] = [];
-  const assignedNames = new Set<string>();
+  const assignedNames = new Set<string>(blockedNames);
 
   const rows = Array.isArray(hapakRows) ? hapakRows : [];
 
@@ -139,7 +140,10 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
     let hasReturningInSlot = false;
 
     // Defined Priority rows in order
-    const priorityRoles = ["מהנדס", "רופא", "אוכלוסיה", "שו\"ב", "חובש", "קשר", "מפקד2", "מהנדס2"];
+    // Special priority for MP: Engineer + 2 from {שו"ב, אוכלוסיה, קשר}
+    const priorityRoles = mission.key === "מפ" 
+      ? ["מהנדס", "שו\"ב", "אוכלוסיה", "קשר", "רופא", "חובש", "מפקד2", "מהנדס2"]
+      : ["מהנדס", "רופא", "אוכלוסיה", "שו\"ב", "חובש", "קשר", "מפקד2", "מהנדס2"];
     
     for (const rolePattern of priorityRoles) {
        // If we've reached the slot limit AND we are not just looking for a complementary partial day, break.
@@ -199,7 +203,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
          id: mission.id,
          memberIndex: Math.floor(filledSlots) + 1,
          name: `חפ"ק ${mission.name} - עמדה ${Math.floor(filledSlots) + 1}`,
-         assignedTo: "טרם שובץ",
+         assignedTo: "לא מאויש",
          points: POINTS.HAPAK
        });
     }
@@ -209,16 +213,31 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
   // We use a local points tracker for the current generation to avoid duplicate/heavy loading in one person
   const localGenerationPoints: Record<string, number> = {};
   
-  const guardAssignments: GuardShift[] = [];
   const guardCandidates = records.filter(p => 
     !assignedNames.has(p.name) && 
     GUARD_RELEVANT_ROLES.some(role => (p.role || "").includes(role))
   );
 
+  // Define all shifts and determine processing order (Night shifts first)
+  const allShifts = [];
   for (let i = 0; i < 24; i++) {
-    const hour = (i + 12) % 24;
+    const hour = (i + 12) % 24; // 12 to 23, then 0 to 11
     const time = `${String(hour).padStart(2, "0")}:00 - ${String((hour + 1) % 24).padStart(2, "0")}:00`;
-    const shiftPoints = getPointsForHour(hour);
+    const isNight = hour >= 0 && hour < 8; // Night shifts: 00:00 to 07:00
+    allShifts.push({ hour, time, isNight, shiftPoints: getPointsForHour(hour), originalIndex: i });
+  }
+
+  // Sort shifts to process night shifts first
+  const sortedShifts = [...allShifts].sort((a, b) => {
+    if (a.isNight && !b.isNight) return -1;
+    if (!a.isNight && b.isNight) return 1;
+    return a.originalIndex - b.originalIndex; // Preserve original chronological order within groups
+  });
+
+  const temporaryAssignmentsMap = new Map<number, GuardShift>();
+
+  for (const shift of sortedShifts) {
+    const hour = shift.hour;
 
     // Rule:
     // 1. In base (בבסיס) -> All hours
@@ -234,27 +253,37 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
     });
 
     if (hourlyEligible.length > 0) {
-      // Pick the best person based on (Burden Points + Historical Points + Points already assigned in this session)
+      // Pick the best person based on:
+      // 1. Have they been assigned yet in this generation? (Unassigned > Assigned)
+      // 2. Tie-breaker: (Burden Points + Historical Points)
       const best = hourlyEligible.reduce((prev, curr) => {
-        const prevScore = (prev.burdenPoints || 0) + (history[prev.name] || 0) + (localGenerationPoints[prev.name] || 0);
-        const currScore = (curr.burdenPoints || 0) + (history[curr.name] || 0) + (localGenerationPoints[curr.name] || 0);
+        const prevAssignments = Math.floor((localGenerationPoints[prev.name] || 0) / 1000);
+        const currAssignments = Math.floor((localGenerationPoints[curr.name] || 0) / 1000);
+
+        if (currAssignments < prevAssignments) return curr;
+        if (currAssignments > prevAssignments) return prev;
+
+        const prevScore = (prev.burdenPoints || 0) + (history[prev.name] || 0) + ((localGenerationPoints[prev.name] || 0) % 1000);
+        const currScore = (curr.burdenPoints || 0) + (history[curr.name] || 0) + ((localGenerationPoints[curr.name] || 0) % 1000);
         return currScore < prevScore ? curr : prev;
       });
 
-      guardAssignments.push({
+      temporaryAssignmentsMap.set(hour, {
         hour,
-        time,
+        time: shift.time,
         name: best.name,
-        points: shiftPoints
+        points: shift.shiftPoints
       });
 
-      // נוסיף פנדל גבוה מאוד (1000) לאותו אדם בתוך הסשן הנוכחי
-      // זה יבטיח שהמערכת תשתדל ככל האפשר שלא לשבץ את אותו אדם פעמיים באותו יום ללא תלות בניקוד הקודם שלו.
-      localGenerationPoints[best.name] = (localGenerationPoints[best.name] || 0) + shiftPoints + 1000;
+      // נוסיף פנדל גבוה מאוד (1000) לאותו אדם בתוך הסשן הנוכחי כדי לסמן שהוא כבר שובץ
+      localGenerationPoints[best.name] = (localGenerationPoints[best.name] || 0) + shift.shiftPoints + 1000;
     } else {
-      guardAssignments.push({ hour, time, name: "-", points: shiftPoints });
+      temporaryAssignmentsMap.set(hour, { hour, time: shift.time, name: "לא מאויש", points: shift.shiftPoints });
     }
   }
+
+  // Reconstruct guardAssignments in chronological order
+  const guardAssignments: GuardShift[] = allShifts.map(s => temporaryAssignmentsMap.get(s.hour)!);
 
   return { hapak: hapakAssignments, guards: guardAssignments };
 }
@@ -265,12 +294,14 @@ function PersonnelSwap({
   currentName,
   allPersonnel,
   onSwap,
-  readonly
+  readonly,
+  allowEmpty
 }: {
   currentName: string;
   allPersonnel: AttendanceRecord[];
   onSwap: (newName: string) => void;
   readonly?: boolean;
+  allowEmpty?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -294,10 +325,23 @@ function PersonnelSwap({
       </PopoverTrigger>
       <PopoverContent className="p-0 w-[200px]" align="start">
         <Command>
-          <CommandInput placeholder="חפש חייל..." className="h-9" />
+          <CommandInput placeholder="חפש חייל..." className="h-9 text-right" dir="rtl" />
           <CommandList>
             <CommandEmpty>לא נמצאו חיילים.</CommandEmpty>
             <CommandGroup>
+              {allowEmpty && (
+                <CommandItem
+                  value="לא מאויש"
+                  onSelect={() => {
+                    onSwap("לא מאויש");
+                    setOpen(false);
+                  }}
+                  className="flex items-center justify-between text-muted-foreground italic"
+                >
+                  <span>לא מאויש</span>
+                  {currentName === "לא מאויש" && <Check className="w-3 h-3" />}
+                </CommandItem>
+              )}
               {available.map((p) => (
                 <CommandItem
                   key={p.name}
@@ -333,6 +377,7 @@ export default function GuardAssignmentPage() {
   const [history, setHistory] = useState<PersonnelPoints>({});
   const [isSaved, setIsSaved] = useState(false);
   const [hapakData, setHapakData] = useState<any[]>([]);
+  const [blockedNames, setBlockedNames] = useState<Set<string>>(new Set());
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingHapak, setIsExportingHapak] = useState(false);
@@ -399,6 +444,15 @@ export default function GuardAssignmentPage() {
         console.error("Failed to parse history", e);
       }
     }
+
+    const savedBlocked = localStorage.getItem(BLOCKED_STORAGE_KEY);
+    if (savedBlocked) {
+      try {
+        setBlockedNames(new Set(JSON.parse(savedBlocked)));
+      } catch (e) {
+        console.error("Failed to parse blocked names", e);
+      }
+    }
   }, []);
 
   const fetchSavedAssignment = async (targetDate: string) => {
@@ -441,7 +495,7 @@ export default function GuardAssignmentPage() {
           setIsSaved(true);
         } else {
           if (isAuthenticated) {
-            setAssignments(generateAssignment(data, history, hapakData));
+            setAssignments(generateAssignment(data, history, hapakData, blockedNames));
             setIsSaved(false);
           } else {
             setAssignments(null);
@@ -451,14 +505,14 @@ export default function GuardAssignmentPage() {
       }
     };
     init();
-  }, [data, history, date, hapakData, isAuthenticated]);
+  }, [data, history, date, hapakData, isAuthenticated]); // Note: blockedNames is intentionally left out to avoid auto-regenerating while user is clicking
 
   const handleGenerate = () => {
     if (data) {
       setIsGenerating(true);
       setAssignments(null); // Clears the screen visually
       setTimeout(() => {
-        setAssignments(generateAssignment(data, history, hapakData));
+        setAssignments(generateAssignment(data, history, hapakData, blockedNames));
         setIsSaved(false);
         setIsGenerating(false);
       }, 500);
@@ -491,7 +545,7 @@ export default function GuardAssignmentPage() {
     const consolidated = new Map<string, any>();
 
     const addUpdate = (name: string, role: string, type: string, hours: string, points: number) => {
-      if (name === "טרם שובץ" || name === "-") return;
+      if (name === "לא מאויש" || name === "טרם שובץ" || name === "-") return;
       if (!consolidated.has(name)) {
         consolidated.set(name, {
           date: formattedDate,
@@ -511,7 +565,7 @@ export default function GuardAssignmentPage() {
     };
 
     assignments.hapak.forEach(h => {
-      if (h.assignedTo !== "טרם שובץ") {
+      if (h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") {
         const parts = h.name.split(' - ');
         const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
         addUpdate(h.assignedTo, displayRole, 'חפ"ק', 'לתאם', h.points);
@@ -519,7 +573,7 @@ export default function GuardAssignmentPage() {
     });
 
     assignments.guards.forEach(g => {
-      if (g.name !== "-") {
+      if (g.name !== "לא מאויש" && g.name !== "-") {
         const person = data?.find(p => p.name === g.name);
         addUpdate(g.name, person?.role || 'שומר', 'שמירה', g.time, g.points);
       }
@@ -589,6 +643,25 @@ export default function GuardAssignmentPage() {
       setHistory({});
       localStorage.removeItem(STORAGE_KEY);
       toast.info("ההיסטוריה אופסה.");
+    }
+  };
+
+  const toggleBlock = (name: string) => {
+    setBlockedNames(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      localStorage.setItem(BLOCKED_STORAGE_KEY, JSON.stringify(Array.from(next)));
+      return next;
+    });
+    setIsSaved(false);
+  };
+
+  const handleResetBlocks = () => {
+    if (window.confirm("האם אתה בטוח שברצונך לבטל את כל החסימות?")) {
+      setBlockedNames(new Set());
+      localStorage.removeItem(BLOCKED_STORAGE_KEY);
+      toast.info("כל החסימות בוטלו.");
     }
   };
 
@@ -702,30 +775,53 @@ export default function GuardAssignmentPage() {
                     <Users className="w-4 h-4" />
                     טבלת עומס (ניקוד מצטבר)
                   </h3>
-                  <button onClick={handleResetHistory} title="אפס הכל" className="text-muted-foreground hover:text-red-500 transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={handleResetBlocks} title="בטל את כל החסימות" className="text-muted-foreground hover:text-amber-500 transition-colors">
+                      <ShieldOff className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleResetHistory} title="אפס הכל" className="text-muted-foreground hover:text-red-500 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <div className="p-1 max-h-[600px] overflow-y-auto">
                   {sortedHistory.length === 0 ? (
                     <div className="p-4 text-center text-xs text-muted-foreground">אין נתונים היסטוריים</div>
                   ) : (
-                    sortedHistory.map((p) => (
-                      <div key={p.name} className="flex items-center justify-between p-2.5 border-b border-border last:border-0">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium">{p.name}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {p.isPermanent ? "מהגליון" : "בסשן זה"}
+                    sortedHistory.map((p) => {
+                      const isBlocked = blockedNames.has(p.name);
+                      return (
+                        <div key={p.name} className={cn(
+                          "flex items-center justify-between p-2.5 border-b border-border last:border-0 group",
+                          isBlocked && "bg-red-500/5 opacity-80"
+                        )}>
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={() => toggleBlock(p.name)}
+                              className={cn(
+                                "p-1.5 rounded-md transition-colors",
+                                isBlocked ? "text-red-500 bg-red-500/10 hover:bg-red-500/20" : "text-muted-foreground hover:text-primary hover:bg-muted"
+                              )}
+                              title={isBlocked ? "בטל חסימה" : "חסום משיבוץ"}
+                            >
+                              {isBlocked ? <ShieldOff className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+                            </button>
+                            <div className="flex flex-col text-right">
+                              <span className={cn("text-sm font-medium", isBlocked && "line-through text-muted-foreground")}>{p.name}</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {p.isPermanent ? "מהגליון" : "בסשן זה"}
+                              </span>
+                            </div>
+                          </div>
+                          <span className={cn(
+                            "text-xs font-bold px-2 py-0.5 rounded-full",
+                            p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
+                          )}>
+                            {p.total} נק'
                           </span>
                         </div>
-                        <span className={cn(
-                          "text-xs font-bold px-2 py-0.5 rounded-full",
-                          p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
-                        )}>
-                          {p.total} נק'
-                        </span>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -769,7 +865,8 @@ export default function GuardAssignmentPage() {
                         .sort((a, b) => a.memberIndex - b.memberIndex)
                         .map(h => {
                          const person = data?.find(p => p.name === h.assignedTo);
-                         const roleText = h.assignedTo !== "טרם שובץ" && person?.role ? `(${person.role.trim()})` : '';
+                         const personName = h.assignedTo === "לא מאויש" || h.assignedTo === "טרם שובץ" ? "לא מאויש" : h.assignedTo;
+                         const roleText = personName !== "לא מאויש" && person?.role ? `(${person.role.trim()})` : '';
                          
                          // Get dynamic role name from h.name (e.g., 'חפ"ק מ"פ - מפקד' -> 'מפקד')
                          const parts = h.name.split(' - ');
@@ -781,12 +878,13 @@ export default function GuardAssignmentPage() {
                                {displayRole}
                              </span>
                              <div className="flex items-center gap-1.5 flex-row-reverse">
-                               <PersonnelSwap
-                                 currentName={h.assignedTo}
-                                 allPersonnel={data || []}
-                                 onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex)}
-                                 readonly={!isAuthenticated}
-                               />
+                                 <PersonnelSwap
+                                   currentName={personName}
+                                   allPersonnel={data || []}
+                                   onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex)}
+                                   readonly={!isAuthenticated}
+                                   allowEmpty={true}
+                                 />
                                {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
                              </div>
                            </div>
@@ -842,10 +940,11 @@ export default function GuardAssignmentPage() {
                         </td>
                         <td className="px-5 py-3 font-bold">
                           <PersonnelSwap
-                            currentName={g.name}
+                            currentName={g.name === "-" ? "לא מאויש" : g.name}
                             allPersonnel={data || []}
                             onSwap={(newName) => handleSwap("guard", g.hour, newName)}
                             readonly={!isAuthenticated}
+                            allowEmpty={true}
                           />
                         </td>
                         {(!isExporting && isAuthenticated) && (
