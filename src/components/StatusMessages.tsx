@@ -2,12 +2,12 @@ import { Loader2 } from "lucide-react";
 
 export function LoadingOverlay({ message = "טוען נתונים..." }: { message?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 gap-4">
+    <div className="flex flex-col items-center justify-center min-h-[40vh] py-12 gap-4">
       <div className="relative">
-        <div className="w-14 h-14 rounded-full border-4 border-muted" />
-        <div className="absolute inset-0 w-14 h-14 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-4 border-muted" />
+        <div className="absolute inset-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full border-4 border-primary border-t-transparent animate-spin" />
       </div>
-      <p className="text-muted-foreground font-medium">{message}</p>
+      <p className="text-muted-foreground font-medium text-sm sm:text-base">{message}</p>
     </div>
   );
 }

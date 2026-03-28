@@ -862,13 +862,13 @@ export default function GuardAssignmentPage() {
       {/* Page Header */}
       <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Shield className="w-6 h-6 text-overlay" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-overlay" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-overlay">שיבוץ שוויוני (ניקוד)</h1>
-              <p className="text-overlay/70 text-sm mt-0.5">
+              <h1 className="text-xl sm:text-3xl font-black text-overlay leading-none">שיבוץ שוויוני (ניקוד)</h1>
+              <p className="text-overlay/70 text-xs sm:text-sm mt-1 sm:mt-0.5">
                 רשימת שמירות ושיבוצי חפ"ק
               </p>
             </div>
@@ -1099,11 +1099,11 @@ export default function GuardAssignmentPage() {
                     {isHapakCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </button>
                   <div className="flex flex-col">
-                    <h2 className="font-black flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
-                      שיבוץ חפ"ק (לפי היררכיית תפקידים)
+                    <h2 className="font-black flex items-center gap-2 text-sm sm:text-base">
+                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                      שיבוץ חפ"ק
                     </h2>
-                    <span className="text-[10px] text-muted-foreground font-mono mr-7">
+                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">
                       תאריך: {date.split('-').reverse().join('/')}
                     </span>
                   </div>
@@ -1167,11 +1167,11 @@ export default function GuardAssignmentPage() {
                     {isGuardCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </button>
                   <div className="flex flex-col">
-                    <h2 className="font-black flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-primary" />
-                      לו"ז שמירות (24 שעות)
+                    <h2 className="font-black flex items-center gap-2 text-sm sm:text-base">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                      לו"ז שמירות
                     </h2>
-                    <span className="text-[10px] text-muted-foreground font-mono mr-7">
+                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">
                       תאריך: {date.split('-').reverse().join('/')}
                     </span>
                   </div>
@@ -1191,9 +1191,9 @@ export default function GuardAssignmentPage() {
                   <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-muted z-10">
                       <tr className="text-right">
-                        <th className="px-5 py-3 font-black text-muted-foreground">שעה</th>
-                        <th className="px-5 py-3 font-black text-muted-foreground">שומר</th>
-                        {(!isExporting && isAuthenticated) && <th className="px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
+                        <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שעה</th>
+                        <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שומר</th>
+                        {(!isExporting && isAuthenticated) && <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -1205,14 +1205,14 @@ export default function GuardAssignmentPage() {
                             idx % 2 === 0 ? "bg-card" : "bg-background"
                           )}
                         >
-                          <td className="px-5 py-3 font-mono text-xs text-muted-foreground flex items-center gap-2">
+                          <td className="px-3 sm:px-5 py-3 font-mono text-[11px] sm:text-xs text-muted-foreground flex items-center gap-2 whitespace-nowrap">
                             <div className={cn(
-                              "w-2 h-2 rounded-full",
+                              "w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full",
                               g.points === 2 ? "bg-indigo-500" : "bg-yellow-500"
                             )} />
                             {g.time}
                           </td>
-                          <td className="px-5 py-3 font-bold">
+                          <td className="px-3 sm:px-5 py-3 font-bold truncate">
                             <PersonnelSwap
                               currentName={g.name}
                               allPersonnel={data || []}

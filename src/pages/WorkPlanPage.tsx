@@ -193,7 +193,7 @@ export default function WorkPlanPage() {
       <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-overlay">
+            <h1 className="text-xl sm:text-3xl font-black text-overlay leading-none">
               תוכנית עבודה
             </h1>
             <p className="text-overlay/70 text-sm mt-1">
@@ -326,7 +326,7 @@ export default function WorkPlanPage() {
               <thead>
                 <tr className="gradient-hero text-primary-foreground">
                   {/* Name column */}
-                  <th className="px-4 py-3 font-bold text-right border-l border-white/10 sticky right-0 z-20 gradient-hero elevated-shadow-left">
+                  <th className="px-3 sm:px-4 py-3 font-bold text-right border-l border-white/10 sticky right-0 z-20 gradient-hero elevated-shadow-left">
                     שם
                   </th>
                   {/* Day columns */}
@@ -373,7 +373,7 @@ export default function WorkPlanPage() {
                       {/* Sticky name column */}
                       <td
                         className={cn(
-                          "px-4 py-2.5 font-semibold text-right border-l border-border sticky right-0 z-10 transition-colors group-hover:bg-muted/30",
+                          "px-3 sm:px-4 py-2.5 font-semibold text-right border-l border-border sticky right-0 z-10 transition-colors group-hover:bg-muted/30",
                           idx % 2 === 0 ? "bg-card" : "bg-background"
                         )}
                       >
@@ -387,13 +387,13 @@ export default function WorkPlanPage() {
                           <td
                             key={di}
                             className={cn(
-                              "px-4 py-2.5 text-center transition-colors",
+                              "px-2 sm:px-4 py-2.5 text-center transition-colors",
                               di < days.length - 1 && "border-l border-border/50",
                               di === 1 && "bg-primary/5" // today highlight
                             )}
                           >
                             {isLoading ? (
-                              <span className="inline-block w-16 h-5 rounded bg-muted animate-pulse" />
+                              <span className="inline-block w-12 sm:w-16 h-5 rounded bg-muted animate-pulse" />
                             ) : status ? (
                               <StatusBadge status={status} size="sm" showIcon={false} />
                             ) : (
