@@ -243,9 +243,9 @@ export default function Layout() {
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
             <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
             <span className="opacity-30">|</span>
-            <a href="tel:050-88533548" className="hover:text-primary transition-colors font-bold">050-0000000</a>
+            <a href="tel:050-88533548" className="hover:text-primary transition-colors font-bold">050-88533548</a>
             <span className="opacity-30">|</span>
-            <span className="font-mono">גרסה 1.2.2</span>
+            <span className="font-mono">גרסה 1.3.5</span>
           </div>
           <span className="opacity-70 font-medium">דוח! — מערכת נוכחות יומי</span>
         </div>

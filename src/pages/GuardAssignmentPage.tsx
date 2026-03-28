@@ -5,8 +5,8 @@ import { useMainAttendance } from "@/hooks/useAttendanceData";
 import { getTodayIso, formatDateForApi } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
 import DatePickerBar from "@/components/DatePickerBar";
-import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMessages";
-import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, UserX, UserCheck } from "lucide-react";
+import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
+import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -23,7 +23,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check, Search } from "lucide-react";
+import { Check } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -53,8 +53,8 @@ type PersonnelPoints = Record<string, number>;
 
 
 const GUARD_RELEVANT_ROLES = ["חייל", "מ\"כ", "חובש", "אוכלוסיה", "אנוח", "מפקד"];
+const GUARD_EXCLUDED_ROLES = ["סמל", "סמ\"ל", "סמר", "סמ\"ר"];
 
-const SPECIALIST_ORDER = ["מהנדס", "רופא", "אוכלוסיה", "שו\"ב", "קשר", "חובש"];
 const HAPAK_MISSIONS = [
   { id: 1, name: "מ\"פ", key: "מפ" },
   { id: 2, name: "1ג", key: "1ג" },
@@ -77,43 +77,51 @@ function getPointsForHour(hour: number): number {
   return (hour >= 0 && hour < 8) ? POINTS.NIGHT_GUARD : POINTS.DAY_GUARD;
 }
 
-const normalizeNameStr = (name: string) => name.replace(/\s+/g, ' ').trim();
+const normalizeNameStr = (name: any) => String(name || "").replace(/\(.*\)/g, '').replace(/\s+/g, ' ').trim();
 
-function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>): AssignmentData {
-  const hapakAssignments: HapakMission[] = [];
-  const assignedNames = new Set<string>(blockedNames);
+function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string): AssignmentData {
+  try {
+    if (!records) records = [];
+    if (!hapakRows) hapakRows = [];
+    
+    const hapakAssignments: HapakMission[] = [];
+    const assignedNames = new Set<string>(blockedNames);
 
-  const rows = Array.isArray(hapakRows) ? hapakRows : [];
-
-  const inBaseMap = new Map<string, boolean>(records.map(r => [normalizeNameStr(r.name), String(r.todayValue).trim() === "1"]));
+  const rows = (Array.isArray(hapakRows) ? hapakRows : []).filter(r => r && typeof r === 'object');
 
   for (const mission of HAPAK_MISSIONS) {
-    // 1. Mandatory Commander (always slot 1)
-    const commanderRow = rows.find(r => r["תפקיד"] && r["תפקיד"].trim().includes("מפקד") && !r["תפקיד"].includes("2"));
-    const commander2Row = rows.find(r => r["תפקיד"] && r["תפקיד"].trim().includes("מפקד2"));
+    let currentMemberIndex = 1;
+    
+    // 1. Mandatory Commander (All missions)
+    const commanderRow = rows.find(r => String(r["תפקיד"] || "").trim().includes("מפקד") && !String(r["תפקיד"] || "").includes("2"));
+    const commander2Row = rows.find(r => String(r["תפקיד"] || "").trim().includes("מפקד2"));
     
     let commanderName = "טרם שובץ";
     
     const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
-      const p = records.find(r => normalizeNameStr(r.name) === name);
-      if (!p) return "none";
-      const v = String(p.todayValue).trim();
-      if (v === "1") return "full";
-      if (v.includes("היום בבית")) return "leaving";
-      if (v.includes("חוזר היום")) return "returning";
+      const normalizedQuery = normalizeNameStr(name);
+      const p = records.find(r => normalizeNameStr(r.name) === normalizedQuery);
+      if (!p) {
+        // console.log(`[DEBUG Hapak] Presence check FAILED for: "${name}" (normalized: "${normalizedQuery}")`);
+        return "none";
+      }
+      const v = String(p.todayValue).trim().toUpperCase();
+      if (v === "1" || v === "V") return "full";
+      if (v.includes("בית")) return "leaving";
+      if (v.includes("חוזר")) return "returning";
       return "none";
     };
 
-    // Primary commander check
     if (commanderRow && commanderRow[mission.key]) {
       const pureNameFromApi = String(commanderRow[mission.key]);
       const nameFromApi = normalizeNameStr(pureNameFromApi);
-      if (nameFromApi && nameFromApi !== "טרם שובץ" && getStatus(nameFromApi) !== "none") {
+      const status = getStatus(nameFromApi);
+      
+      if (nameFromApi && nameFromApi !== "טרם שובץ" && status !== "none") {
         commanderName = pureNameFromApi.trim();
       }
     }
     
-    // Secondary commander fallback
     if (commanderName === "טרם שובץ" && commander2Row && commander2Row[mission.key]) {
       const pureNameFromApi = String(commander2Row[mission.key]);
       const nameFromApi = normalizeNameStr(pureNameFromApi);
@@ -122,116 +130,171 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
       }
     }
     
-    if (commanderName && commanderName !== "טרם שובץ") assignedNames.add(commanderName);
+    if (commanderName && commanderName !== "טרם שובץ") {
+      assignedNames.add(normalizeNameStr(commanderName));
+    }
     
+    const commanderStatus = commanderName !== "טרם שובץ" ? getStatus(commanderName) : "none";
+    const commanderSuffix = commanderStatus === "leaving" ? " (היום בבית)" : commanderStatus === "returning" ? " (חוזר היום)" : "";
+
     hapakAssignments.push({
       id: mission.id,
-      memberIndex: 1,
-      name: `חפ"ק ${mission.name} - מפקד`,
-      assignedTo: commanderName,
+      memberIndex: currentMemberIndex++,
+      name: `חפ"ק ${mission.name} - מפקד${commanderSuffix}`,
+      assignedTo: commanderName === "טרם שובץ" ? "" : commanderName,
       points: POINTS.HAPAK
     });
 
     // 2. Remaining Specialists (3 for MP, 2 for others)
-    const slotCount = mission.key === "מפ" ? 3 : 2;
-    let filledSlots = 0;
+    const specialistCount = mission.key === "מפ" ? 3 : 2;
+    let filledSpecialists = 0;
     
     let hasLeavingInSlot = false;
     let hasReturningInSlot = false;
 
-    // Defined Priority rows in order
-    // Special priority for MP: Engineer + 2 from {שו"ב, אוכלוסיה, קשר}
-    const priorityRoles = mission.key === "מפ" 
-      ? ["מהנדס", "שו\"ב", "אוכלוסיה", "קשר", "רופא", "חובש", "מפקד2", "מהנדס2"]
-      : ["מהנדס", "רופא", "אוכלוסיה", "שו\"ב", "חובש", "קשר", "מפקד2", "מהנדס2"];
+    // Dynamically iterate over ALL registry rows instead of hardcoded priority list
     
-    for (const rolePattern of priorityRoles) {
-       // If we've reached the slot limit AND we are not just looking for a complementary partial day, break.
-       // E.g. If we have 2 slots, and we've filled 2. But the 2nd slot was a "leaving" person, we can take 1 more "returning" person.
-       if (filledSlots >= slotCount) {
-         if (!(filledSlots === slotCount && ((hasLeavingInSlot && !hasReturningInSlot) || (!hasLeavingInSlot && hasReturningInSlot)))) {
-           break;
-         }
-       }
-
-       const roleRow = rows.find(r => r["תפקיד"] && r["תפקיד"].trim().includes(rolePattern));
-       if (roleRow && roleRow[mission.key]) {
-         const purePersonName = String(roleRow[mission.key]);
-         const personName = normalizeNameStr(purePersonName);
-         if (personName && personName !== "" && personName !== "טרם שובץ") {
-           const status = getStatus(personName);
-           const assignedOriginalName = purePersonName.trim();
-           
-           if (status !== "none" && !assignedNames.has(assignedOriginalName)) {
-             
-             // Manage slot capacity with partials
-             if (status === "full") {
-               filledSlots++;
-             } else if (status === "leaving") {
-               if (hasReturningInSlot) {
-                 hasReturningInSlot = false; // completed a pair
-               } else {
-                 hasLeavingInSlot = true;
-                 filledSlots++;
-               }
-             } else if (status === "returning") {
-               if (hasLeavingInSlot) {
-                 hasLeavingInSlot = false; // completed a pair
-               } else {
-                 hasReturningInSlot = true;
-                 filledSlots++;
-               }
-             }
-
-             assignedNames.add(assignedOriginalName);
-             hapakAssignments.push({
-               id: mission.id,
-               memberIndex: filledSlots + 1,
-               name: `חפ"ק ${mission.name} - ${rolePattern}`,
-               assignedTo: assignedOriginalName,
-               points: POINTS.HAPAK
-             });
-           }
-         }
-       }
+    // MP Specialist Prioritization: Ensure Engineer is first if available
+    if (mission.key === "מפ") {
+      const engineerRow = rows.find(r => String(r["תפקיד"] || "").includes("מהנדס"));
+      if (engineerRow && engineerRow["מפ"]) {
+        const purePersonName = String(engineerRow["מפ"]);
+        const personName = normalizeNameStr(purePersonName);
+        if (personName && personName !== "" && personName !== "טרם שובץ") {
+          const finalStatus = getStatus(personName);
+          
+          if (finalStatus !== "none" && !assignedNames.has(purePersonName.trim())) {
+            if (finalStatus === "full") filledSpecialists++;
+            else if (finalStatus === "leaving") { hasLeavingInSlot = true; filledSpecialists++; }
+            else if (finalStatus === "returning") { hasReturningInSlot = true; filledSpecialists++; }
+            
+            assignedNames.add(normalizeNameStr(purePersonName));
+            const personSuffix = finalStatus === "leaving" ? " (היום בבית)" : finalStatus === "returning" ? " (חוזר היום)" : "";
+            hapakAssignments.push({
+              id: mission.id,
+              memberIndex: currentMemberIndex++,
+              name: `חפ"ק ${mission.name} - מהנדס${personSuffix}`,
+              assignedTo: purePersonName.trim(),
+              points: POINTS.HAPAK
+            });
+          }
+        }
+      }
     }
 
-    // 3. Fallback: If slots still empty, fill with placeholders
-    while (Math.floor(filledSlots) < slotCount) {
-       filledSlots++;
+    for (const row of rows) {
+      const rolePattern = String(row["תפקיד"] || "").trim();
+      if (!rolePattern || rolePattern === "מפקד" || rolePattern === "מפקד חפ\"ק") continue; 
+      
+      // Skip if already assigned in previous prioritization step
+      if (mission.key === "מפ" && rolePattern.includes("מהנדס")) continue;
+
+      if (filledSpecialists >= specialistCount) {
+        if (!(filledSpecialists === specialistCount && ((hasLeavingInSlot && !hasReturningInSlot) || (!hasLeavingInSlot && hasReturningInSlot)))) {
+          break;
+        }
+      }
+
+      const purePersonName = String(row[mission.key] || "");
+      const personName = normalizeNameStr(purePersonName);
+      if (personName && personName !== "" && personName !== "טרם שובץ") {
+        
+        // Medical exclusivity for non-MP missions (e.g., 2G, 3G) - only one doctor / medic per mission
+        if ((rolePattern.includes("רופא") || rolePattern.includes("חובש")) && mission.key !== "מפ") {
+          const alreadyHasMedical = hapakAssignments.some(h => {
+            if (h.id !== mission.id) return false;
+            if (h.name.includes("רופא") || h.name.includes("חובש")) return true;
+            const person = records.find(p => normalizeNameStr(p.name) === normalizeNameStr(h.assignedTo));
+            return person && ((person.role || "").includes("רופא") || (person.role || "").includes("חובש"));
+          });
+          if (alreadyHasMedical) continue;
+        }
+
+        // Commander exclusivity for non-MP: no Commander 2 if Commander is assigned
+        if (rolePattern.includes("מפקד2") && mission.key !== "מפ") {
+          const alreadyHasCommander = hapakAssignments.some(h => 
+            h.id === mission.id && h.assignedTo !== "" && (h.name.includes("מפקד") && !h.name.includes("מפקד2"))
+          );
+          if (alreadyHasCommander) continue;
+        }
+
+        // Saturday engineer restriction for 1G
+        const isSaturday = new Date(date).getDay() === 6;
+        if (rolePattern.includes("מהנדס") && isSaturday && mission.key === "1ג") {
+          continue;
+        }
+
+        const finalStatus = getStatus(personName);
+        
+        const assignedOriginalName = purePersonName.trim();
+        
+        if (finalStatus !== "none" && !assignedNames.has(assignedOriginalName)) {
+          if (finalStatus === "full") {
+            filledSpecialists++;
+          } else if (finalStatus === "leaving") {
+            if (hasReturningInSlot) {
+              hasReturningInSlot = false; 
+            } else {
+              hasLeavingInSlot = true;
+              filledSpecialists++;
+            }
+          } else if (finalStatus === "returning") {
+            if (hasLeavingInSlot) {
+              hasLeavingInSlot = false; 
+            } else {
+              hasReturningInSlot = true;
+              filledSpecialists++;
+            }
+          }
+
+          assignedNames.add(normalizeNameStr(assignedOriginalName));
+          const personSuffix = finalStatus === "leaving" ? " (היום בבית)" : finalStatus === "returning" ? " (חוזר היום)" : "";
+          hapakAssignments.push({
+            id: mission.id,
+            memberIndex: currentMemberIndex++,
+            name: `חפ"ק ${mission.name} - ${rolePattern}${personSuffix}`,
+            assignedTo: assignedOriginalName,
+            points: POINTS.HAPAK
+          });
+        }
+      }
+    }
+
+    while (filledSpecialists < specialistCount) {
+       filledSpecialists++;
        hapakAssignments.push({
          id: mission.id,
-         memberIndex: Math.floor(filledSlots) + 1,
-         name: `חפ"ק ${mission.name} - עמדה ${Math.floor(filledSlots) + 1}`,
-         assignedTo: "לא מאויש",
+         memberIndex: currentMemberIndex++,
+         name: `חפ"ק ${mission.name} - עמדה ${currentMemberIndex - 1}`,
+         assignedTo: "",
          points: POINTS.HAPAK
        });
     }
   }
 
-  // 2. Guard Assignment (24 hourly slots)
-  // We use a local points tracker for the current generation to avoid duplicate/heavy loading in one person
   const localGenerationPoints: Record<string, number> = {};
   
-  const guardCandidates = records.filter(p => 
-    !assignedNames.has(p.name) && 
-    GUARD_RELEVANT_ROLES.some(role => (p.role || "").includes(role))
-  );
+  const guardCandidates = records.filter(p => {
+    const role = (p.role || "").trim();
+    const isExcluded = GUARD_EXCLUDED_ROLES.some(ex => role.includes(ex));
+    if (isExcluded) return false;
+    
+    return !assignedNames.has(normalizeNameStr(p.name)) && 
+           GUARD_RELEVANT_ROLES.some(included => role.includes(included));
+  });
 
-  // Define all shifts and determine processing order (Night shifts first)
   const allShifts = [];
   for (let i = 0; i < 24; i++) {
-    const hour = (i + 12) % 24; // 12 to 23, then 0 to 11
+    const hour = (i + 12) % 24; 
     const time = `${String(hour).padStart(2, "0")}:00 - ${String((hour + 1) % 24).padStart(2, "0")}:00`;
-    const isNight = hour >= 0 && hour < 8; // Night shifts: 00:00 to 07:00
+    const isNight = hour >= 0 && hour < 8; 
     allShifts.push({ hour, time, isNight, shiftPoints: getPointsForHour(hour), originalIndex: i });
   }
 
-  // Sort shifts to process night shifts first
   const sortedShifts = [...allShifts].sort((a, b) => {
     if (a.isNight && !b.isNight) return -1;
     if (!a.isNight && b.isNight) return 1;
-    return a.originalIndex - b.originalIndex; // Preserve original chronological order within groups
+    return a.originalIndex - b.originalIndex; 
   });
 
   const temporaryAssignmentsMap = new Map<number, GuardShift>();
@@ -239,23 +302,15 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
   for (const shift of sortedShifts) {
     const hour = shift.hour;
 
-    // Rule:
-    // 1. In base (בבסיס) -> All hours
-    // 2. Leaving Today (היום בבית) -> Only until 14:00 (h < 14)
-    // 3. Returning Today (חוזר היום) -> Only from 20:00 (h >= 20)
-    
     const hourlyEligible = guardCandidates.filter(p => {
-       const rawStatus = String(p.todayValue || "").trim();
-       if (rawStatus === "1") return true;
-       if (rawStatus.includes("היום בבית") && hour < 14) return true;
-       if (rawStatus.includes("חוזר היום") && hour >= 20) return true;
+       const rawStatus = String(p.todayValue || "").trim().toUpperCase();
+       if (rawStatus === "1" || rawStatus === "V") return true;
+       if (rawStatus.includes("בית") && hour < 14) return true;
+       if (rawStatus.includes("חוזר") && hour >= 20) return true;
        return false;
     });
 
     if (hourlyEligible.length > 0) {
-      // Pick the best person based on:
-      // 1. Have they been assigned yet in this generation? (Unassigned > Assigned)
-      // 2. Tie-breaker: (Burden Points + Historical Points)
       const best = hourlyEligible.reduce((prev, curr) => {
         const prevAssignments = Math.floor((localGenerationPoints[prev.name] || 0) / 1000);
         const currAssignments = Math.floor((localGenerationPoints[curr.name] || 0) / 1000);
@@ -275,17 +330,19 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
         points: shift.shiftPoints
       });
 
-      // נוסיף פנדל גבוה מאוד (1000) לאותו אדם בתוך הסשן הנוכחי כדי לסמן שהוא כבר שובץ
       localGenerationPoints[best.name] = (localGenerationPoints[best.name] || 0) + shift.shiftPoints + 1000;
     } else {
-      temporaryAssignmentsMap.set(hour, { hour, time: shift.time, name: "לא מאויש", points: shift.shiftPoints });
+      temporaryAssignmentsMap.set(hour, { hour, time: shift.time, name: "", points: shift.shiftPoints });
     }
   }
 
-  // Reconstruct guardAssignments in chronological order
   const guardAssignments: GuardShift[] = allShifts.map(s => temporaryAssignmentsMap.get(s.hour)!);
 
-  return { hapak: hapakAssignments, guards: guardAssignments };
+    return { hapak: hapakAssignments, guards: guardAssignments };
+  } catch (error) {
+    console.error("Critical error in generateAssignment:", error);
+    throw error;
+  }
 }
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
@@ -318,9 +375,12 @@ function PersonnelSwap({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="font-bold hover:text-primary transition-colors text-right flex items-center gap-1 group">
-          {currentName}
-          <Shuffle className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <button className={cn(
+          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1 group truncate max-w-[120px]",
+          (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
+        )}>
+          {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
+          <Shuffle className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="p-0 w-[200px]" align="start">
@@ -331,15 +391,15 @@ function PersonnelSwap({
             <CommandGroup>
               {allowEmpty && (
                 <CommandItem
-                  value="לא מאויש"
+                  value="ריק ללא שיבוץ"
                   onSelect={() => {
-                    onSwap("לא מאויש");
+                    onSwap("");
                     setOpen(false);
                   }}
-                  className="flex items-center justify-between text-muted-foreground italic"
+                  className="flex items-center justify-between text-muted-foreground italic font-normal"
                 >
-                  <span>לא מאויש</span>
-                  {currentName === "לא מאויש" && <Check className="w-3 h-3" />}
+                  <span>(ריק) - ללא שיבוץ</span>
+                  {(!currentName || currentName === "לא מאויש") && <Check className="w-3 h-3" />}
                 </CommandItem>
               )}
               {available.map((p) => (
@@ -378,9 +438,53 @@ export default function GuardAssignmentPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [hapakData, setHapakData] = useState<any[]>([]);
   const [blockedNames, setBlockedNames] = useState<Set<string>>(new Set());
+
+  const availablePersonnel = useMemo(() => {
+    if (!data || !assignments) return [];
+    const assigned = new Set<string>();
+    assignments.hapak.forEach(h => {
+      if (h.assignedTo && h.assignedTo !== "טרם שובץ" && h.assignedTo !== "לא מאויש") {
+        assigned.add(normalizeNameStr(h.assignedTo));
+      }
+    });
+    assignments.guards.forEach(g => {
+      if (g.name) assigned.add(normalizeNameStr(g.name));
+    });
+    blockedNames.forEach(name => assigned.add(normalizeNameStr(name)));
+    
+    return data.filter(p => {
+      const isPresent = String(p.todayValue).trim().toUpperCase() === "1" || String(p.todayValue).trim().toUpperCase() === "V";
+      if (!isPresent || assigned.has(normalizeNameStr(p.name))) return false;
+
+      const role = (p.role || "").trim();
+      
+      // Explicit Whitelist for manual assignment visibility
+      const ELIGIBLE_ROLES = [
+        "חייל", 
+        "קצין", 
+        "סמל", 
+        "סמ\"ר", 
+        "סמ\"ל", 
+        "סמר", 
+        "מפקד", 
+        "חובש", 
+        "מהנדס", 
+        "אוכלוסיה", 
+        "אנוח", 
+        "שו\"ב"
+      ];
+
+      return ELIGIBLE_ROLES.some(eligible => role.includes(eligible));
+    });
+  }, [data, assignments, blockedNames]);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingHapak, setIsExportingHapak] = useState(false);
+  const [isLedgerCollapsed, setIsLedgerCollapsed] = useState(false);
+  const [isHapakCollapsed, setIsHapakCollapsed] = useState(false);
+  const [isGuardCollapsed, setIsGuardCollapsed] = useState(false);
+  const [isAvailableCollapsed, setIsAvailableCollapsed] = useState(false);
   const guardTableRef = useRef<HTMLDivElement>(null);
   const hapakGridRef = useRef<HTMLDivElement>(null);
 
@@ -389,11 +493,34 @@ export default function GuardAssignmentPage() {
     try {
       setIsExportingHapak(true);
       toast.info("מכין תמונת חפ\"ק להורדה...");
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 200));
+
       const canvas = await html2canvas(hapakGridRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff'
+        scale: 3, // Higher resolution
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        windowWidth: 500, // Force mobile-like layout during capture
+        onclone: (clonedDoc) => {
+          const element = clonedDoc.getElementById('hapak-export-container');
+          if (element) {
+            element.style.width = '500px';
+            element.style.padding = '20px';
+          }
+          // Inject capture-specific styles
+          const style = clonedDoc.createElement('style');
+          style.innerHTML = `
+            .grid-cols-1.md\\:grid-cols-2 { grid-template-cols: 1fr !important; }
+            h2, h3 { font-size: 20px !important; margin-bottom: 15px !important; color: #000 !important; }
+            .text-xs { font-size: 14px !important; }
+            .text-\\[10px\\] { font-size: 11px !important; }
+            .bg-amber-500\\/10 { background-color: #fff9db !important; border: 1px solid #fab005 !important; }
+            .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
+            button { display: none !important; }
+          `;
+          clonedDoc.head.appendChild(style);
+        }
       });
+
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `hapak-schedule-${date}.png`;
@@ -413,13 +540,34 @@ export default function GuardAssignmentPage() {
     try {
       setIsExporting(true);
       toast.info("מכין תמונה להורדה...");
-      // אנו ממתינים קצר כדי לאפשר למערכת להסיר את הגבלת הגובה ואז לצלם
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       const canvas = await html2canvas(guardTableRef.current, {
-        scale: 2, // Retain high resolution on export
-        backgroundColor: '#ffffff'
+        scale: 3, // Higher resolution
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        windowWidth: 500, // Force mobile-like layout during capture
+        onclone: (clonedDoc) => {
+          const element = clonedDoc.getElementById('guard-export-container');
+          if (element) {
+            element.style.width = '500px';
+            element.style.padding = '20px';
+          }
+          // Inject capture-specific styles
+          const style = clonedDoc.createElement('style');
+          style.innerHTML = `
+            table { width: 100% !important; min-width: 460px !important; }
+            th, td { font-size: 15px !important; padding: 12px 8px !important; border-bottom: 1px solid #eee !important; color: #000 !important; }
+            h2 { font-size: 22px !important; margin-bottom: 10px !important; color: #000 !important; }
+            .font-mono { font-size: 13px !important; }
+            .font-bold { font-weight: 800 !important; }
+            button, .btn { display: none !important; }
+            .max-h-\\[600px\\] { max-height: none !important; overflow: visible !important; }
+          `;
+          clonedDoc.head.appendChild(style);
+        }
       });
+
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `guard-schedule-${date}.png`;
@@ -434,7 +582,20 @@ export default function GuardAssignmentPage() {
     }
   };
 
-  // Load history from localStorage
+  const loadHapakRegistry = async () => {
+    try {
+      const response = await fetch("https://151.145.89.228.sslip.io/webhook/hapak-eligible");
+      if (!response.ok) throw new Error("Failed to fetch hapak registry");
+      const results = await response.json();
+      const registryRows = results.map((r: any) => r.json || r);
+      setHapakData(registryRows);
+      return registryRows;
+    } catch (err) {
+      console.error("Error fetching Hapak registry:", err);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -471,31 +632,15 @@ export default function GuardAssignmentPage() {
   };
 
   useEffect(() => {
-    const fetchHapakData = async () => {
-      try {
-        const response = await fetch("https://151.145.89.228.sslip.io/webhook/hapak-eligible");
-        if (response.ok) {
-          const data = await response.json();
-          setHapakData(Array.isArray(data) ? data : [data]);
-        }
-      } catch (e) {
-        console.error("Failed to fetch hapak data", e);
-      }
-    };
-    fetchHapakData();
-  }, []);
-
-  useEffect(() => {
     const init = async () => {
-      // Wait for Hapak API data before generating new assignment
-      if (data && data.length > 0 && hapakData.length > 0) {
+      if (data && data.length > 0 && (hapakData && hapakData.length > 0)) {
         const saved = await fetchSavedAssignment(date);
         if (saved) {
           setAssignments(saved);
           setIsSaved(true);
         } else {
           if (isAuthenticated) {
-            setAssignments(generateAssignment(data, history, hapakData, blockedNames));
+            setAssignments(generateAssignment(data, history, hapakData, blockedNames, date));
             setIsSaved(false);
           } else {
             setAssignments(null);
@@ -505,27 +650,72 @@ export default function GuardAssignmentPage() {
       }
     };
     init();
-  }, [data, history, date, hapakData, isAuthenticated]); // Note: blockedNames is intentionally left out to avoid auto-regenerating while user is clicking
+  }, [date, history, isAuthenticated, blockedNames, data, hapakData]);
 
-  const handleGenerate = () => {
-    if (data) {
-      setIsGenerating(true);
-      setAssignments(null); // Clears the screen visually
-      setTimeout(() => {
-        setAssignments(generateAssignment(data, history, hapakData, blockedNames));
-        setIsSaved(false);
-        setIsGenerating(false);
-      }, 500);
+  useEffect(() => {
+    loadHapakRegistry();
+  }, []);
+
+  const handleGenerate = async () => {
+    if (!isAuthenticated) return;
+    setIsGenerating(true);
+    setAssignments(null); // Clear UI during generation
+    
+    try {
+      // Reload everything before generating to ensure latest changes from Excel/spreadsheet are used
+      const { data: latestData } = await refetch();
+      const latestHapakRows = await loadHapakRegistry();
+      
+      if (!latestData || !latestHapakRows) {
+        toast.error("נכשל בטעינת נתונים עדכניים. הגנרוט הופסק.");
+        return;
+      }
+
+      setAssignments(generateAssignment(latestData, history, latestHapakRows, blockedNames, date));
+      setIsSaved(false);
+    } catch (error) {
+      console.error("Generation failed:", error);
+      toast.error("שגיאה ביצירת השיבוץ.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
-  const handleSwap = (type: "hapak" | "guard", id: number, newName: string, memberIndex?: number) => {
+  const handleSwap = (type: "hapak" | "guard", id: number, newName: string, memberIndex?: number, hapakName?: string) => {
+    if (newName && newName !== "לא מאויש" && newName !== "טרם שובץ" && newName !== "-") {
+      const normalizedNew = normalizeNameStr(newName);
+      
+      // 1. Check Hapak Conflicts
+      const existingHapak = assignments?.hapak.find(h => 
+        h.assignedTo && normalizeNameStr(h.assignedTo) === normalizedNew && 
+        !(type === "hapak" && h.id === id && h.memberIndex === memberIndex)
+      );
+      
+      // 2. Check Guard Conflicts
+      const existingGuard = assignments?.guards.find(g => 
+        g.name && normalizeNameStr(g.name) === normalizedNew && 
+        !(type === "guard" && g.hour === id)
+      );
+
+      if (type === "guard" && existingHapak) {
+        toast.warning(`שים לב: ${newName} כבר משובץ ב${existingHapak.name}`, {
+          description: "השינוי בוצע, אך קיימת כפילות עם חפ\"ק.",
+          duration: 5000
+        });
+      } else if (type === "hapak" && existingGuard) {
+        toast.warning(`שים לב: ${newName} כבר משובץ בשמירה (${existingGuard.time})`, {
+          description: "השינוי בוצע, אך קיימת כפילות עם שמירות.",
+          duration: 5000
+        });
+      }
+    }
+
     setAssignments(prev => {
       if (!prev) return null;
       const next = { ...prev };
       if (type === "hapak") {
         next.hapak = next.hapak.map(h =>
-          (h.id === id && h.memberIndex === memberIndex) ? { ...h, assignedTo: newName } : h
+          (h.id === id && h.memberIndex === memberIndex && (!hapakName || h.name === hapakName)) ? { ...h, assignedTo: newName } : h
         );
       } else {
         next.guards = next.guards.map(g =>
@@ -534,18 +724,17 @@ export default function GuardAssignmentPage() {
       }
       return next;
     });
-    setIsSaved(false); // Mark as modified
+    setIsSaved(false); 
   };
 
   const handleConfirm = async () => {
     if (!assignments) return;
 
-    // 1. Prepare updates for the API (Activity Log format) - CONSOLIDATED PER PERSON
     const formattedDate = formatDateForApi(date);
     const consolidated = new Map<string, any>();
 
     const addUpdate = (name: string, role: string, type: string, hours: string, points: number) => {
-      if (name === "לא מאויש" || name === "טרם שובץ" || name === "-") return;
+      if (!name || name === "לא מאויש" || name === "טרם שובץ" || name === "-") return;
       if (!consolidated.has(name)) {
         consolidated.set(name, {
           date: formattedDate,
@@ -565,7 +754,7 @@ export default function GuardAssignmentPage() {
     };
 
     assignments.hapak.forEach(h => {
-      if (h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") {
+      if (h.assignedTo && h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") {
         const parts = h.name.split(' - ');
         const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
         addUpdate(h.assignedTo, displayRole, 'חפ"ק', 'לתאם', h.points);
@@ -573,7 +762,7 @@ export default function GuardAssignmentPage() {
     });
 
     assignments.guards.forEach(g => {
-      if (g.name !== "לא מאויש" && g.name !== "-") {
+      if (g.name && g.name !== "לא מאויש" && g.name !== "-") {
         const person = data?.find(p => p.name === g.name);
         addUpdate(g.name, person?.role || 'שומר', 'שמירה', g.time, g.points);
       }
@@ -581,7 +770,6 @@ export default function GuardAssignmentPage() {
 
     const sessionUpdates = Array.from(consolidated.values());
 
-    // 2. Call the API
     try {
       const response = await fetch("https://151.145.89.228.sslip.io/webhook/confirm-guards", {
         method: "POST",
@@ -591,24 +779,15 @@ export default function GuardAssignmentPage() {
 
       if (!response.ok) throw new Error("API update failed");
 
-      // 3. Update session history internally so UI updates flawlessly (shows points added matching API)
       const newHistory = { ...history };
       sessionUpdates.forEach(u => {
         newHistory[u.name] = (newHistory[u.name] || 0) + u.points;
       });
       setHistory(newHistory);
-      
-      // Clear localStorage so we don't double count on next app reload (Google sheets will be computed by then)
       localStorage.removeItem(STORAGE_KEY);
-
       toast.success("השיבוץ אושר ונרשם ביומן הפעילות בהצלחה!");
-      
-      // Deliberately NOT calling refetch() here. 
-      // Google Sheets formulas take several seconds to compute. 
-      // If we refetch instantly, we'll get the old values and appear as if nothing happened.
     } catch (e) {
       console.error("Confirm API Error:", e);
-      // Fallback to local storage if API fails completely
       const newHistory = { ...history };
       sessionUpdates.forEach(u => {
         newHistory[u.name] = (newHistory[u.name] || 0) + u.points;
@@ -666,7 +845,6 @@ export default function GuardAssignmentPage() {
   };
 
   const sortedHistory = useMemo(() => {
-    // Current points per person = record.burdenPoints + history[name]
     const allPersonnel = data?.map(r => ({
       name: r.name,
       total: (r.burdenPoints || 0) + (history[r.name] || 0),
@@ -690,7 +868,7 @@ export default function GuardAssignmentPage() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-overlay">שיבוץ שוויוני (ניקוד)</h1>
               <p className="text-overlay/70 text-sm mt-0.5">
-                {isAuthenticated ? 'חפ"ק = 3 | לילה = 2 | יום = 1' : 'רשימת שמירות ושיבוצי חפ"ק'}
+                רשימת שמירות ושיבוצי חפ"ק
               </p>
             </div>
           </div>
@@ -739,7 +917,7 @@ export default function GuardAssignmentPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Left Column: Controls, Stats & History */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 text-right" dir="rtl">
             <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4">
               <h2 className="text-lg font-black flex items-center gap-2">
                 <Shuffle className="w-5 h-5 text-primary" />
@@ -767,14 +945,22 @@ export default function GuardAssignmentPage() {
               )}
             </div>
 
-            {/* Burden Ledger (Top 10) */}
+            {/* Burden Ledger */}
             {isAuthenticated && (
               <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
                 <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
-                  <h3 className="font-black text-sm flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    טבלת עומס (ניקוד מצטבר)
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setIsLedgerCollapsed(!isLedgerCollapsed)}
+                      className="p-1 hover:bg-muted rounded-md transition-colors"
+                    >
+                      {isLedgerCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                    </button>
+                    <h3 className="font-black text-sm flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      טבלת עומס (ניקוד מצטבר)
+                    </h3>
+                  </div>
                   <div className="flex items-center gap-2">
                     <button onClick={handleResetBlocks} title="בטל את כל החסימות" className="text-muted-foreground hover:text-amber-500 transition-colors">
                       <ShieldOff className="w-4 h-4" />
@@ -784,46 +970,87 @@ export default function GuardAssignmentPage() {
                     </button>
                   </div>
                 </div>
-                <div className="p-1 max-h-[600px] overflow-y-auto">
-                  {sortedHistory.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-muted-foreground">אין נתונים היסטוריים</div>
-                  ) : (
-                    sortedHistory.map((p) => {
-                      const isBlocked = blockedNames.has(p.name);
-                      return (
-                        <div key={p.name} className={cn(
-                          "flex items-center justify-between p-2.5 border-b border-border last:border-0 group",
-                          isBlocked && "bg-red-500/5 opacity-80"
-                        )}>
-                          <div className="flex items-center gap-3">
-                            <button 
-                              onClick={() => toggleBlock(p.name)}
-                              className={cn(
-                                "p-1.5 rounded-md transition-colors",
-                                isBlocked ? "text-red-500 bg-red-500/10 hover:bg-red-500/20" : "text-muted-foreground hover:text-primary hover:bg-muted"
-                              )}
-                              title={isBlocked ? "בטל חסימה" : "חסום משיבוץ"}
-                            >
-                              {isBlocked ? <ShieldOff className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
-                            </button>
-                            <div className="flex flex-col text-right">
-                              <span className={cn("text-sm font-medium", isBlocked && "line-through text-muted-foreground")}>{p.name}</span>
-                              <span className="text-[10px] text-muted-foreground">
-                                {p.isPermanent ? "מהגליון" : "בסשן זה"}
-                              </span>
-                            </div>
-                          </div>
-                          <span className={cn(
-                            "text-xs font-bold px-2 py-0.5 rounded-full",
-                            p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
+                {!isLedgerCollapsed && (
+                  <div className="p-1 max-h-[600px] overflow-y-auto">
+                    {sortedHistory.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-muted-foreground">אין נתונים היסטוריים</div>
+                    ) : (
+                      sortedHistory.map((p) => {
+                        const isBlocked = blockedNames.has(p.name);
+                        return (
+                          <div key={p.name} className={cn(
+                            "flex items-center justify-between p-2.5 border-b border-border last:border-0 group",
+                            isBlocked && "bg-red-500/5 opacity-80"
                           )}>
-                            {p.total} נק'
-                          </span>
-                        </div>
-                      );
-                    })
-                  )}
+                            <div className="flex items-center gap-3">
+                              <button 
+                                onClick={() => toggleBlock(p.name)}
+                                className={cn(
+                                  "p-1.5 rounded-md transition-colors",
+                                  isBlocked ? "text-red-500 bg-red-500/10 hover:bg-red-500/20" : "text-muted-foreground hover:text-primary hover:bg-muted"
+                                )}
+                                title={isBlocked ? "בטל חסימה" : "חסום משיבוץ"}
+                              >
+                                {isBlocked ? <ShieldOff className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+                              </button>
+                              <div className="flex flex-col text-right">
+                                <span className={cn("text-sm font-medium", isBlocked && "line-through text-muted-foreground")}>{p.name}</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {p.isPermanent ? "מהגליון" : "בסשן זה"}
+                                </span>
+                              </div>
+                            </div>
+                            <span className={cn(
+                              "text-xs font-bold px-2 py-0.5 rounded-full",
+                              p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
+                            )}>
+                              {p.total} נק'
+                            </span>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Available Personnel */}
+            {isAuthenticated && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
+                <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setIsAvailableCollapsed(!isAvailableCollapsed)}
+                      className="p-1 hover:bg-muted rounded-md transition-colors"
+                    >
+                      {isAvailableCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                    </button>
+                    <h3 className="font-black text-sm flex items-center gap-2">
+                      <UserCheck className="w-4 h-4 text-green-500" />
+                      חיילים פנויים למשימות ({availablePersonnel.length})
+                    </h3>
+                  </div>
                 </div>
+                {!isAvailableCollapsed && (
+                  <div className="p-3 max-h-[400px] overflow-y-auto space-y-2">
+                    {availablePersonnel.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-muted-foreground">אין חיילים פנויים כרגע</div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2 justify-start" dir="rtl">
+                        {availablePersonnel.map((p) => (
+                          <div 
+                            key={p.name} 
+                            className="bg-green-500/10 text-green-700 border border-green-500/20 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2"
+                          >
+                            <span>{p.name}</span>
+                            <span className="text-[10px] opacity-60">({p.role || "חייל"})</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -831,7 +1058,7 @@ export default function GuardAssignmentPage() {
               <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
                 <div className="flex gap-2 text-primary">
                   <Info className="w-5 h-5 shrink-0" />
-                  <div className="text-xs space-y-1">
+                  <div className="text-xs space-y-1 text-right">
                     <p className="font-bold">איך זה עובד?</p>
                     <p>המערכת מחשבת מי שמר הכי פחות לפי הניקוד המצטבר ומתעדפת אותו בשיבוץ הבא.</p>
                   </div>
@@ -843,125 +1070,154 @@ export default function GuardAssignmentPage() {
           {/* Right Column: Assignments */}
           <div className="lg:col-span-2 space-y-6">
             {/* Hapak Grid */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef}>
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef} id="hapak-export-container">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
-                <h2 className="font-black flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  שיבוץ חפ"ק (לפי היררכיית תפקידים)
-                </h2>
-                {!isExportingHapak && (
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setIsHapakCollapsed(!isHapakCollapsed)}
+                    className="p-1 hover:bg-muted rounded-md transition-colors"
+                  >
+                    {isHapakCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                  </button>
+                  <div className="flex flex-col">
+                    <h2 className="font-black flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      שיבוץ חפ"ק (לפי היררכיית תפקידים)
+                    </h2>
+                    <span className="text-[10px] text-muted-foreground font-mono mr-7">
+                      תאריך: {date.split('-').reverse().join('/')}
+                    </span>
+                  </div>
+                </div>
+                {!isExportingHapak && !isHapakCollapsed && (
                   <Button onClick={handleExportHapak} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5">
                     <Camera className="w-3.5 h-3.5 mr-2" />
                     שמור כתמונה
                   </Button>
                 )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
-                {HAPAK_MISSIONS.map(mission => (
-                  <div key={mission.id} className="bg-card p-4">
-                    <h3 className="text-sm font-black mb-3 text-primary">חפ"ק {mission.name}</h3>
-                    <div className="space-y-2">
-                      {assignments?.hapak.filter(h => h.id === mission.id)
-                        .sort((a, b) => a.memberIndex - b.memberIndex)
-                        .map(h => {
-                         const person = data?.find(p => p.name === h.assignedTo);
-                         const personName = h.assignedTo === "לא מאויש" || h.assignedTo === "טרם שובץ" ? "לא מאויש" : h.assignedTo;
-                         const roleText = personName !== "לא מאויש" && person?.role ? `(${person.role.trim()})` : '';
-                         
-                         // Get dynamic role name from h.name (e.g., 'חפ"ק מ"פ - מפקד' -> 'מפקד')
-                         const parts = h.name.split(' - ');
-                         const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
+              {!isHapakCollapsed && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+                  {HAPAK_MISSIONS.map(mission => (
+                    <div key={mission.id} className="bg-card p-4">
+                      <h3 className="text-sm font-black mb-3 text-primary text-right" dir="rtl">חפ"ק {mission.name}</h3>
+                      <div className="space-y-2">
+                        {assignments?.hapak.filter(h => h.id === mission.id)
+                          .sort((a, b) => a.memberIndex - b.memberIndex)
+                          .map((h, hIdx) => {
+                           const person = data?.find(p => p.name === h.assignedTo);
+                           const isUnmanned = !h.assignedTo || h.assignedTo === "לא מאויש" || h.assignedTo === "טרם שובץ";
+                           const roleText = !isUnmanned && person?.role ? `(${person.role.trim()})` : '';
+                           
+                           const parts = h.name.split(' - ');
+                           const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
 
-                         return (
-                           <div key={`${h.id}-${h.memberIndex}`} className={cn("flex items-center justify-between p-2 rounded-lg text-xs", h.memberIndex === 1 ? "bg-amber-500/10 border border-amber-500/20" : "bg-muted/30")}>
-                             <span className={cn("font-medium max-w-[90px] break-words text-right", h.memberIndex === 1 ? "text-amber-700 font-black" : "text-muted-foreground")}>
-                               {displayRole}
-                             </span>
-                             <div className="flex items-center gap-1.5 flex-row-reverse">
-                                 <PersonnelSwap
-                                   currentName={personName}
-                                   allPersonnel={data || []}
-                                   onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex)}
-                                   readonly={!isAuthenticated}
-                                   allowEmpty={true}
-                                 />
-                               {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
+                           return (
+                             <div key={`${h.id}-${h.memberIndex}-${h.name}-${hIdx}`} className={cn("flex items-center justify-between p-2 rounded-lg text-xs", h.memberIndex === 1 ? "bg-amber-500/10 border border-amber-500/20" : "bg-muted/30")}>
+                               <span className={cn("font-medium max-w-[100px] break-words text-right", h.memberIndex === 1 ? "text-amber-700 font-black" : "text-muted-foreground")}>
+                                 {displayRole}
+                               </span>
+                               <div className="flex items-center gap-1.5 flex-row-reverse">
+                                   <PersonnelSwap
+                                     currentName={h.assignedTo}
+                                     allPersonnel={data || []}
+                                     onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
+                                     readonly={!isAuthenticated}
+                                     allowEmpty={true}
+                                   />
+                                  {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
+                               </div>
                              </div>
-                           </div>
-                         );
-                      })}
+                           );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Guard Table */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={guardTableRef}>
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={guardTableRef} id="guard-export-container">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
-                <h2 className="font-black flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-primary" />
-                  לו"ז שמירות (24 שעות)
-                </h2>
-                {!isExporting && (
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setIsGuardCollapsed(!isGuardCollapsed)}
+                    className="p-1 hover:bg-muted rounded-md transition-colors"
+                  >
+                    {isGuardCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                  </button>
+                  <div className="flex flex-col">
+                    <h2 className="font-black flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      לו"ז שמירות (24 שעות)
+                    </h2>
+                    <span className="text-[10px] text-muted-foreground font-mono mr-7">
+                      תאריך: {date.split('-').reverse().join('/')}
+                    </span>
+                  </div>
+                </div>
+                {!isExporting && !isGuardCollapsed && (
                   <Button onClick={handleExportImage} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5">
                     <Camera className="w-3.5 h-3.5 mr-2" />
                     שמור כתמונה
                   </Button>
                 )}
               </div>
-              <div className={cn(
-                "overflow-x-auto",
-                !isExporting && "max-h-[600px] overflow-y-auto"
-              )}>
-                <table className="w-full text-sm">
-                  <thead className="sticky top-0 bg-muted z-10">
-                    <tr className="text-right">
-                      <th className="px-5 py-3 font-black text-muted-foreground">שעה</th>
-                      <th className="px-5 py-3 font-black text-muted-foreground">שומר</th>
-                      {(!isExporting && isAuthenticated) && <th className="px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {assignments?.guards.map((g, idx) => (
-                      <tr
-                        key={idx}
-                        className={cn(
-                          "border-t border-border transition-colors hover:bg-muted/50",
-                          idx % 2 === 0 ? "bg-card" : "bg-background"
-                        )}
-                      >
-                        <td className="px-5 py-3 font-mono text-xs text-muted-foreground flex items-center gap-2">
-                          <div className={cn(
-                            "w-2 h-2 rounded-full",
-                            g.points === 2 ? "bg-indigo-500" : "bg-yellow-500"
-                          )} />
-                          {g.time}
-                        </td>
-                        <td className="px-5 py-3 font-bold">
-                          <PersonnelSwap
-                            currentName={g.name === "-" ? "לא מאויש" : g.name}
-                            allPersonnel={data || []}
-                            onSwap={(newName) => handleSwap("guard", g.hour, newName)}
-                            readonly={!isAuthenticated}
-                            allowEmpty={true}
-                          />
-                        </td>
-                        {(!isExporting && isAuthenticated) && (
-                          <td className="px-5 py-3">
-                            <span className={cn(
-                              "text-[10px] px-2 py-0.5 rounded-full font-bold",
-                              g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700"
-                            )}>
-                              {g.points} נק'
-                            </span>
-                          </td>
-                        )}
+              {!isGuardCollapsed && (
+                <div className={cn(
+                  "overflow-x-auto",
+                  !isExporting && "max-h-[600px] overflow-y-auto"
+                )}>
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-muted z-10">
+                      <tr className="text-right">
+                        <th className="px-5 py-3 font-black text-muted-foreground">שעה</th>
+                        <th className="px-5 py-3 font-black text-muted-foreground">שומר</th>
+                        {(!isExporting && isAuthenticated) && <th className="px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {assignments?.guards.map((g, idx) => (
+                        <tr
+                          key={idx}
+                          className={cn(
+                            "border-t border-border transition-colors hover:bg-muted/50",
+                            idx % 2 === 0 ? "bg-card" : "bg-background"
+                          )}
+                        >
+                          <td className="px-5 py-3 font-mono text-xs text-muted-foreground flex items-center gap-2">
+                            <div className={cn(
+                              "w-2 h-2 rounded-full",
+                              g.points === 2 ? "bg-indigo-500" : "bg-yellow-500"
+                            )} />
+                            {g.time}
+                          </td>
+                          <td className="px-5 py-3 font-bold">
+                            <PersonnelSwap
+                              currentName={g.name}
+                              allPersonnel={data || []}
+                              onSwap={(newName) => handleSwap("guard", g.hour, newName)}
+                              readonly={!isAuthenticated}
+                              allowEmpty={true}
+                            />
+                          </td>
+                          {(!isExporting && isAuthenticated) && (
+                            <td className="px-5 py-3">
+                              <span className={cn(
+                                "text-[10px] px-2 py-0.5 rounded-full font-bold",
+                                g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700"
+                              )}>
+                                {g.points} נק'
+                              </span>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
 
