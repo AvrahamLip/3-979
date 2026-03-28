@@ -453,8 +453,9 @@ export default function GuardAssignmentPage() {
     blockedNames.forEach(name => assigned.add(normalizeNameStr(name)));
     
     return data.filter(p => {
-      const isPresent = String(p.todayValue).trim().toUpperCase() === "1" || String(p.todayValue).trim().toUpperCase() === "V";
-      if (!isPresent || assigned.has(normalizeNameStr(p.name))) return false;
+      const v = String(p.todayValue).trim().toUpperCase();
+      const isEligibleAttendance = v === "1" || v === "V" || v.includes("בית") || v.includes("חוזר");
+      if (!isEligibleAttendance || assigned.has(normalizeNameStr(p.name))) return false;
 
       const role = (p.role || "").trim();
       
@@ -1038,15 +1039,33 @@ export default function GuardAssignmentPage() {
                       <div className="p-4 text-center text-xs text-muted-foreground">אין חיילים פנויים כרגע</div>
                     ) : (
                       <div className="flex flex-wrap gap-2 justify-start" dir="rtl">
-                        {availablePersonnel.map((p) => (
-                          <div 
-                            key={p.name} 
-                            className="bg-green-500/10 text-green-700 border border-green-500/20 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2"
-                          >
-                            <span>{p.name}</span>
-                            <span className="text-[10px] opacity-60">({p.role || "חייל"})</span>
-                          </div>
-                        ))}
+                        {availablePersonnel.map((p) => {
+                          const v = String(p.todayValue).trim().toUpperCase();
+                          let statusLabel = "זמין";
+                          let statusColor = "bg-green-500/10 text-green-700 border-green-500/20";
+                          
+                          if (v.includes("בית")) {
+                            statusLabel = "יוצא היום";
+                            statusColor = "bg-amber-500/10 text-amber-700 border-amber-500/20";
+                          } else if (v.includes("חוזר")) {
+                            statusLabel = "חוזר היום";
+                            statusColor = "bg-blue-500/10 text-blue-700 border-blue-500/20";
+                          }
+
+                          return (
+                            <div 
+                              key={p.name} 
+                              className={cn("border px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2", statusColor)}
+                            >
+                              <span>{p.name}</span>
+                              <div className="flex items-center gap-1 opacity-60">
+                                <span className="text-[10px]">({p.role || "חייל"})</span>
+                                <span className="text-[10px] font-black">•</span>
+                                <span className="text-[10px]">{statusLabel}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
