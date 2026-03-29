@@ -586,30 +586,34 @@ export default function GuardAssignmentPage() {
         scale: 3, // Higher resolution
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 1200, 
-        onclone: (clonedDoc) => {
-          const element = clonedDoc.getElementById('guard-export-container');
-          if (element) {
-            element.style.width = '1200px';
-            element.style.padding = '20px';
-            element.style.minHeight = 'auto';
-            element.style.overflow = 'visible';
-          }
-          // Inject capture-specific styles
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `
-            table { width: 100% !important; min-width: 460px !important; }
-            th, td { font-size: 15px !important; padding: 12px 8px !important; border-bottom: 1px solid #eee !important; color: #000 !important; white-space: nowrap !important; }
-            h2 { font-size: 22px !important; margin-bottom: 10px !important; color: #000 !important; }
-            .font-mono { font-size: 13px !important; }
-            .font-bold { font-weight: 800 !important; }
-            .no-export { display: none !important; }
-            button { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #000 !important; box-shadow: none !important; text-align: right !important; width: 100% !important; white-space: nowrap !important; }
-            button svg { display: none !important; }
-            .max-h-\\[600px\\] { max-height: none !important; overflow: visible !important; }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
+        windowWidth: 1000, 
+         onclone: (clonedDoc) => {
+           const element = clonedDoc.getElementById('guard-export-container');
+           if (element) {
+             element.style.width = '1000px';
+             element.style.padding = '20px';
+             element.style.minHeight = 'auto';
+             element.style.overflow = 'visible';
+           }
+           // Inject capture-specific styles
+           const style = clonedDoc.createElement('style');
+           style.innerHTML = `
+             table { width: 100% !important; min-width: 960px !important; table-layout: fixed !important; border-collapse: collapse !important; }
+             th, td { font-size: 15px !important; padding: 12px 8px !important; border-bottom: 1px solid #eee !important; color: #000 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: clip !important; }
+             /* Set fixed widths for columns in export */
+             th:nth-child(1), td:nth-child(1) { width: 140px !important; } /* Time column */
+             th:nth-child(3), td:nth-child(3) { width: 100px !important; } /* Points column */
+             h2 { font-size: 22px !important; margin-bottom: 10px !important; color: #000 !important; }
+             .font-mono { font-size: 13px !important; }
+             .font-bold { font-weight: 800 !important; }
+             .no-export { display: none !important; }
+             * { max-width: none !important; max-height: none !important; overflow: visible !important; }
+             button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #000 !important; box-shadow: none !important; text-align: right !important; white-space: nowrap !important; }
+             button svg { display: none !important; }
+             .max-h-\\[800px\\], .overflow-y-auto { max-height: none !important; overflow: visible !important; }
+           `;
+           clonedDoc.head.appendChild(style);
+         }
       });
 
       const dataUrl = canvas.toDataURL('image/png');
@@ -1276,14 +1280,16 @@ export default function GuardAssignmentPage() {
                             )} />
                             {g.time}
                           </td>
-                          <td className="px-3 sm:px-5 py-3 font-bold flex items-center justify-start gap-2 whitespace-nowrap">
-                            <PersonnelSwap
-                              currentName={g.name}
-                              allPersonnel={data || []}
-                              onSwap={(newName) => handleSwap("guard", g.hour, newName)}
-                              readonly={!isAuthenticated}
-                              allowEmpty={true}
-                            />
+                          <td className="px-3 sm:px-5 py-3 font-bold whitespace-nowrap">
+                            <div className="flex items-center justify-start gap-2">
+                              <PersonnelSwap
+                                currentName={g.name}
+                                allPersonnel={data || []}
+                                onSwap={(newName) => handleSwap("guard", g.hour, newName)}
+                                readonly={!isAuthenticated || isExporting}
+                                allowEmpty={true}
+                              />
+                            </div>
                           </td>
                           {(!isExporting && isAuthenticated) && (
                             <td className="px-5 py-3">
