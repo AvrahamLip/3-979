@@ -530,11 +530,11 @@ export default function GuardAssignmentPage() {
         scale: 3, // Higher resolution
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 1200, 
+        windowWidth: 800, 
         onclone: (clonedDoc) => {
           const element = clonedDoc.getElementById('hapak-export-container');
           if (element) {
-            element.style.width = '1200px'; 
+            element.style.width = '800px'; 
             element.style.padding = '20px';
             element.style.minHeight = 'auto';
             element.style.overflow = 'visible';
@@ -550,8 +550,11 @@ export default function GuardAssignmentPage() {
             .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
             .no-export { display: none !important; }
             * { max-width: none !important; max-height: none !important; overflow: visible !important; min-width: 0 !important; }
-            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; whitespace: nowrap !important; text-align: right !important; }
+            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; whitespace: nowrap !important; text-align: left !important; }
             button svg { display: none !important; }
+            /* Reset grid to 1 column for export image */
+            .grid { grid-template-cols: 1fr !important; }
+            .grid-cols-\\[100px\\,1fr\\] { grid-template-cols: 100px 1fr !important; }
             .flex-row-reverse { flex-direction: row-reverse !important; }
           `;
           clonedDoc.head.appendChild(style);
