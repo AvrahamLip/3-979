@@ -27,6 +27,13 @@ export function useRoleAuth(role: string, buttonContainerId: string = "google-si
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 0. Development Bypass for Localhost
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      setIsAuthenticated(true);
+      setIsLoading(false);
+      return;
+    }
+
     const cachedAuthKey = `auth_${role}`;
     
     // 1. Check for cached session
