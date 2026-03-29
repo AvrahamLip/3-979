@@ -529,7 +529,9 @@ export default function GuardAssignmentPage() {
             .text-\\[10px\\] { font-size: 11px !important; }
             .bg-amber-500\\/10 { background-color: #fff9db !important; border: 1px solid #fab005 !important; }
             .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
-            button { display: none !important; }
+            .no-export { display: none !important; }
+            button { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; }
+            button svg { display: none !important; }
           `;
           clonedDoc.head.appendChild(style);
         }
@@ -575,7 +577,9 @@ export default function GuardAssignmentPage() {
             h2 { font-size: 22px !important; margin-bottom: 10px !important; color: #000 !important; }
             .font-mono { font-size: 13px !important; }
             .font-bold { font-weight: 800 !important; }
-            button, .btn { display: none !important; }
+            .no-export { display: none !important; }
+            button { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #000 !important; box-shadow: none !important; text-align: right !important; width: 100% !important; }
+            button svg { display: none !important; }
             .max-h-\\[600px\\] { max-height: none !important; overflow: visible !important; }
           `;
           clonedDoc.head.appendChild(style);
@@ -1143,7 +1147,7 @@ export default function GuardAssignmentPage() {
                   </div>
                 </div>
                 {!isExportingHapak && !isHapakCollapsed && (
-                  <Button onClick={handleExportHapak} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5">
+                  <Button onClick={handleExportHapak} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export">
                     <Camera className="w-3.5 h-3.5 mr-2" />
                     שמור כתמונה
                   </Button>
@@ -1211,7 +1215,7 @@ export default function GuardAssignmentPage() {
                   </div>
                 </div>
                 {!isExporting && !isGuardCollapsed && (
-                  <Button onClick={handleExportImage} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5">
+                  <Button onClick={handleExportImage} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export">
                     <Camera className="w-3.5 h-3.5 mr-2" />
                     שמור כתמונה
                   </Button>
