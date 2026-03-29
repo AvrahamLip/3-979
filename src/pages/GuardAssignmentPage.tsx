@@ -394,7 +394,7 @@ function PersonnelSwap({
 
   if (readonly) {
     return (
-      <span className="font-bold text-right py-1 flex items-center gap-1.5">
+      <span className="font-bold text-right py-1 flex items-center gap-1.5 whitespace-nowrap">
         {statusDot}
         {currentName}
       </span>
@@ -405,7 +405,7 @@ function PersonnelSwap({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn(
-          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1.5 group whitespace-normal",
+          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1.5 group whitespace-nowrap",
           (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
         )}>
           {statusDot}
@@ -550,7 +550,7 @@ export default function GuardAssignmentPage() {
             .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
             .no-export { display: none !important; }
             * { max-width: none !important; max-height: none !important; overflow: visible !important; min-width: 0 !important; }
-            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; white-space: normal !important; text-align: right !important; }
+            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; whitespace: nowrap !important; text-align: right !important; }
             button svg { display: none !important; }
             .flex-row-reverse { flex-direction: row-reverse !important; }
           `;
@@ -596,12 +596,12 @@ export default function GuardAssignmentPage() {
           const style = clonedDoc.createElement('style');
           style.innerHTML = `
             table { width: 100% !important; min-width: 460px !important; }
-            th, td { font-size: 15px !important; padding: 12px 8px !important; border-bottom: 1px solid #eee !important; color: #000 !important; }
+            th, td { font-size: 15px !important; padding: 12px 8px !important; border-bottom: 1px solid #eee !important; color: #000 !important; white-space: nowrap !important; }
             h2 { font-size: 22px !important; margin-bottom: 10px !important; color: #000 !important; }
             .font-mono { font-size: 13px !important; }
             .font-bold { font-weight: 800 !important; }
             .no-export { display: none !important; }
-            button { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #000 !important; box-shadow: none !important; text-align: right !important; width: 100% !important; }
+            button { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #000 !important; box-shadow: none !important; text-align: right !important; width: 100% !important; white-space: nowrap !important; }
             button svg { display: none !important; }
             .max-h-\\[600px\\] { max-height: none !important; overflow: visible !important; }
           `;
@@ -1116,7 +1116,7 @@ export default function GuardAssignmentPage() {
                           return (
                             <div 
                               key={p.name} 
-                              className={cn("border px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2", statusColor)}
+                              className={cn("border px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 whitespace-nowrap", statusColor)}
                             >
                               <span>{p.name}</span>
                               <div className="flex items-center gap-1 opacity-60">
@@ -1273,7 +1273,7 @@ export default function GuardAssignmentPage() {
                             )} />
                             {g.time}
                           </td>
-                          <td className="px-3 sm:px-5 py-3 font-bold flex items-center justify-start gap-2">
+                          <td className="px-3 sm:px-5 py-3 font-bold flex items-center justify-start gap-2 whitespace-nowrap">
                             <PersonnelSwap
                               currentName={g.name}
                               allPersonnel={data || []}
