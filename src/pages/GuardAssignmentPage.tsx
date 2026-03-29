@@ -381,17 +381,34 @@ function PersonnelSwap({
       .sort((a, b) => (a.burdenPoints || 0) - (b.burdenPoints || 0));
   }, [allPersonnel]);
 
+  const person = useMemo(() => allPersonnel.find(p => p.name === currentName), [allPersonnel, currentName]);
+  const v = person ? String(person.todayValue || "").trim().toUpperCase() : "";
+  
+  const statusDot = useMemo(() => {
+    if (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") return null;
+    let color = "bg-green-500";
+    if (v.includes("בית")) color = "bg-amber-500";
+    else if (v.includes("חוזר")) color = "bg-blue-500";
+    return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", color)} />;
+  }, [currentName, v]);
+
   if (readonly) {
-    return <span className="font-bold text-right py-1">{currentName}</span>;
+    return (
+      <span className="font-bold text-right py-1 flex items-center gap-1.5">
+        {statusDot}
+        {currentName}
+      </span>
+    );
   }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn(
-          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1 group whitespace-normal",
+          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1.5 group whitespace-normal",
           (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
         )}>
+          {statusDot}
           {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
           <Shuffle className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
         </button>
@@ -532,9 +549,10 @@ export default function GuardAssignmentPage() {
             .bg-amber-500\\/10 { background-color: #fff9db !important; border: 1px solid #fab005 !important; }
             .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
             .no-export { display: none !important; }
-            * { max-width: none !important; max-height: none !important; overflow: visible !important; }
-            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; white-space: normal !important; }
+            * { max-width: none !important; max-height: none !important; overflow: visible !important; min-width: 0 !important; }
+            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; white-space: normal !important; text-align: right !important; }
             button svg { display: none !important; }
+            .flex-row-reverse { flex-direction: row-reverse !important; }
           `;
           clonedDoc.head.appendChild(style);
         }
@@ -1132,7 +1150,7 @@ export default function GuardAssignmentPage() {
           {/* Right Column: Assignments */}
           <div className="lg:col-span-2 space-y-6">
             {/* Hapak Grid */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef} id="hapak-export-container">
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef} id="hapak-export-container" style={{ overflow: 'visible' }}>
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button 
