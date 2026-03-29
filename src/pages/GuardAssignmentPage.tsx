@@ -513,11 +513,11 @@ export default function GuardAssignmentPage() {
         scale: 3, // Higher resolution
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 500, // Force mobile-like layout during capture
+        windowWidth: 1000, // Increased width to avoid name clipping
         onclone: (clonedDoc) => {
           const element = clonedDoc.getElementById('hapak-export-container');
           if (element) {
-            element.style.width = '500px';
+            element.style.width = '1000px';
             element.style.padding = '20px';
           }
           // Inject capture-specific styles
@@ -562,11 +562,11 @@ export default function GuardAssignmentPage() {
         scale: 3, // Higher resolution
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 500, // Force mobile-like layout during capture
+        windowWidth: 1000, // Increased width to avoid name clipping
         onclone: (clonedDoc) => {
           const element = clonedDoc.getElementById('guard-export-container');
           if (element) {
-            element.style.width = '500px';
+            element.style.width = '1000px';
             element.style.padding = '20px';
           }
           // Inject capture-specific styles
@@ -1250,7 +1250,7 @@ export default function GuardAssignmentPage() {
                             )} />
                             {g.time}
                           </td>
-                          <td className="px-3 sm:px-5 py-3 font-bold truncate">
+                          <td className="px-3 sm:px-5 py-3 font-bold flex items-center justify-start gap-2">
                             <PersonnelSwap
                               currentName={g.name}
                               allPersonnel={data || []}
