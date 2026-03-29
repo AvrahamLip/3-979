@@ -1179,7 +1179,7 @@ export default function GuardAssignmentPage() {
                                      currentName={h.assignedTo}
                                      allPersonnel={data || []}
                                      onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
-                                     readonly={!isAuthenticated}
+                                     readonly={!isAuthenticated || isExportingHapak}
                                      allowEmpty={true}
                                    />
                                   {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
