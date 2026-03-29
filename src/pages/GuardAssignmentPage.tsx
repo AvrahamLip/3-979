@@ -1224,7 +1224,7 @@ export default function GuardAssignmentPage() {
               {!isGuardCollapsed && (
                 <div className={cn(
                   "overflow-x-auto",
-                  !isExporting && "max-h-[600px] overflow-y-auto"
+                  !isExporting && "max-h-[800px] overflow-y-auto"
                 )}>
                   <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-muted z-10">
