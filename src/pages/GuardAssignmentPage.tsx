@@ -79,7 +79,13 @@ function getPointsForHour(hour: number): number {
 
 const normalizeNameStr = (name: any) => String(name || "").replace(/\(.*\)/g, '').replace(/\s+/g, ' ').trim();
 
-function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string): AssignmentData {
+const getYesterdayIso = (dateStr: string) => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split('T')[0];
+};
+
+function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string, yesterdayNightGuards: Set<string> = new Set()): AssignmentData {
   try {
     if (!records) records = [];
     if (!hapakRows) hapakRows = [];
@@ -318,8 +324,15 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
         if (currAssignments < prevAssignments) return curr;
         if (currAssignments > prevAssignments) return prev;
 
-        const prevScore = (prev.burdenPoints || 0) + (history[prev.name] || 0) + ((localGenerationPoints[prev.name] || 0) % 1000);
-        const currScore = (curr.burdenPoints || 0) + (history[curr.name] || 0) + ((localGenerationPoints[curr.name] || 0) % 1000);
+        let prevScore = (prev.burdenPoints || 0) + (history[prev.name] || 0) + ((localGenerationPoints[prev.name] || 0) % 1000);
+        let currScore = (curr.burdenPoints || 0) + (history[curr.name] || 0) + ((localGenerationPoints[curr.name] || 0) % 1000);
+        
+        // Soft constraint for consecutive night shifts
+        if (shift.isNight) {
+          if (yesterdayNightGuards.has(normalizeNameStr(prev.name))) prevScore += 10000;
+          if (yesterdayNightGuards.has(normalizeNameStr(curr.name))) currScore += 10000;
+        }
+
         return currScore < prevScore ? curr : prev;
       });
 
@@ -641,7 +654,17 @@ export default function GuardAssignmentPage() {
           setIsSaved(true);
         } else {
           if (isAuthenticated) {
-            setAssignments(generateAssignment(data, history, hapakData, blockedNames, date));
+            const yesterday = getYesterdayIso(date);
+            const yesterdayData = await fetchSavedAssignment(yesterday);
+            const yesterdayNightGuards = new Set<string>();
+            if (yesterdayData) {
+              yesterdayData.guards.forEach(g => {
+                if (g.hour >= 0 && g.hour < 8 && g.name) {
+                  yesterdayNightGuards.add(normalizeNameStr(g.name));
+                }
+              });
+            }
+            setAssignments(generateAssignment(data, history, hapakData, blockedNames, date, yesterdayNightGuards));
             setIsSaved(false);
           } else {
             setAssignments(null);
@@ -667,12 +690,23 @@ export default function GuardAssignmentPage() {
       const { data: latestData } = await refetch();
       const latestHapakRows = await loadHapakRegistry();
       
+      const yesterday = getYesterdayIso(date);
+      const yesterdayData = await fetchSavedAssignment(yesterday);
+      const yesterdayNightGuards = new Set<string>();
+      if (yesterdayData) {
+        yesterdayData.guards.forEach(g => {
+          if (g.hour >= 0 && g.hour < 8 && g.name) {
+            yesterdayNightGuards.add(normalizeNameStr(g.name));
+          }
+        });
+      }
+
       if (!latestData || !latestHapakRows) {
         toast.error("נכשל בטעינת נתונים עדכניים. הגנרוט הופסק.");
         return;
       }
 
-      setAssignments(generateAssignment(latestData, history, latestHapakRows, blockedNames, date));
+      setAssignments(generateAssignment(latestData, history, latestHapakRows, blockedNames, date, yesterdayNightGuards));
       setIsSaved(false);
     } catch (error) {
       console.error("Generation failed:", error);
