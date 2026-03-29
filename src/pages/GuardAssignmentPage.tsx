@@ -389,7 +389,7 @@ function PersonnelSwap({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn(
-          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1 group truncate max-w-[120px]",
+          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1 group whitespace-normal",
           (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
         )}>
           {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
@@ -513,12 +513,14 @@ export default function GuardAssignmentPage() {
         scale: 3, // Higher resolution
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 1000, // Increased width to avoid name clipping
+        windowWidth: 1200, 
         onclone: (clonedDoc) => {
           const element = clonedDoc.getElementById('hapak-export-container');
           if (element) {
-            element.style.width = '1000px';
+            element.style.width = '1200px'; 
             element.style.padding = '20px';
+            element.style.minHeight = 'auto';
+            element.style.overflow = 'visible';
           }
           // Inject capture-specific styles
           const style = clonedDoc.createElement('style');
@@ -530,7 +532,8 @@ export default function GuardAssignmentPage() {
             .bg-amber-500\\/10 { background-color: #fff9db !important; border: 1px solid #fab005 !important; }
             .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
             .no-export { display: none !important; }
-            button { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; }
+            * { max-width: none !important; max-height: none !important; overflow: visible !important; }
+            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; white-space: normal !important; }
             button svg { display: none !important; }
           `;
           clonedDoc.head.appendChild(style);
@@ -562,12 +565,14 @@ export default function GuardAssignmentPage() {
         scale: 3, // Higher resolution
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 1000, // Increased width to avoid name clipping
+        windowWidth: 1200, 
         onclone: (clonedDoc) => {
           const element = clonedDoc.getElementById('guard-export-container');
           if (element) {
-            element.style.width = '1000px';
+            element.style.width = '1200px';
             element.style.padding = '20px';
+            element.style.minHeight = 'auto';
+            element.style.overflow = 'visible';
           }
           // Inject capture-specific styles
           const style = clonedDoc.createElement('style');
