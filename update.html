@@ -597,13 +597,14 @@
                         authError.classList.remove('hidden');
                     }
                 } else {
-                    console.error('Auth status error:', res.status);
-                    authError.innerText = 'שגיאת שרת באימות';
+                    const errorText = await res.text();
+                    console.error('Auth status error (res.status):', res.status, errorText);
+                    authError.innerText = `שגיאת שרת באימות (קוד: ${res.status})`;
                     authError.classList.remove('hidden');
                 }
             } catch (err) {
                 console.error('Auth communication error:', err);
-                authError.innerText = 'שגיאת תקשורת';
+                authError.innerText = `שגיאת תקשורת: ${err.message || 'לא ידוע'}`;
                 authError.classList.remove('hidden');
             } finally {
                 authLoading.classList.add('hidden');
