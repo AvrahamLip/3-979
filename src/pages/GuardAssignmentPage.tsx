@@ -1116,15 +1116,10 @@ export default function GuardAssignmentPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <div className="px-3 py-1.5 bg-green-500/20 text-white border border-green-500/30 rounded-lg text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 מצב עריכה
-              </div>
-            ) : (
-              <div className="px-3 py-1.5 bg-white/10 text-white/70 border border-white/20 rounded-lg text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm">
-                <Shield className="w-3.5 h-3.5 opacity-50" />
-                מצב צפייה
               </div>
             )}
             <DatePickerBar value={date} onChange={setDate} />
@@ -1149,7 +1144,7 @@ export default function GuardAssignmentPage() {
           <Shield className="w-16 h-16 text-muted-foreground/30 mb-4" />
           <h2 className="text-xl font-black text-foreground mb-2">טרם שובצו שמירות</h2>
           <p className="text-muted-foreground text-center max-w-sm">
-            לא נמצא שיבוץ שמור לתאריך זה. רק משתמש מורשה יכול לג'נרט ולשמור לוח שמירות חדש. התחבר למעלה לתחילת עבודה.
+            לא נמצא שיבוץ שמור לתאריך הנבחר. ניתן לבדוק תאריכים אחרים באמצעות לוח השנה למעלה.
           </p>
         </div>
       )}
@@ -1164,7 +1159,7 @@ export default function GuardAssignmentPage() {
                 <Shuffle className="w-5 h-5 text-primary" />
                 {isAuthenticated ? "ניהול שיבוץ" : "צפייה בשיבוץ (למורשים בלבד)"}
               </h2>
-              {isAuthenticated ? (
+              {isAuthenticated && (
                 <div className="space-y-2">
                   <Button onClick={handleGenerate} className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md">
                     ג'נרט שיבוץ חדש
@@ -1177,11 +1172,6 @@ export default function GuardAssignmentPage() {
                     <CheckCircle2 className="w-4 h-4 mr-2" />
                     אשר ועדכן ניקוד בגליון
                   </Button>
-                </div>
-              ) : (
-                <div className="text-sm text-amber-600/80 p-3 bg-amber-500/5 rounded-lg text-center border border-amber-500/10">
-                  <p>המערכת במצב <b>צפייה בלבד</b>.</p>
-                  <p className="text-xs mt-1">כדי לערוך שיבוצים, עליך להתחבר דרך הכפתור למעלה באמצעות חשבון מורשה.</p>
                 </div>
               )}
             </div>
