@@ -9,7 +9,6 @@ import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
 import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import {
   Popover,
@@ -585,21 +584,12 @@ function generateAggregatedHistory(history: Record<string, PersonnelPoints>): Pe
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function GuardAssignmentPage() {
+export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "soldier" | "commander" }) {
   const { isAuthenticated, checkPermission, user } = useAuth();
-  const location = useLocation();
-  const isAuthorized = isAuthenticated && user?.authorizedRolls?.includes('guard');
+  const isAuthorized = mode === "commander" || (isAuthenticated && user?.authorizedRolls?.includes('guard'));
 
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showAuthButton, setShowAuthButton] = useState(false);
-
-  // Auto-show login prompt if coming from commander page and not authorized
-  useEffect(() => {
-    if (location.state?.from === 'commander' && !isAuthorized) {
-      setShowAuthButton(true);
-      setShowLoginPrompt(true);
-    }
-  }, [location.state, isAuthorized]);
 
   const authError = null;
   const resetError = () => {};
@@ -1185,9 +1175,9 @@ export default function GuardAssignmentPage() {
             <div className="lg:col-span-1 space-y-6 text-right" dir="rtl">
               {/* Management Card */}
               <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4 animate-in fade-in slide-in-from-top-2">
-                <h2 className="text-lg font-black flex items-center gap-2 text-primary">
+                <h2 className="text-lg font-black flex items-center gap-2 text-primary border-b border-border pb-2">
                   <Shield className="w-5 h-5 text-primary" />
-                  ניהול שיבוץ
+                  {mode === "commander" ? "ניהול מפקדים" : "ניהול שיבוץ"}
                 </h2>
                 <div className="space-y-2">
                   <Button onClick={handleGenerate} className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md">

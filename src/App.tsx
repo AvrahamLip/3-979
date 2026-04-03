@@ -42,6 +42,16 @@ const App = () => (
               <Route path="/main" element={<MainPage />} />
               <Route path="/zama" element={<ZamaPage />} />
               <Route path="/workplan" element={<WorkPlanPage />} />
+              
+              {/* Commander-only Management routes */}
+              <Route 
+                path="/guards/manage" 
+                element={
+                  <CommanderGuard requiredRoll="guard">
+                    <GuardAssignmentPage mode="commander" />
+                  </CommanderGuard>
+                } 
+              />
             </Route>
           </Routes>
         </HashRouter>
