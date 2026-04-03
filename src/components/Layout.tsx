@@ -82,7 +82,7 @@ export default function Layout() {
                 </NavLink>
                 
                 <NavLink
-                  to="/guards"
+                  to={isAuthenticated ? "/guards/manage" : "/guards"}
                   className={({ isActive }) =>
                     cn(
                       "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
@@ -236,21 +236,21 @@ export default function Layout() {
                 <span>תוכנית עבודה</span>
               </NavLink>
 
-              <NavLink
-                to="/guards"
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <Shield className="w-5 h-5" />
-                <span>שיבוץ שמירות</span>
-              </NavLink>
+                    <NavLink
+                      to={isAuthenticated ? "/guards/manage" : "/guards"}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all active:scale-95",
+                          isActive
+                            ? "bg-accent text-accent-foreground shadow-lg shadow-accent/20"
+                            : "text-overlay/70 hover:text-overlay hover:bg-white/10"
+                        )
+                      }
+                    >
+                      <Shield className={cn("w-5 h-5", isAuthenticated ? "text-accent" : "text-overlay/40")} />
+                      <span>שיבוץ שמירות</span>
+                    </NavLink>
               <NavLink
                 to="/contact"
                 onClick={() => setMobileMenuOpen(false)}
