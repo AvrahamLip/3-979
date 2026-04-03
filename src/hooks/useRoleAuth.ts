@@ -40,7 +40,7 @@ export function useRoleAuth(buttonId?: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: payload.email,
-          role: "commander",
+          role: "guard",
           credential: response.credential,
         }),
       });
