@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
 // The validation API for commanders
-const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
+const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate-email";
 const CLIENT_ID = "435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com";
 
 export type UserRole = "commander" | "soldier" | "none";
