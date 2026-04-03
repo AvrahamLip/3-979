@@ -38,10 +38,10 @@ const App = () => (
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/vacation" element={<VacationPage />} />
               
-              {/* Commander-only routes */}
-              <Route path="/main" element={<CommanderGuard><MainPage /></CommanderGuard>} />
-              <Route path="/zama" element={<CommanderGuard><ZamaPage /></CommanderGuard>} />
-              <Route path="/workplan" element={<CommanderGuard><WorkPlanPage /></CommanderGuard>} />
+              {/* Commander routes (Now public via secret URL) */}
+              <Route path="/main" element={<MainPage />} />
+              <Route path="/zama" element={<ZamaPage />} />
+              <Route path="/workplan" element={<WorkPlanPage />} />
             </Route>
           </Routes>
         </HashRouter>
