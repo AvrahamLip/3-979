@@ -7,7 +7,6 @@
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="/3-979/icon-192.png">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -397,33 +396,7 @@
     </style>
 <link rel="manifest" href="/3-979/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/3-979/registerSW.js"></script></head>
 <body>
-    <div id="auth-overlay" class="auth-overlay">
-        <div class="auth-box">
-            <h2>כניסה למערכת</h2>
-            <p>התחבר עם חשבון Google כדי להמשיך</p>
-            
-            <div id="g_id_onload"
-                 data-client_id="435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com"
-                 data-callback="handleCredentialResponse"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="outline"
-                 data-text="sign_in_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left">
-            </div>
-
-            <p id="auth-error" class="hidden" style="color: #b91c1c; font-size: 0.875rem; margin-top: 1.5rem; font-weight: 600;">אין לך הרשאה לגשת לדף זה</p>
-            <div id="auth-loading" class="hidden" style="margin-top: 1.5rem;">
-                <div class="loading-spinner"></div> בודק הרשאות...
-            </div>
-        </div>
-    </div>
-
-    <header class="sticky-header hidden" id="main-header">
+    <header class="sticky-header" id="main-header">
         <div class="nav-container">
             <div class="nav-content">
                 {/* Logo */}
@@ -431,13 +404,11 @@
                     <div class="logo-box">ד!</div>
                     <span class="logo-text">דוח!</span>
                 </a>
-
-                {/* Nav links - Removed for standalone access */}
-
+                
                 <div class="user-actions">
                     <button id="pwa-install-btn" class="hidden install-btn">התקן אפליקציה ⬇️</button>
                     <div id="user-info" class="user-info">
-                        <span id="user-name"></span>
+                        <span id="user-name">מצב עריכה פתוח</span>
                         <span class="status-dot"></span>
                     </div>
                 </div>
@@ -445,7 +416,7 @@
         </div>
     </header>
 
-    <div class="page-header-container hidden" id="sub-header">
+    <div class="page-header-container" id="sub-header">
         <div class="container">
             <div class="gradient-hero rounded-header">
                 <div class="header-main">
@@ -457,7 +428,7 @@
     </div>
 
 
-    <main class="container hidden" id="main-content">
+    <main class="container" id="main-content">
         <div class="card">
             <div class="card-header">
                 <div class="input-group">
@@ -552,55 +523,8 @@
         }
 
         // Auth Logic
-        async function handleCredentialResponse(response) {
-            authError.classList.add('hidden');
-            authLoading.classList.remove('hidden');
-
-            const payload = parseJwt(response.credential);
-            if (!payload || !payload.email) {
-                authError.textContent = 'שגיאה בפענוח נתוני המשתמש';
-                authError.classList.remove('hidden');
-                authLoading.classList.add('hidden');
-                return;
-            }
-
-            try {
-                const res = await fetch(VALIDATE_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        email: payload.email,
-                        role: "update",
-                        credential: response.credential
-                    })
-                });
-
-                if (res.status === 200) {
-                    const data = await res.json();
-                    if (data.authorized === false) {
-                        authError.textContent = data.error || 'אין לך הרשאה לגשת לדף העדכון';
-                        authError.classList.remove('hidden');
-                        return;
-                    }
-                    
-                    authOverlay.classList.add('hidden');
-                    mainHeader.classList.remove('hidden');
-                    document.getElementById('sub-header').classList.remove('hidden');
-                    mainContent.classList.remove('hidden');
-                    userNameSpan.textContent = payload.name || payload.email;
-                    fetchData();
-                } else {
-                    authError.textContent = `שגיאת הרשאות (קוד: ${res.status}). פנה למנהל המערכת.`;
-                    authError.classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error('Auth error:', err);
-                authError.textContent = 'שגיאת תקשורת עם שרת האימות. נסה שוב מאוחר יותר.';
-                authError.classList.remove('hidden');
-            } finally {
-                authLoading.classList.add('hidden');
-            }
-        }
+        // Initial Fetch
+        fetchData();
 
         // Data Logic
         dateInput.addEventListener('change', fetchData);
