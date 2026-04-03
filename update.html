@@ -497,7 +497,7 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-        const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate-email";
+        const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
         const GET_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
         const POST_API = "https://151.145.89.228.sslip.io/webhook/update-status";
         const CLIENT_ID = "435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com";
@@ -592,14 +592,17 @@
                         }));
                         showAuthorizedContent(payload.name);
                     } else {
+                        console.error('Auth server error:', res.status);
                         authError.innerText = data.error || 'אין לך הרשאת מפקד';
                         authError.classList.remove('hidden');
                     }
                 } else {
+                    console.error('Auth status error:', res.status);
                     authError.innerText = 'שגיאת שרת באימות';
                     authError.classList.remove('hidden');
                 }
             } catch (err) {
+                console.error('Auth communication error:', err);
                 authError.innerText = 'שגיאת תקשורת';
                 authError.classList.remove('hidden');
             } finally {

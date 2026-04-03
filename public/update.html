@@ -514,7 +514,7 @@
     </footer>
 
     <script>
-        const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate-email";
+        const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
         const GET_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
         const POST_API = "https://151.145.89.228.sslip.io/webhook/update-status";
 
@@ -578,6 +578,7 @@
                 if (res.status === 200) {
                     const data = await res.json();
                     if (data.authorized === false) {
+                        console.error('Auth server rejected:', data.error);
                         authError.textContent = data.error || 'אין לך הרשאה לגשת לדף העדכון';
                         authError.classList.remove('hidden');
                         return;
@@ -590,11 +591,12 @@
                     userNameSpan.textContent = payload.name || payload.email;
                     fetchData();
                 } else {
+                    console.error('Auth status error:', res.status);
                     authError.textContent = `שגיאת הרשאות (קוד: ${res.status}). פנה למנהל המערכת.`;
                     authError.classList.remove('hidden');
                 }
             } catch (err) {
-                console.error('Auth error:', err);
+                console.error('Auth communication error:', err);
                 authError.textContent = 'שגיאת תקשורת עם שרת האימות. נסה שוב מאוחר יותר.';
                 authError.classList.remove('hidden');
             } finally {
