@@ -586,6 +586,7 @@ function generateAggregatedHistory(history: Record<string, PersonnelPoints>): Pe
 
 export default function GuardAssignmentPage() {
   const { isAuthenticated } = useAuth();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const isAuthLoading = false;
   const authError = null;
   const resetError = () => {};
@@ -1119,9 +1120,25 @@ export default function GuardAssignmentPage() {
             {isAuthenticated && (
               <div className="px-3 py-1.5 bg-green-500/20 text-white border border-green-500/30 rounded-lg text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                מצב עריכה
+                מצב עריכה מאושר
               </div>
             )}
+            
+            {!isAuthenticated && !showLoginPrompt && (
+              <Button
+                onClick={() => setShowLoginPrompt(true)}
+                className="bg-primary/20 hover:bg-primary/30 text-white border border-primary/40 text-xs font-bold h-9 px-3 backdrop-blur-sm"
+              >
+                התחבר לעריכה
+              </Button>
+            )}
+
+            {!isAuthenticated && showLoginPrompt && (
+              <div id="google-signin-btn-commander" className="bg-white rounded-lg p-0.5 overflow-hidden border border-white/50 h-9 flex items-center justify-center">
+                {/* Button rendered by useRoleAuth */}
+              </div>
+            )}
+
             <DatePickerBar value={date} onChange={setDate} />
             <button
               onClick={() => refetch()}
@@ -1155,10 +1172,16 @@ export default function GuardAssignmentPage() {
           {/* Left Column: Controls, Stats & History */}
           <div className="lg:col-span-1 space-y-6 text-right" dir="rtl">
             <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4">
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <Shuffle className="w-5 h-5 text-primary" />
-                {isAuthenticated ? "ניהול שיבוץ" : "צפייה בשיבוץ (למורשים בלבד)"}
+              <h2 className="text-lg font-black flex items-center gap-2 text-primary">
+                <Shield className="w-5 h-5 text-primary" />
+                {isAuthenticated ? "ניהול שיבוץ" : "שיבוץ שמירות"}
               </h2>
+              {!isAuthenticated && (
+                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 text-[11px] text-muted-foreground flex items-start gap-2">
+                  <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <p>צפייה בשיבוץ פתוחה לכולם. כדי לבצע שינויים או ג'ינרוט מחדש, עליך להתחבר כפי שנדרש למפקדים.</p>
+                </div>
+              )}
               {isAuthenticated && (
                 <div className="space-y-2">
                   <Button onClick={handleGenerate} className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md">
