@@ -10,74 +10,74 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  base: "/3-979/",
-  server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
-    },
-  },
-  plugins: [
-    tsconfigPaths(),
-    react(),
-    mode === "development" && componentTagger(),
-    VitePWA({
-      registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
-      manifest: {
-        name: "דוח-1 - דוח נוכחות יומי",
-        short_name: "דוח-1",
-        description: "מערכת דיווח נוכחות יומי - דוח-1",
-        theme_color: "#ffffff",
-        background_color: "#ffffff",
-        display: "standalone",
-        start_url: ".",
-        icons: [
-          {
-            src: "icon-192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "icon-512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "icon-512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable",
-          },
-        ],
-      },
-      devOptions: {
-        enabled: true,
-      },
-    }),
-  ].filter(Boolean),
-  build: {
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, "index.html"),
-        zama: path.resolve(__dirname, "zama.html"),
-        contact: path.resolve(__dirname, "contact.html"),
-        "main-page": path.resolve(__dirname, "main.html"),
+export default defineConfig(({ mode }) => {
+  // Use / as base for Netlify, and /3-979/ for GitHub Pages
+  // Check NETLIFY env var (provided by Netlify) or manual mode
+  const isNetlify = process.env.NETLIFY === "true" || mode === "production-netlify";
+  const base = isNetlify ? "/" : "/3-979/";
+
+  return {
+    base,
+    server: {
+      host: "::",
+      port: 8080,
+      hmr: {
+        overlay: false,
       },
     },
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "src"),
+    plugins: [
+      tsconfigPaths(),
+      react(),
+      mode === "development" && componentTagger(),
+      VitePWA({
+        registerType: "autoUpdate",
+        includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
+        manifest: {
+          name: "דוח-1 - דוח נוכחות יומי",
+          short_name: "דוח-1",
+          description: "מערכת דיווח נוכחות יומי - דוח-1",
+          theme_color: "#ffffff",
+          background_color: "#ffffff",
+          display: "standalone",
+          start_url: ".",
+          icons: [
+            {
+              src: "icon-192.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "icon-512.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+            {
+              src: "icon-512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any maskable",
+            },
+          ],
+        },
+        devOptions: {
+          enabled: true,
+        },
+      }),
+    ].filter(Boolean),
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, "index.html"),
+          zama: path.resolve(__dirname, "zama.html"),
+          contact: path.resolve(__dirname, "contact.html"),
+          "main-page": path.resolve(__dirname, "main.html"),
+        },
+      },
     },
-  },
-}));
-
-
-
-
-
-
-
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "src"),
+      },
+    },
+  };
+});

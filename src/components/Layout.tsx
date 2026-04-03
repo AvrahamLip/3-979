@@ -127,7 +127,7 @@ export default function Layout() {
                 
                 {isAuthenticated && (
                   <a
-                    href="/3-979/update.html"
+                    href="https://avrahamlip.github.io/3-979/update.html"
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
                   >
                     <Edit className="w-4 h-4" />
@@ -157,13 +157,13 @@ export default function Layout() {
 
               {/* Enter Commander Mode (Hidden trigger for Soldiers) */}
               {!isAuthenticated && (
-                <Link
-                  to="/main"
+                <a
+                  href="https://avrahamlip.github.io/3-979/#/main"
                   className="p-2 rounded-lg text-white/40 hover:text-white transition-colors"
                   title="גישת מפקדים"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                </Link>
+                </a>
               )}
 
               {/* PWA Install Button */}
@@ -297,7 +297,7 @@ export default function Layout() {
               {isAuthenticated && (
                 <>
                   <a
-                    href="/3-979/update.html"
+                    href="https://avrahamlip.github.io/3-979/update.html"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10"
                   >
