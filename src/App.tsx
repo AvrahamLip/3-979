@@ -2,13 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
 import WorkPlanPage from "./pages/WorkPlanPage";
 import GuardAssignmentPage from "./pages/GuardAssignmentPage";
 import ContactPage from "./pages/ContactPage";
+import VacationPage from "./pages/VacationPage";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { CommanderGuard } from "./components/CommanderGuard";
@@ -28,13 +29,14 @@ const App = () => (
       <AuthProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename="/3-979/">
+        <HashRouter>
           <Routes>
             <Route element={<Layout />}>
               {/* Soldier routes / Main defaults */}
               <Route path="/" element={<Navigate to="/guards" replace />} />
               <Route path="/guards" element={<GuardAssignmentPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/vacation" element={<VacationPage />} />
               
               {/* Commander-only routes */}
               <Route path="/main" element={<CommanderGuard><MainPage /></CommanderGuard>} />
@@ -42,7 +44,7 @@ const App = () => (
               <Route path="/workplan" element={<CommanderGuard><WorkPlanPage /></CommanderGuard>} />
             </Route>
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

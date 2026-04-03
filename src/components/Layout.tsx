@@ -110,15 +110,20 @@ export default function Layout() {
                   <Phone className="w-4 h-4" />
                   <span>טלפונים</span>
                 </NavLink>
-                <a
-                  href="https://avrahamlip.github.io/vacation-planner/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
+                <NavLink
+                  to="/vacation"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
                 >
                   <Palmtree className="w-4 h-4 text-accent" />
                   <span>תוכנית חופשים</span>
-                </a>
+                </NavLink>
                 
                 {isAuthenticated && (
                   <a
@@ -273,16 +278,21 @@ export default function Layout() {
                 <Phone className="w-5 h-5" />
                 <span>טלפונים</span>
               </NavLink>
-              <a
-                href="https://avrahamlip.github.io/vacation-planner/"
-                target="_blank"
-                rel="noopener noreferrer"
+              <NavLink
+                to="/vacation"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10"
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                  )
+                }
               >
                 <Palmtree className="w-5 h-5 text-accent" />
                 <span>תוכנית חופשים</span>
-              </a>
+              </NavLink>
               
               {isAuthenticated && (
                 <>
