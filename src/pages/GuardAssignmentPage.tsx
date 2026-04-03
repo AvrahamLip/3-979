@@ -587,7 +587,8 @@ function generateAggregatedHistory(history: Record<string, PersonnelPoints>): Pe
 export default function GuardAssignmentPage() {
   const { isAuthenticated } = useAuth();
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const isAuthLoading = false;
+  const [showAuthButton, setShowAuthButton] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const authError = null;
   const resetError = () => {};
   const [date, setDate] = useState(getTodayIso());
@@ -1106,7 +1107,11 @@ export default function GuardAssignmentPage() {
       <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
+            <div 
+              className="p-1.5 sm:p-2 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors active:scale-95"
+              onClick={() => setShowAuthButton(!showAuthButton)}
+              title="גישת מפקדים"
+            >
               <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-overlay" />
             </div>
             <div>
@@ -1124,8 +1129,8 @@ export default function GuardAssignmentPage() {
               </div>
             )}
             
-            {!isAuthenticated && (
-              <div className="flex items-center gap-2">
+            {!isAuthenticated && showAuthButton && (
+              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
                 {!showLoginPrompt ? (
                   <Button
                     onClick={() => setShowLoginPrompt(true)}
