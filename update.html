@@ -396,7 +396,19 @@
     </style>
 <link rel="manifest" href="/3-979/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/3-979/registerSW.js"></script></head>
 <body>
-    <header class="sticky-header" id="main-header">
+    <div class="auth-overlay" id="auth-overlay">
+        <div class="auth-box">
+            <h2>גישת מפקדים בלבד</h2>
+            <p>אנא הזדהה באמצעות חשבון Google כדי לעדכן נוכחות.</p>
+            <div id="google-signin-btn" style="display: flex; justify-content: center;"></div>
+            <div id="auth-loading" class="hidden" style="margin-top: 1rem;">
+                <div class="loading-spinner"></div> בודק הרשאות...
+            </div>
+            <div id="auth-error" class="error-flash hidden" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <header class="sticky-header hidden" id="main-header">
         <div class="nav-container">
             <div class="nav-content">
                 {/* Logo */}
@@ -408,7 +420,7 @@
                 <div class="user-actions">
                     <button id="pwa-install-btn" class="hidden install-btn">התקן אפליקציה ⬇️</button>
                     <div id="user-info" class="user-info">
-                        <span id="user-name">מצב עריכה פתוח</span>
+                        <span id="user-name"></span>
                         <span class="status-dot"></span>
                     </div>
                 </div>
@@ -416,7 +428,7 @@
         </div>
     </header>
 
-    <div class="page-header-container" id="sub-header">
+    <div class="page-header-container hidden" id="sub-header">
         <div class="container">
             <div class="gradient-hero rounded-header">
                 <div class="header-main">
@@ -427,8 +439,7 @@
         </div>
     </div>
 
-
-    <main class="container" id="main-content">
+    <main class="container hidden" id="main-content">
         <div class="card">
             <div class="card-header">
                 <div class="input-group">
@@ -484,10 +495,12 @@
         </div>
     </footer>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
         const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
         const GET_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
         const POST_API = "https://151.145.89.228.sslip.io/webhook/update-status";
+        const CLIENT_ID = "435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com";
 
         const authOverlay = document.getElementById('auth-overlay');
         const mainHeader = document.getElementById('main-header');
@@ -523,8 +536,85 @@
         }
 
         // Auth Logic
-        // Initial Fetch
-        fetchData();
+        window.onload = function () {
+            // Check if already authorized in current session
+            const savedUser = localStorage.getItem('user_info');
+            const isCommander = localStorage.getItem('is_commander') === 'true';
+            
+            if (isCommander && savedUser) {
+                const user = JSON.parse(savedUser);
+                showAuthorizedContent(user.name);
+            } else {
+                initGoogleAuth();
+            }
+        };
+
+        function initGoogleAuth() {
+            if (window.google) {
+                google.accounts.id.initialize({
+                    client_id: CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("google-signin-btn"),
+                    { theme: "outline", size: "large", width: 250 }
+                );
+            } else {
+                setTimeout(initGoogleAuth, 100);
+            }
+        }
+
+        async function handleCredentialResponse(response) {
+            authLoading.classList.remove('hidden');
+            authError.classList.add('hidden');
+            
+            const payload = parseJwt(response.credential);
+            
+            try {
+                const res = await fetch(VALIDATE_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: payload.email,
+                        role: 'commander',
+                        credential: response.credential
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.authorized) {
+                        localStorage.setItem('is_commander', 'true');
+                        localStorage.setItem('user_info', JSON.stringify({
+                            name: payload.name,
+                            email: payload.email,
+                            role: 'commander'
+                        }));
+                        showAuthorizedContent(payload.name);
+                    } else {
+                        authError.innerText = data.error || 'אין לך הרשאת מפקד';
+                        authError.classList.remove('hidden');
+                    }
+                } else {
+                    authError.innerText = 'שגיאת שרת באימות';
+                    authError.classList.remove('hidden');
+                }
+            } catch (err) {
+                authError.innerText = 'שגיאת תקשורת';
+                authError.classList.remove('hidden');
+            } finally {
+                authLoading.classList.add('hidden');
+            }
+        }
+
+        function showAuthorizedContent(name) {
+            authOverlay.classList.add('hidden');
+            mainHeader.classList.remove('hidden');
+            mainContent.classList.remove('hidden');
+            document.getElementById('sub-header').classList.remove('hidden');
+            userNameSpan.innerText = name;
+            fetchData();
+        }
 
         // Data Logic
         dateInput.addEventListener('change', fetchData);
