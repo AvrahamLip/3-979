@@ -16,6 +16,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerClose,
+} from "@/components/ui/drawer";
+import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -23,7 +31,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check } from "lucide-react";
+import { Check, X as CloseX } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -503,69 +512,108 @@ function PersonnelSwap({
     );
   }
 
+  const isMobile = useIsMobile();
+
+  const SelectionContent = (
+    <Command className="border-none">
+      <CommandInput placeholder="חפש חייל..." className="h-10 text-right" dir="rtl" autoFocus />
+      <CommandList className="max-h-[60vh] sm:max-h-[300px]">
+        <CommandEmpty>לא נמצאו חיילים.</CommandEmpty>
+        <CommandGroup>
+          {allowEmpty && (
+            <CommandItem
+              value="ריק ללא שיבוץ"
+              onSelect={() => {
+                onSwap("");
+                setOpen(false);
+              }}
+              className="flex items-center justify-between text-muted-foreground italic font-normal py-3 px-4"
+            >
+              <span>(ריק) - ללא שיבוץ</span>
+              {(!currentName || currentName === "לא מאויש") && <Check className="w-4 h-4 text-primary" />}
+            </CommandItem>
+          )}
+          {available.map((p) => (
+            <CommandItem
+              key={p.name}
+              value={p.name}
+              onSelect={(currentValue) => {
+                onSwap(currentValue);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0",
+                p.gapConflict && "opacity-60 bg-red-500/5"
+              )}
+            >
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                   <span className="font-bold">{p.name}</span>
+                   {p.gapConflict && (
+                     <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full flex items-center gap-1 font-bold">
+                       <Clock className="w-2.5 h-2.5" />
+                       מרווח: {p.gapHours}ש'
+                     </span>
+                   )}
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
+                  <span className={cn(
+                    "px-1.5 rounded-md",
+                    p.burdenPoints > 10 ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700"
+                  )}>
+                    {p.burdenPoints || 0} נק'
+                  </span>
+                  <span>•</span>
+                  <span>{!p.gapConflict ? "זמין לשיבוץ" : "בעיית מרווח"}</span>
+                </div>
+              </div>
+              {currentName === p.name && <Check className="w-4 h-4 text-primary animate-in zoom-in" />}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+
+  const trigger = (
+    <button className={cn(
+      "font-bold hover:text-primary transition-colors text-right flex items-center gap-1.5 group whitespace-nowrap",
+      (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
+    )}>
+      {statusDot}
+      {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
+      <Shuffle className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+    </button>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          {trigger}
+        </DrawerTrigger>
+        <DrawerContent className="px-0 pb-6 h-[85vh]">
+          <DrawerHeader className="border-b pb-4 px-4 flex items-center justify-between">
+            <DrawerTitle className="text-right w-full">בחירת חייל לשיבוץ</DrawerTitle>
+            <DrawerClose asChild>
+                <button className="p-2 rounded-full hover:bg-muted"><CloseX className="w-5 h-5"/></button>
+            </DrawerClose>
+          </DrawerHeader>
+          <div className="mt-2 flex-1 overflow-hidden">
+            {SelectionContent}
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn(
-          "font-bold hover:text-primary transition-colors text-right flex items-center gap-1.5 group whitespace-nowrap",
-          (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
-        )}>
-          {statusDot}
-          {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
-          <Shuffle className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-        </button>
+        {trigger}
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-[200px]" align="start">
-        <Command>
-          <CommandInput placeholder="חפש חייל..." className="h-9 text-right" dir="rtl" />
-          <CommandList>
-            <CommandEmpty>לא נמצאו חיילים.</CommandEmpty>
-            <CommandGroup>
-              {allowEmpty && (
-                <CommandItem
-                  value="ריק ללא שיבוץ"
-                  onSelect={() => {
-                    onSwap("");
-                    setOpen(false);
-                  }}
-                  className="flex items-center justify-between text-muted-foreground italic font-normal"
-                >
-                  <span>(ריק) - ללא שיבוץ</span>
-                  {(!currentName || currentName === "לא מאויש") && <Check className="w-3 h-3" />}
-                </CommandItem>
-              )}
-              {available.map((p) => (
-                <CommandItem
-                  key={p.name}
-                  value={p.name}
-                  onSelect={(currentValue) => {
-                    onSwap(currentValue);
-                    setOpen(false);
-                  }}
-                  className={cn(
-                    "flex items-center justify-between",
-                    p.gapConflict && "opacity-60 bg-red-500/5"
-                  )}
-                >
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                       <span>{p.name}</span>
-                       {p.gapConflict && (
-                         <span className="text-[9px] bg-red-100 text-red-600 px-1 rounded flex items-center gap-0.5">
-                           <Clock className="w-2 h-2" />
-                           מרווח: {p.gapHours}ש'
-                         </span>
-                       )}
-                    </div>
-                    <span className="text-[10px] text-muted-foreground">{p.burdenPoints || 0} נק' {!p.gapConflict && "• זמין לשיבוץ"}</span>
-                  </div>
-                  {currentName === p.name && <Check className="w-3 h-3" />}
-                </CommandItem>
-              ))}
-
-            </CommandGroup>
-          </CommandList>
-        </Command>
+      <PopoverContent className="p-0 w-[240px]" align="start">
+        {SelectionContent}
       </PopoverContent>
     </Popover>
   );
