@@ -37,6 +37,7 @@ export default function Layout() {
               <nav className="hidden md:flex items-center gap-1 py-2">
                 <NavLink
                   to="/main"
+                  state={{ from: "commander" }}
                   className={({ isActive }) =>
                     cn(
                       "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
@@ -51,6 +52,7 @@ export default function Layout() {
                 </NavLink>
                 <NavLink
                   to="/zama"
+                  state={{ from: "commander" }}
                   className={({ isActive }) =>
                     cn(
                       "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
@@ -65,6 +67,7 @@ export default function Layout() {
                 </NavLink>
                 <NavLink
                   to="/workplan"
+                  state={{ from: "commander" }}
                   className={({ isActive }) =>
                     cn(
                       "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
@@ -133,7 +136,7 @@ export default function Layout() {
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Commander Profile / Logout */}
-              {isAuthenticated && (
+              {isAuthenticated ? (
                 <div className="hidden sm:flex items-center gap-2 mr-2 border-r border-white/20 pr-2">
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] font-bold text-accent uppercase tracking-tighter leading-none mb-0.5">מפקד מחובר</span>
@@ -146,6 +149,12 @@ export default function Layout() {
                   >
                     <LogOut className="w-3.5 h-3.5" />
                   </button>
+                </div>
+              ) : (
+                <div className="hidden sm:flex items-center mr-2 border-r border-white/20 pr-2">
+                   <div id="google-signin-btn-commander" className="bg-white rounded-lg p-0.5 overflow-hidden h-8 flex items-center justify-center min-w-[120px]">
+                      {/* Google Button rendered by hook */}
+                   </div>
                 </div>
               )}
 

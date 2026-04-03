@@ -9,6 +9,7 @@ import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
 import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import {
   Popover,
@@ -585,10 +586,21 @@ function generateAggregatedHistory(history: Record<string, PersonnelPoints>): Pe
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function GuardAssignmentPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, checkPermission, user } = useAuth();
+  const location = useLocation();
+  const isAuthorized = isAuthenticated && user?.authorizedRolls?.includes('guard');
+
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showAuthButton, setShowAuthButton] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+
+  // Auto-show login prompt if coming from commander page and not authorized
+  useEffect(() => {
+    if (location.state?.from === 'commander' && !isAuthorized) {
+      setShowAuthButton(true);
+      setShowLoginPrompt(true);
+    }
+  }, [location.state, isAuthorized]);
+
   const authError = null;
   const resetError = () => {};
   const [date, setDate] = useState(getTodayIso());
@@ -821,7 +833,7 @@ export default function GuardAssignmentPage() {
           setIsSaved(true);
         } else {
           setLoadedAssignments(null);
-          if (isAuthenticated) {
+          if (isAuthorized) {
             const yesterday = getYesterdayIso(date);
             const yesterdayData = await fetchSavedAssignment(yesterday);
             const yesterdayGuardsArray = yesterdayData?.guards || [];
@@ -829,7 +841,6 @@ export default function GuardAssignmentPage() {
             const aggregatedHistory = generateAggregatedHistory(history);
             setAssignments(generateAssignment(data, aggregatedHistory, hapakData, blockedNames, date, yesterdayGuardsArray));
             setIsSaved(false);
-
           } else {
             setAssignments(null);
             setIsSaved(true);
@@ -845,7 +856,10 @@ export default function GuardAssignmentPage() {
   }, []);
 
   const handleGenerate = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthorized) {
+      toast.error("אין לך הרשאה לבצע שיבוץ (נדרשת הרשאת guard)");
+      return;
+    }
     setIsGenerating(true);
     setAssignments(null); // Clear UI during generation
     
@@ -1106,21 +1120,21 @@ export default function GuardAssignmentPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            {isAuthenticated && (
+            {isAuthorized && (
               <div className="px-3 py-1.5 bg-green-500/20 text-white border border-green-500/30 rounded-lg text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                מצב עריכה מאושר
+                מצב עריכה מאושר (Guard)
               </div>
             )}
             
-            {!isAuthenticated && showAuthButton && (
+            {!isAuthorized && showAuthButton && (
               <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
                 {!showLoginPrompt ? (
                   <Button
                     onClick={() => setShowLoginPrompt(true)}
                     className="bg-primary/20 hover:bg-primary/30 text-white border border-primary/40 text-xs font-bold h-9 px-3 backdrop-blur-sm"
                   >
-                    התחבר לעריכה
+                    {!isAuthenticated ? "התחבר לעריכה" : "בקש הרשאת שיבוץ"}
                   </Button>
                 ) : (
                   <Button
@@ -1164,10 +1178,10 @@ export default function GuardAssignmentPage() {
       {!isLoading && !isGenerating && !isError && assignments && (
         <div className={cn(
           "grid gap-6",
-          isAuthenticated ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1"
+          isAuthorized ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1"
         )}>
           {/* Side Column: Management, Ledger & Statistics - Visible ONLY for Authenticated Commanders */}
-          {isAuthenticated && (
+          {isAuthorized && (
             <div className="lg:col-span-1 space-y-6 text-right" dir="rtl">
               {/* Management Card */}
               <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4 animate-in fade-in slide-in-from-top-2">
@@ -1328,7 +1342,7 @@ export default function GuardAssignmentPage() {
                                       currentName={h.assignedTo}
                                       allPersonnel={data || []}
                                       onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
-                                      readonly={!isAuthenticated || isExportingHapak}
+                                      readonly={!isAuthorized || isExportingHapak}
                                       allowEmpty={true}
                                       type="hapak"
                                       currentAssignments={assignments}
@@ -1375,7 +1389,7 @@ export default function GuardAssignmentPage() {
                       <tr className="text-right">
                         <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שעה</th>
                         <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שומר</th>
-                        {(!isExporting && isAuthenticated) && <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
+                        {(!isExporting && isAuthorized) && <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -1391,7 +1405,7 @@ export default function GuardAssignmentPage() {
                                 currentName={g.name}
                                 allPersonnel={data || []}
                                 onSwap={(newName) => handleSwap("guard", g.hour, newName)}
-                                readonly={!isAuthenticated || isExporting}
+                                readonly={!isAuthorized || isExporting}
                                 allowEmpty={true}
                                 hour={g.hour}
                                 type="guard"
@@ -1400,7 +1414,7 @@ export default function GuardAssignmentPage() {
                               />
                             </div>
                           </td>
-                          {(!isExporting && isAuthenticated) && (
+                          {(!isExporting && isAuthorized) && (
                             <td className="px-5 py-3">
                               <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold", g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700")}>
                                 {g.points} נק'

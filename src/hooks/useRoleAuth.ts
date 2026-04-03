@@ -11,9 +11,10 @@ interface UserInfo {
   name: string;
   email: string;
   role: UserRole;
+  authorizedRolls: string[];
 }
 
-export function useRoleAuth(buttonId?: string) {
+export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem("is_commander") === "true";
   });
@@ -24,33 +25,92 @@ export function useRoleAuth(buttonId?: string) {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const checkRollAuthorization = useCallback(async (roll: string, credential?: string): Promise<boolean> => {
+    const currentEmail = user?.email;
+    const currentCredential = credential || "";
+    
+    if (!currentEmail && !currentCredential) return false;
+    
+    // Check if already authorized for this roll locally
+    if (user?.authorizedRolls?.includes(roll)) {
+      return true;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(VALIDATE_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: currentEmail || "", 
+          roll: roll,
+          credential: currentCredential,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.email || data.authorized === true) {
+          const updatedRolls = Array.from(new Set([...(user?.authorizedRolls || []), roll]));
+          
+          setIsAuthenticated(true);
+          const info: UserInfo = { 
+            name: user?.name || data.name || "מפקד", 
+            email: currentEmail || data.email, 
+            role: "commander",
+            authorizedRolls: updatedRolls
+          };
+          setUser(info);
+          localStorage.setItem("is_commander", "true");
+          localStorage.setItem("user_info", JSON.stringify(info));
+          return true;
+        } else {
+          setError(data.error || `אין לך הרשאה מתאימה (${roll})`);
+          return false;
+        }
+      } else {
+        setError(`שגיאת שרת באימות (קוד: ${res.status})`);
+        return false;
+      }
+    } catch (err: any) {
+      setError(`שגיאת תקשורת: ${err.message || 'לא ידוע'}`);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
   const handleCredentialResponse = useCallback(async (response: any) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Decode JWT locally for name/email
       const base64Url = response.credential.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const payload = JSON.parse(window.atob(base64));
 
-      // Validate with n8n
       const res = await fetch(VALIDATE_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: payload.email,
-          roll: "guard",
+          roll: defaultRoll,
           credential: response.credential,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        // Authorized if we get a user object with an email
         if (data.email || data.authorized === true) {
           setIsAuthenticated(true);
-          const info: UserInfo = { name: payload.name, email: payload.email, role: "commander" };
+          const info: UserInfo = { 
+            name: payload.name, 
+            email: payload.email, 
+            role: "commander",
+            authorizedRolls: [defaultRoll]
+          };
           setUser(info);
           localStorage.setItem("is_commander", "true");
           localStorage.setItem("user_info", JSON.stringify(info));
@@ -60,21 +120,19 @@ export function useRoleAuth(buttonId?: string) {
           toast.error(data.error || "אין לך הרשאת מפקד");
         }
       } else {
-        const errorText = await res.text();
-        console.error("Auth server error:", res.status, errorText);
         setError(`שגיאת שרת באימות (קוד: ${res.status})`);
         toast.error(`שגיאת שרת באימות (קוד: ${res.status})`);
       }
     } catch (err: any) {
       setError(`שגיאת תקשורת: ${err.message || 'לא ידוע'}`);
-      console.error("Auth communication error:", err);
+      toast.error(`שגיאת תקשורת: ${err.message || 'לא ידוע'}`);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [defaultRoll]);
 
   useEffect(() => {
-    if (!buttonId || isAuthenticated) return;
+    if (!buttonId || (isAuthenticated && user?.authorizedRolls?.includes(defaultRoll))) return;
 
     const interval = setInterval(() => {
       const g = (window as any).google;
@@ -94,7 +152,7 @@ export function useRoleAuth(buttonId?: string) {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [buttonId, handleCredentialResponse, isAuthenticated]);
+  }, [buttonId, handleCredentialResponse, isAuthenticated, user, defaultRoll]);
 
   const logout = () => {
     setIsAuthenticated(false);
@@ -110,6 +168,7 @@ export function useRoleAuth(buttonId?: string) {
     error,
     user,
     logout,
+    checkRollAuthorization,
     resetError: () => setError(null),
   };
 }

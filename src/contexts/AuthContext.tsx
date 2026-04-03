@@ -6,13 +6,14 @@ interface AuthContextType {
   isLoading: boolean;
   user: any;
   logout: () => void;
+  checkPermission: (roll: string) => Promise<boolean>;
   role: UserRole;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const auth = useRoleAuth("google-signin-btn-commander");
+  const auth = useRoleAuth("google-signin-btn-commander", "guard");
 
   return (
     <AuthContext.Provider
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: auth.isLoading,
         user: auth.user,
         logout: auth.logout,
+        checkPermission: auth.checkRollAuthorization,
         role: auth.isAuthenticated ? "commander" : "soldier",
       }}
     >
