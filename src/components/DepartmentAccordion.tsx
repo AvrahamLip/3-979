@@ -30,7 +30,10 @@ function DeptCard({ dept, index }: { dept: DepartmentStats; index: number }) {
         <div className="flex-1 text-right mr-3">
           <div className="flex items-center gap-2 justify-end flex-wrap">
             <StatusCountsRow counts={dept.counts} compact />
-            <span className="text-xs font-bold text-muted-foreground">
+            <span className="text-xs font-black text-primary/80 bg-primary/5 px-1.5 py-0.5 rounded">
+              {pct}%
+            </span>
+            <span className="text-xs font-bold text-muted-foreground mr-1">
               {dept.counts["בבסיס"]}/{dept.counts.total}
             </span>
           </div>
@@ -71,6 +74,9 @@ function DeptCard({ dept, index }: { dept: DepartmentStats; index: number }) {
                   >
                     <StatusCountsRow counts={role.counts} compact />
                     <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-primary px-1.5 py-0.5 bg-primary/5 rounded">
+                        {role.counts.total > 0 ? Math.round((role.counts["בבסיס"] / role.counts.total) * 100) : 0}%
+                      </span>
                       <span className="text-xs text-muted-foreground">
                         {role.counts["בבסיס"]}/{role.counts.total}
                       </span>

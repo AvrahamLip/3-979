@@ -103,6 +103,10 @@ function ZamaDeptSection({
                       >
                         <StatusCountsRow counts={role.counts} compact />
                         <div className="flex items-center gap-2">
+                          <span className="text-sm font-black text-primary">
+                            {role.counts.total > 0 ? Math.round((role.counts["בבסיס"] / role.counts.total) * 100) : 0}%
+                          </span>
+                          <span className="text-xs text-muted-foreground px-1 opacity-40">|</span>
                           <span className="text-xs text-muted-foreground">
                             {role.counts["בבסיס"]}/{role.counts.total}
                           </span>

@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { Outlet, NavLink, useLocation, Link } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays, Shield } from "lucide-react";
+import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays, Shield, LogOut, LayoutDashboard, Palmtree } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "./PWAInstallButton";
 import pkg from "../../package.json";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Layout() {
   const { theme, setTheme } = useTheme();
+  const { isAuthenticated, logout, user } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const showNav = location.pathname === "/main" || location.pathname === "/" || location.pathname === "/workplan" || location.pathname === "/guards";
+  // Always show nav now, but items are conditional
+  const showNav = true;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -32,48 +35,53 @@ export default function Layout() {
             {/* Desktop Nav links */}
             {showNav && (
               <nav className="hidden md:flex items-center gap-1 py-2">
-                <NavLink
-                  to="/main"
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
-                      isActive
-                        ? "bg-accent text-accent-foreground shadow-md"
-                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                    )
-                  }
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>דוח נוכחות</span>
-                </NavLink>
-                <NavLink
-                  to="/zama"
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
-                      isActive
-                        ? "bg-accent text-accent-foreground shadow-md"
-                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                    )
-                  }
-                >
-                  <Truck className="w-4 h-4" />
-                  <span>צמ&quot;ה</span>
-                </NavLink>
-                <NavLink
-                  to="/workplan"
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
-                      isActive
-                        ? "bg-accent text-accent-foreground shadow-md"
-                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                    )
-                  }
-                >
-                  <CalendarDays className="w-4 h-4" />
-                  <span>תוכנית עבודה</span>
-                </NavLink>
+                {isAuthenticated && (
+                  <>
+                    <NavLink
+                      to="/main"
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                          isActive
+                            ? "bg-accent text-accent-foreground shadow-md"
+                            : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                        )
+                      }
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>דוח נוכחות</span>
+                    </NavLink>
+                    <NavLink
+                      to="/zama"
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                          isActive
+                            ? "bg-accent text-accent-foreground shadow-md"
+                            : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                        )
+                      }
+                    >
+                      <Truck className="w-4 h-4" />
+                      <span>צמ&quot;ה</span>
+                    </NavLink>
+                    <NavLink
+                      to="/workplan"
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                          isActive
+                            ? "bg-accent text-accent-foreground shadow-md"
+                            : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                        )
+                      }
+                    >
+                      <CalendarDays className="w-4 h-4" />
+                      <span>תוכנית עבודה</span>
+                    </NavLink>
+                  </>
+                )}
+                
                 <NavLink
                   to="/guards"
                   className={({ isActive }) =>
@@ -103,16 +111,56 @@ export default function Layout() {
                   <span>טלפונים</span>
                 </NavLink>
                 <a
-                  href="/3-979/update.html"
+                  href="https://avrahamlip.github.io/vacation-planner/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
                 >
-                  <Edit className="w-4 h-4" />
-                  <span>עדכון נתונים</span>
+                  <Palmtree className="w-4 h-4 text-accent" />
+                  <span>תוכנית חופשים</span>
                 </a>
+                
+                {isAuthenticated && (
+                  <a
+                    href="/3-979/update.html"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
+                  >
+                    <Edit className="w-4 h-4" />
+                    <span>עדכון נתונים</span>
+                  </a>
+                )}
               </nav>
             )}
 
             <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Commander Profile / Logout */}
+              {isAuthenticated && (
+                <div className="hidden sm:flex items-center gap-2 mr-2 border-r border-white/20 pr-2">
+                  <div className="flex flex-col items-end">
+                    <span className="text-[10px] font-bold text-accent uppercase tracking-tighter leading-none mb-0.5">מפקד מחובר</span>
+                    <span className="text-[11px] font-medium text-white/90 leading-none truncate max-w-[80px]">{user?.name}</span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all active:scale-90"
+                    title="התנתק"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Enter Commander Mode (Hidden trigger for Soldiers) */}
+              {!isAuthenticated && (
+                <Link
+                  to="/main"
+                  className="p-2 rounded-lg text-white/40 hover:text-white transition-colors"
+                  title="גישת מפקדים"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                </Link>
+              )}
+
               {/* PWA Install Button */}
               <PWAInstallButton variant="header" />
 
@@ -143,53 +191,58 @@ export default function Layout() {
           </div>
 
           {/* Mobile dropdown nav */}
-          {showNav && mobileMenuOpen && (
-            <nav className="md:hidden pb-3 pt-1 border-t border-white/10 space-y-1 animate-fade-in">
-              <NavLink
-                to="/main"
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <FileText className="w-5 h-5" />
-                <span>דוח נוכחות</span>
-              </NavLink>
-              <NavLink
-                to="/zama"
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <Truck className="w-5 h-5" />
-                <span>צמ&quot;ה</span>
-              </NavLink>
-              <NavLink
-                to="/workplan"
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
-                    isActive
-                      ? "bg-accent text-accent-foreground shadow-md"
-                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
-                  )
-                }
-              >
-                <CalendarDays className="w-5 h-5" />
-                <span>תוכנית עבודה</span>
-              </NavLink>
+          {mobileMenuOpen && (
+            <nav className="md:hidden pb-3 pt-1 border-t border-white/10 space-y-1 animate-fade-in px-2">
+              {isAuthenticated && (
+                <>
+                  <NavLink
+                    to="/main"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                        isActive
+                          ? "bg-accent text-accent-foreground shadow-md"
+                          : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                      )
+                    }
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span>דוח נוכחות</span>
+                  </NavLink>
+                  <NavLink
+                    to="/zama"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                        isActive
+                          ? "bg-accent text-accent-foreground shadow-md"
+                          : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                      )
+                    }
+                  >
+                    <Truck className="w-5 h-5" />
+                    <span>צמ&quot;ה</span>
+                  </NavLink>
+                  <NavLink
+                    to="/workplan"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                        isActive
+                          ? "bg-accent text-accent-foreground shadow-md"
+                          : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                      )
+                    }
+                  >
+                    <CalendarDays className="w-5 h-5" />
+                    <span>תוכנית עבודה</span>
+                  </NavLink>
+                </>
+              )}
+
               <NavLink
                 to="/guards"
                 onClick={() => setMobileMenuOpen(false)}
@@ -221,13 +274,38 @@ export default function Layout() {
                 <span>טלפונים</span>
               </NavLink>
               <a
-                href="/3-979/update.html"
+                href="https://avrahamlip.github.io/vacation-planner/"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10"
               >
-                <Edit className="w-5 h-5" />
-                <span>עדכון נתונים</span>
+                <Palmtree className="w-5 h-5 text-accent" />
+                <span>תוכנית חופשים</span>
               </a>
+              
+              {isAuthenticated && (
+                <>
+                  <a
+                    href="/3-979/update.html"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10"
+                  >
+                    <Edit className="w-5 h-5" />
+                    <span>עדכון נתונים</span>
+                  </a>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-red-200 hover:bg-red-500/20 w-full text-right"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>התנתקות מפקד</span>
+                  </button>
+                </>
+              )}
             </nav>
           )}
         </div>

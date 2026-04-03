@@ -10,6 +10,9 @@ import WorkPlanPage from "./pages/WorkPlanPage";
 import GuardAssignmentPage from "./pages/GuardAssignmentPage";
 import ContactPage from "./pages/ContactPage";
 
+import { AuthProvider } from "./contexts/AuthContext";
+import { CommanderGuard } from "./components/CommanderGuard";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -22,20 +25,25 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter basename="/3-979/">
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Navigate to="/main" replace />} />
-            <Route path="/main" element={<MainPage />} />
-            <Route path="/zama" element={<ZamaPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/workplan" element={<WorkPlanPage />} />
-            <Route path="/guards" element={<GuardAssignmentPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter basename="/3-979/">
+          <Routes>
+            <Route element={<Layout />}>
+              {/* Soldier routes / Main defaults */}
+              <Route path="/" element={<Navigate to="/guards" replace />} />
+              <Route path="/guards" element={<GuardAssignmentPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              
+              {/* Commander-only routes */}
+              <Route path="/main" element={<CommanderGuard><MainPage /></CommanderGuard>} />
+              <Route path="/zama" element={<CommanderGuard><ZamaPage /></CommanderGuard>} />
+              <Route path="/workplan" element={<CommanderGuard><WorkPlanPage /></CommanderGuard>} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
