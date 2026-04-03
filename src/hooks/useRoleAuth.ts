@@ -59,11 +59,13 @@ export function useRoleAuth(buttonId?: string) {
           toast.error(data.error || "אין לך הרשאת מפקד");
         }
       } else {
-        console.error("Auth server error:", res.status);
-        setError("שגיאת שרת באימות");
+        const errorText = await res.text();
+        console.error("Auth server error:", res.status, errorText);
+        setError(`שגיאת שרת באימות (קוד: ${res.status})`);
+        toast.error(`שגיאת שרת באימות (קוד: ${res.status})`);
       }
-    } catch (err) {
-      setError("שגיאת תקשורת");
+    } catch (err: any) {
+      setError(`שגיאת תקשורת: ${err.message || 'לא ידוע'}`);
       console.error("Auth communication error:", err);
     } finally {
       setIsLoading(false);

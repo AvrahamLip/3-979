@@ -591,13 +591,14 @@
                     userNameSpan.textContent = payload.name || payload.email;
                     fetchData();
                 } else {
-                    console.error('Auth status error:', res.status);
+                    const errorText = await res.text();
+                    console.error('Auth status error (res.status):', res.status, errorText);
                     authError.textContent = `שגיאת הרשאות (קוד: ${res.status}). פנה למנהל המערכת.`;
                     authError.classList.remove('hidden');
                 }
             } catch (err) {
                 console.error('Auth communication error:', err);
-                authError.textContent = 'שגיאת תקשורת עם שרת האימות. נסה שוב מאוחר יותר.';
+                authError.textContent = `שגיאת תקשורת: ${err.message || 'לא ידוע'}. נסה שוב מאוחר יותר.`;
                 authError.classList.remove('hidden');
             } finally {
                 authLoading.classList.add('hidden');
