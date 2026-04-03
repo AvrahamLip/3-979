@@ -964,10 +964,7 @@ export default function GuardAssignmentPage() {
     });
 
     // ─── Differential Updates (UPSERT-0 Strategy) ──────────────────────────
-    // For every previous assignee that NO LONGER exists in the current session,
-    // we send a 0-point record to zero them out in the log via n8n's UPSERT.
     if (loadedAssignments) {
-        // Collect all currently active names for this date
         const currentActiveNames = new Set<string>();
         assignments.hapak.forEach(h => {
              if (h.assignedTo && h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") currentActiveNames.add(normalizeNameStr(h.assignedTo));
@@ -976,7 +973,6 @@ export default function GuardAssignmentPage() {
              if (g.name && g.name !== "לא מאויש" && g.name !== "-") currentActiveNames.add(normalizeNameStr(g.name));
         });
 
-        // 1. Check previous Hapak
         loadedAssignments.hapak.forEach(h => {
             if (h.assignedTo && h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") {
                 const normName = normalizeNameStr(h.assignedTo);
@@ -986,14 +982,13 @@ export default function GuardAssignmentPage() {
             }
         });
 
-        // 2. Check previous Guards
         loadedAssignments.guards.forEach(g => {
-            if (g.name && g.name !== "לא מאויש" && g.name !== "-") {
+             if (g.name && g.name !== "לא מאויש" && g.name !== "-") {
                 const normName = normalizeNameStr(g.name);
                 if (!currentActiveNames.has(normName) && !consolidated.has(g.name)) {
                    addUpdate(g.name, 'הוסר מהשיבוץ', 'שמירה', 'הוסר', 0);
                 }
-            }
+             }
         });
     }
 
@@ -1008,13 +1003,11 @@ export default function GuardAssignmentPage() {
 
       if (!response.ok) throw new Error("API update failed");
 
-      // Replace history for the current date with the new points
-      const formattedDate = formatDateForApi(date);
+      const formattedDateDay = formatDateForApi(date);
       const newHistory = { ...history };
-      // Remove any previous entries for this date
-      newHistory[formattedDate] = {};
+      newHistory[formattedDateDay] = {};
       sessionUpdates.forEach(u => {
-        newHistory[formattedDate][u.name] = (newHistory[formattedDate][u.name] || 0) + u.points;
+        newHistory[formattedDateDay][u.name] = (newHistory[formattedDateDay][u.name] || 0) + u.points;
       });
       setHistory(newHistory);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
@@ -1022,15 +1015,6 @@ export default function GuardAssignmentPage() {
       toast.success("השיבוץ אושר ונרשם ביומן הפעילות בהצלחה!");
     } catch (e) {
       console.error("Confirm API Error:", e);
-      // On failure, still store the attempted updates locally for the date
-      const formattedDate = formatDateForApi(date);
-      const newHistory = { ...history };
-      newHistory[formattedDate] = {};
-      sessionUpdates.forEach(u => {
-        newHistory[formattedDate][u.name] = (newHistory[formattedDate][u.name] || 0) + u.points;
-      });
-      setHistory(newHistory);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
       toast.warning("עדכון יומן הפעילות נכשל, נשמר באופן מקומי בלבד.");
     }
   };
@@ -1177,33 +1161,20 @@ export default function GuardAssignmentPage() {
       {(isLoading || isGenerating) && <LoadingOverlay />}
       {isError && !isLoading && !isGenerating && <ErrorMessage message={(error as Error)?.message ?? "שגיאה לא ידועה"} />}
 
-      {!isLoading && !isGenerating && !isError && !assignments && !isAuthenticated && (
-        <div className="flex flex-col items-center justify-center p-12 bg-card rounded-2xl border border-border shadow-sm animate-fade-in-up">
-          <Shield className="w-16 h-16 text-muted-foreground/30 mb-4" />
-          <h2 className="text-xl font-black text-foreground mb-2">טרם שובצו שמירות</h2>
-          <p className="text-muted-foreground text-center max-w-sm">
-            לא נמצא שיבוץ שמור לתאריך הנבחר. ניתן לבדוק תאריכים אחרים באמצעות לוח השנה למעלה.
-          </p>
-        </div>
-      )}
-
       {!isLoading && !isGenerating && !isError && assignments && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Left Column: Controls, Stats & History */}
-          <div className="lg:col-span-1 space-y-6 text-right" dir="rtl">
-            <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4">
-              <h2 className="text-lg font-black flex items-center gap-2 text-primary">
-                <Shield className="w-5 h-5 text-primary" />
-                {isAuthenticated ? "ניהול שיבוץ" : "שיבוץ שמירות"}
-              </h2>
-              {!isAuthenticated && (
-                <div className="p-3 bg-muted/50 rounded-lg border border-border/50 text-[11px] text-muted-foreground flex items-start gap-2">
-                  <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  <p>צפייה בשיבוץ פתוחה לכולם. כדי לבצע שינויים או ג'ינרוט מחדש, עליך להתחבר כפי שנדרש למפקדים.</p>
-                </div>
-              )}
-              {isAuthenticated && (
+        <div className={cn(
+          "grid gap-6",
+          isAuthenticated ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1"
+        )}>
+          {/* Side Column: Management, Ledger & Statistics - Visible ONLY for Authenticated Commanders */}
+          {isAuthenticated && (
+            <div className="lg:col-span-1 space-y-6 text-right" dir="rtl">
+              {/* Management Card */}
+              <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4 animate-in fade-in slide-in-from-top-2">
+                <h2 className="text-lg font-black flex items-center gap-2 text-primary">
+                  <Shield className="w-5 h-5 text-primary" />
+                  ניהול שיבוץ
+                </h2>
                 <div className="space-y-2">
                   <Button onClick={handleGenerate} className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md">
                     ג'נרט שיבוץ חדש
@@ -1217,18 +1188,13 @@ export default function GuardAssignmentPage() {
                     אשר ועדכן ניקוד בגליון
                   </Button>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Burden Ledger */}
-            {isAuthenticated && (
+              {/* Burden Ledger Card */}
               <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
                 <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => setIsLedgerCollapsed(!isLedgerCollapsed)}
-                      className="p-1 hover:bg-muted rounded-md transition-colors"
-                    >
+                    <button onClick={() => setIsLedgerCollapsed(!isLedgerCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
                       {isLedgerCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                     </button>
                     <h3 className="font-black text-sm flex items-center gap-2">
@@ -1258,29 +1224,15 @@ export default function GuardAssignmentPage() {
                             isBlocked && "bg-red-500/5 opacity-80"
                           )}>
                             <div className="flex items-center gap-3">
-                              <button 
-                                onClick={() => toggleBlock(p.name)}
-                                className={cn(
-                                  "p-1.5 rounded-md transition-colors",
-                                  isBlocked ? "text-red-500 bg-red-500/10 hover:bg-red-500/20" : "text-muted-foreground hover:text-primary hover:bg-muted"
-                                )}
-                                title={isBlocked ? "בטל חסימה" : "חסום משיבוץ"}
-                              >
+                              <button onClick={() => toggleBlock(p.name)} className={cn("p-1.5 rounded-md transition-colors", isBlocked ? "text-red-500 bg-red-500/10 hover:bg-red-500/20" : "text-muted-foreground hover:text-primary hover:bg-muted")} title={isBlocked ? "בטל חסימה" : "חסום משיבוץ"}>
                                 {isBlocked ? <ShieldOff className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
                               </button>
                               <div className="flex flex-col text-right">
                                 <span className={cn("text-sm font-medium", isBlocked && "line-through text-muted-foreground")}>{p.name}</span>
-                                <span className="text-[10px] text-muted-foreground">
-                                  {p.isPermanent ? "מהגליון" : "בסשן זה"}
-                                </span>
+                                <span className="text-[10px] text-muted-foreground">{p.isPermanent ? "מהגליון" : "בסשן זה"}</span>
                               </div>
                             </div>
-                            <span className={cn(
-                              "text-xs font-bold px-2 py-0.5 rounded-full",
-                              p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600"
-                            )}>
-                              {p.total} נק'
-                            </span>
+                            <span className={cn("text-xs font-bold px-2 py-0.5 rounded-full", p.isPermanent ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600")}>{p.total} נק'</span>
                           </div>
                         );
                       })
@@ -1288,22 +1240,17 @@ export default function GuardAssignmentPage() {
                   </div>
                 )}
               </div>
-            )}
 
-            {/* Available Personnel */}
-            {isAuthenticated && (
+              {/* Personnel Stats Card */}
               <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
                 <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => setIsAvailableCollapsed(!isAvailableCollapsed)}
-                      className="p-1 hover:bg-muted rounded-md transition-colors"
-                    >
+                    <button onClick={() => setIsAvailableCollapsed(!isAvailableCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
                       {isAvailableCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                     </button>
                     <h3 className="font-black text-sm flex items-center gap-2">
                       <UserCheck className="w-4 h-4 text-green-500" />
-                      חיילים פנויים למשימות ({availablePersonnel.length})
+                      חיילים פנויים ({availablePersonnel.length})
                     </h3>
                   </div>
                 </div>
@@ -1314,75 +1261,35 @@ export default function GuardAssignmentPage() {
                     ) : (
                       <div className="flex flex-wrap gap-2 justify-start" dir="rtl">
                         {availablePersonnel.map((p) => {
-                          const v = String(p.todayValue).trim().toUpperCase();
-                          const isLeaving = v.includes("בית");
-                          const isReturning = v.includes("חוזר");
-                          
-                          let statusLabel = "זמין";
+                          const v = String(p.todayValue || "").trim().toUpperCase();
                           let statusColor = "bg-green-500/10 text-green-700 border-green-500/20";
-                          let icon = <UserCheck className="w-3.5 h-3.5" />;
-                          
-                          if (isLeaving) {
-                            statusLabel = "יוצא הביתה - פנוי למשימות בוקר";
-                            statusColor = "bg-indigo-500/10 text-indigo-700 border-indigo-500/30 shadow-[0_0_15px_-5px_rgba(99,102,241,0.3)] animate-pulse-subtle";
-                            icon = <Clock className="w-3.5 h-3.5 text-indigo-500" />;
-                          } else if (isReturning) {
-                            statusLabel = "חוזר היום";
-                            statusColor = "bg-blue-500/10 text-blue-700 border-blue-500/20";
-                          }
+                          if (v.includes("בית")) statusColor = "bg-indigo-500/10 text-indigo-700 border-indigo-500/30";
+                          else if (v.includes("חוזר")) statusColor = "bg-blue-500/10 text-blue-700 border-blue-500/20";
 
                           return (
-                            <div 
-                              key={p.name} 
-                              className={cn(
-                                "border px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 whitespace-nowrap transition-all hover:scale-[1.02]", 
-                                statusColor,
-                                isLeaving && "ring-1 ring-indigo-500/20"
-                              )}
-                            >
-                              <div className="flex items-center gap-2">
-                                {icon}
-                                <span>{p.name}</span>
-                              </div>
-                              <div className="flex items-center gap-1.5 border-r border-current/10 pr-3 opacity-80">
-                                <span className="text-[10px]">({p.role || "חייל"})</span>
-                                <span className="text-[10px] font-black">•</span>
-                                <span className="text-[10px]">{statusLabel}</span>
-                              </div>
+                            <div key={p.name} className={cn("border px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2", statusColor)}>
+                              <span>{p.name}</span>
                             </div>
                           );
                         })}
-
                       </div>
                     )}
                   </div>
                 )}
               </div>
-            )}
+            </div>
+          )}
 
-            {isAuthenticated && (
-              <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
-                <div className="flex gap-2 text-primary">
-                  <Info className="w-5 h-5 shrink-0" />
-                  <div className="text-xs space-y-1 text-right">
-                    <p className="font-bold">איך זה עובד?</p>
-                    <p>המערכת מחשבת מי שמר הכי פחות לפי הניקוד המצטבר ומתעדפת אותו בשיבוץ הבא.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Right Column: Assignments */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Hapak Grid */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef} id="hapak-export-container" style={{ overflow: 'visible' }}>
+          {/* Main Column: Assignment Tables */}
+          <div className={cn(
+            "space-y-6",
+            isAuthenticated ? "lg:col-span-2" : "col-span-1"
+          )}>
+            {/* Hapak Assignment Card */}
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef} id="hapak-export-container">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setIsHapakCollapsed(!isHapakCollapsed)}
-                    className="p-1 hover:bg-muted rounded-md transition-colors"
-                  >
+                  <button onClick={() => setIsHapakCollapsed(!isHapakCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
                     {isHapakCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </button>
                   <div className="flex flex-col">
@@ -1390,15 +1297,13 @@ export default function GuardAssignmentPage() {
                       <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                       שיבוץ חפ"ק
                     </h2>
-                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">
-                      תאריך: {date.split('-').reverse().join('/')}
-                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">תאריך: {date.split('-').reverse().join('/')}</span>
                   </div>
                 </div>
                 {!isExportingHapak && !isHapakCollapsed && (
                   <Button onClick={handleExportHapak} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export">
                     <Camera className="w-3.5 h-3.5 mr-2" />
-                    שמור כתמונה
+                    תמונה
                   </Button>
                 )}
               </div>
@@ -1411,35 +1316,29 @@ export default function GuardAssignmentPage() {
                         {assignments?.hapak.filter(h => h.id === mission.id)
                           .sort((a, b) => a.memberIndex - b.memberIndex)
                           .map((h, hIdx) => {
-                           const person = data?.find(p => p.name === h.assignedTo);
-                           const isUnmanned = !h.assignedTo || h.assignedTo === "לא מאויש" || h.assignedTo === "טרם שובץ";
-                           const roleText = !isUnmanned && person?.role ? `(${person.role.trim()})` : '';
-                           
-                           const parts = h.name.split(' - ');
-                           const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
-
-                           return (
-                             <div key={`${h.id}-${h.memberIndex}-${h.name}-${hIdx}`} className={cn("flex items-center justify-between p-2 rounded-lg text-xs", h.memberIndex === 1 ? "bg-amber-500/10 border border-amber-500/20" : "bg-muted/30")}>
-                               <span className={cn("font-medium max-w-[100px] break-words text-right", h.memberIndex === 1 ? "text-amber-700 font-black" : "text-muted-foreground")}>
-                                 {displayRole}
-                               </span>
-                               <div className="flex items-center gap-1.5 flex-row-reverse">
-                                   <PersonnelSwap
-                                     currentName={h.assignedTo}
-                                     allPersonnel={data || []}
-                                     onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
-                                     readonly={!isAuthenticated || isExportingHapak}
-                                     allowEmpty={true}
-                                     type="hapak"
-                                     currentAssignments={assignments}
-                                     yesterdayGuards={loadedAssignments?.guards || []}
-                                   />
-
-                                  {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
+                             const person = data?.find(p => p.name === h.assignedTo);
+                             const roleText = person?.role ? `(${person.role.trim()})` : '';
+                             const parts = h.name.split(' - ');
+                             const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
+                             return (
+                               <div key={`${h.id}-${h.memberIndex}-${hIdx}`} className={cn("flex items-center justify-between p-2 rounded-lg text-xs", h.memberIndex === 1 ? "bg-amber-500/10 border border-amber-500/20" : "bg-muted/30")}>
+                                 <span className={cn("font-medium max-w-[100px] break-words text-right", h.memberIndex === 1 ? "text-amber-700 font-black" : "text-muted-foreground")}>{displayRole}</span>
+                                 <div className="flex items-center gap-1.5 flex-row-reverse">
+                                    <PersonnelSwap
+                                      currentName={h.assignedTo}
+                                      allPersonnel={data || []}
+                                      onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
+                                      readonly={!isAuthenticated || isExportingHapak}
+                                      allowEmpty={true}
+                                      type="hapak"
+                                      currentAssignments={assignments}
+                                      yesterdayGuards={loadedAssignments?.guards || []}
+                                    />
+                                    {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
+                                 </div>
                                </div>
-                             </div>
-                           );
-                        })}
+                             );
+                          })}
                       </div>
                     </div>
                   ))}
@@ -1447,14 +1346,11 @@ export default function GuardAssignmentPage() {
               )}
             </div>
 
-            {/* Guard Table */}
+            {/* Guard Table Card */}
             <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={guardTableRef} id="guard-export-container">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setIsGuardCollapsed(!isGuardCollapsed)}
-                    className="p-1 hover:bg-muted rounded-md transition-colors"
-                  >
+                  <button onClick={() => setIsGuardCollapsed(!isGuardCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
                     {isGuardCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </button>
                   <div className="flex flex-col">
@@ -1462,23 +1358,18 @@ export default function GuardAssignmentPage() {
                       <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                       לו"ז שמירות
                     </h2>
-                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">
-                      תאריך: {date.split('-').reverse().join('/')}
-                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">תאריך: {date.split('-').reverse().join('/')}</span>
                   </div>
                 </div>
                 {!isExporting && !isGuardCollapsed && (
                   <Button onClick={handleExportImage} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export">
                     <Camera className="w-3.5 h-3.5 mr-2" />
-                    שמור כתמונה
+                    תמונה
                   </Button>
                 )}
               </div>
               {!isGuardCollapsed && (
-                <div className={cn(
-                  "overflow-x-auto",
-                  !isExporting && "max-h-[800px] overflow-y-auto"
-                )}>
+                <div className={cn("overflow-x-auto", !isExporting && "max-h-[800px] overflow-y-auto")}>
                   <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-muted z-10">
                       <tr className="text-right">
@@ -1489,18 +1380,9 @@ export default function GuardAssignmentPage() {
                     </thead>
                     <tbody>
                       {assignments?.guards.map((g, idx) => (
-                        <tr
-                          key={idx}
-                          className={cn(
-                            "border-t border-border transition-colors hover:bg-muted/50",
-                            idx % 2 === 0 ? "bg-card" : "bg-background"
-                          )}
-                        >
+                        <tr key={idx} className={cn("border-t border-border transition-colors hover:bg-muted/50", idx % 2 === 0 ? "bg-card" : "bg-background")}>
                           <td className="px-3 sm:px-5 py-3 font-mono text-[11px] sm:text-xs text-muted-foreground flex items-center gap-2 whitespace-nowrap">
-                            <div className={cn(
-                              "w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full",
-                              g.points === 2 ? "bg-indigo-500" : "bg-yellow-500"
-                            )} />
+                            <div className={cn("w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full", g.points === 2 ? "bg-indigo-500" : "bg-yellow-500")} />
                             {g.time}
                           </td>
                           <td className="px-3 sm:px-5 py-3 font-bold whitespace-nowrap">
@@ -1516,15 +1398,11 @@ export default function GuardAssignmentPage() {
                                 currentAssignments={assignments}
                                 yesterdayGuards={loadedAssignments?.guards || []}
                               />
-
                             </div>
                           </td>
                           {(!isExporting && isAuthenticated) && (
                             <td className="px-5 py-3">
-                              <span className={cn(
-                                "text-[10px] px-2 py-0.5 rounded-full font-bold",
-                                g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700"
-                              )}>
+                              <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold", g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700")}>
                                 {g.points} נק'
                               </span>
                             </td>
@@ -1537,7 +1415,6 @@ export default function GuardAssignmentPage() {
               )}
             </div>
           </div>
-
         </div>
       )}
     </div>
