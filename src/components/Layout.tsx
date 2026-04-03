@@ -16,13 +16,6 @@ export default function Layout() {
   // Always show nav now, but items are conditional
   const showNav = true;
 
-  // Determine if we should point to the commander version of the guards page
-  const isCommanderView = location.pathname.startsWith("/main") || 
-                          location.pathname.startsWith("/zama") || 
-                          location.pathname.startsWith("/workplan");
-  
-  const guardsTarget = isCommanderView ? "/guards?mode=commander" : "/guards";
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Navigation Bar */}
@@ -86,7 +79,7 @@ export default function Layout() {
                 </NavLink>
                 
                 <NavLink
-                  to={guardsTarget}
+                  to="/guards"
                   className={({ isActive }) =>
                     cn(
                       "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
@@ -246,7 +239,7 @@ export default function Layout() {
               </NavLink>
 
               <NavLink
-                to={guardsTarget}
+                to="/guards"
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   cn(

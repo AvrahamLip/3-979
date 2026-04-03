@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
@@ -587,19 +586,6 @@ function generateAggregatedHistory(history: Record<string, PersonnelPoints>): Pe
 
 export default function GuardAssignmentPage() {
   const { isAuthenticated } = useAuth();
-  const [searchParams] = useSearchParams();
-  const hasCommanderMode = searchParams.get("mode") === "commander";
-  
-  useEffect(() => {
-    if (hasCommanderMode) {
-      localStorage.setItem("commander_access_granted", "true");
-    }
-  }, [hasCommanderMode]);
-
-  const [manualEditMode, setManualEditMode] = useState(false);
-  const canEdit = isAuthenticated || manualEditMode;
-  const isCommanderAllowed = hasCommanderMode || localStorage.getItem("commander_access_granted") === "true";
-  const showManualToggleButton = !isAuthenticated && isCommanderAllowed;
   const isAuthLoading = false;
   const authError = null;
   const resetError = () => {};
@@ -833,7 +819,7 @@ export default function GuardAssignmentPage() {
           setIsSaved(true);
         } else {
           setLoadedAssignments(null);
-          if (canEdit) {
+          if (isAuthenticated) {
             const yesterday = getYesterdayIso(date);
             const yesterdayData = await fetchSavedAssignment(yesterday);
             const yesterdayGuardsArray = yesterdayData?.guards || [];
@@ -850,14 +836,14 @@ export default function GuardAssignmentPage() {
       }
     };
     init();
-  }, [date, history, canEdit, blockedNames, data, hapakData, isAuthenticated]);
+  }, [date, history, isAuthenticated, blockedNames, data, hapakData]);
 
   useEffect(() => {
     loadHapakRegistry();
   }, []);
 
   const handleGenerate = async () => {
-    if (!canEdit) return;
+    if (!isAuthenticated) return;
     setIsGenerating(true);
     setAssignments(null); // Clear UI during generation
     
@@ -1130,28 +1116,11 @@ export default function GuardAssignmentPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            {canEdit && (
+            {isAuthenticated && (
               <div className="px-3 py-1.5 bg-green-500/20 text-white border border-green-500/30 rounded-lg text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 מצב עריכה
               </div>
-            )}
-            {showManualToggleButton && !manualEditMode && (
-              <Button
-                onClick={() => setManualEditMode(true)}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md h-9 px-3"
-              >
-                עבור למצב עריכה
-              </Button>
-            )}
-            {showManualToggleButton && manualEditMode && (
-              <Button
-                onClick={() => setManualEditMode(false)}
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 font-bold text-xs h-9 px-3 backdrop-blur-sm"
-              >
-                חזרה לתצוגה
-              </Button>
             )}
             <DatePickerBar value={date} onChange={setDate} />
             <button
@@ -1170,7 +1139,7 @@ export default function GuardAssignmentPage() {
       {(isLoading || isGenerating) && <LoadingOverlay />}
       {isError && !isLoading && !isGenerating && <ErrorMessage message={(error as Error)?.message ?? "שגיאה לא ידועה"} />}
 
-      {!isLoading && !isGenerating && !isError && !assignments && !canEdit && (
+      {!isLoading && !isGenerating && !isError && !assignments && !isAuthenticated && (
         <div className="flex flex-col items-center justify-center p-12 bg-card rounded-2xl border border-border shadow-sm animate-fade-in-up">
           <Shield className="w-16 h-16 text-muted-foreground/30 mb-4" />
           <h2 className="text-xl font-black text-foreground mb-2">טרם שובצו שמירות</h2>
@@ -1188,9 +1157,9 @@ export default function GuardAssignmentPage() {
             <div className="bg-card border border-border rounded-xl p-5 card-shadow space-y-4">
               <h2 className="text-lg font-black flex items-center gap-2">
                 <Shuffle className="w-5 h-5 text-primary" />
-                {canEdit ? "ניהול שיבוץ" : "שיבוץ שמירות"}
+                {isAuthenticated ? "ניהול שיבוץ" : "צפייה בשיבוץ (למורשים בלבד)"}
               </h2>
-              {canEdit && (
+              {isAuthenticated && (
                 <div className="space-y-2">
                   <Button onClick={handleGenerate} className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md">
                     ג'נרט שיבוץ חדש
@@ -1208,7 +1177,7 @@ export default function GuardAssignmentPage() {
             </div>
 
             {/* Burden Ledger */}
-            {canEdit && (
+            {isAuthenticated && (
               <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
                 <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1278,7 +1247,7 @@ export default function GuardAssignmentPage() {
             )}
 
             {/* Available Personnel */}
-            {canEdit && (
+            {isAuthenticated && (
               <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
                 <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1347,7 +1316,7 @@ export default function GuardAssignmentPage() {
               </div>
             )}
 
-            {canEdit && (
+            {isAuthenticated && (
               <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
                 <div className="flex gap-2 text-primary">
                   <Info className="w-5 h-5 shrink-0" />
@@ -1415,7 +1384,7 @@ export default function GuardAssignmentPage() {
                                      currentName={h.assignedTo}
                                      allPersonnel={data || []}
                                      onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
-                                     readonly={!canEdit || isExportingHapak}
+                                     readonly={!isAuthenticated || isExportingHapak}
                                      allowEmpty={true}
                                      type="hapak"
                                      currentAssignments={assignments}
@@ -1471,7 +1440,7 @@ export default function GuardAssignmentPage() {
                       <tr className="text-right">
                         <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שעה</th>
                         <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שומר</th>
-                        {(!isExporting && canEdit) && <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
+                        {(!isExporting && isAuthenticated) && <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -1496,7 +1465,7 @@ export default function GuardAssignmentPage() {
                                 currentName={g.name}
                                 allPersonnel={data || []}
                                 onSwap={(newName) => handleSwap("guard", g.hour, newName)}
-                                readonly={!canEdit || isExporting}
+                                readonly={!isAuthenticated || isExporting}
                                 allowEmpty={true}
                                 hour={g.hour}
                                 type="guard"
@@ -1506,7 +1475,7 @@ export default function GuardAssignmentPage() {
 
                             </div>
                           </td>
-                          {(!isExporting && canEdit) && (
+                          {(!isExporting && isAuthenticated) && (
                             <td className="px-5 py-3">
                               <span className={cn(
                                 "text-[10px] px-2 py-0.5 rounded-full font-bold",
