@@ -149,17 +149,6 @@ export default function Layout() {
                 </div>
               )}
 
-              {/* Enter Commander Mode (Hidden trigger for Soldiers) */}
-              {!isAuthenticated && (
-                <a
-                  href="https://avrahamlip.github.io/3-979/#/main"
-                  className="p-2 rounded-lg text-white/40 hover:text-white transition-colors"
-                  title="גישת מפקדים"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                </a>
-              )}
-
               {/* PWA Install Button */}
               <PWAInstallButton variant="header" />
 
