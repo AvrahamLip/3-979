@@ -67,40 +67,6 @@ export default function MainPage() {
         <EmptyState date={date} />
       )}
 
-      {/* Commander Quick Tools */}
-      {!isLoading && !isError && (
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Link 
-            to="/workplan" 
-            className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-center group elevated-shadow"
-          >
-            <CalendarDays className="w-6 h-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-bold text-foreground">תוכנית עבודה</span>
-          </Link>
-          <Link 
-            to="/zama" 
-            className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-center group elevated-shadow"
-          >
-            <Truck className="w-6 h-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-bold text-foreground">צמ&quot;ה</span>
-          </Link>
-          <a 
-            href="https://avrahamlip.github.io/3-979/update.html"
-            className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-center group elevated-shadow"
-          >
-            <Edit className="w-6 h-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-bold text-foreground">עדכון נתונים</span>
-          </a>
-          <Link 
-            to="/guards" 
-            className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-center group elevated-shadow"
-          >
-            <Shield className="w-6 h-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-bold text-foreground">שיבוץ שמירות</span>
-          </Link>
-        </section>
-      )}
-
       {/* Content */}
       {!isLoading && !isError && records.length > 0 && (
         <>
