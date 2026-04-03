@@ -1124,18 +1124,34 @@ export default function GuardAssignmentPage() {
               </div>
             )}
             
-            {!isAuthenticated && !showLoginPrompt && (
-              <Button
-                onClick={() => setShowLoginPrompt(true)}
-                className="bg-primary/20 hover:bg-primary/30 text-white border border-primary/40 text-xs font-bold h-9 px-3 backdrop-blur-sm"
-              >
-                התחבר לעריכה
-              </Button>
-            )}
-
-            {!isAuthenticated && showLoginPrompt && (
-              <div id="google-signin-btn-commander" className="bg-white rounded-lg p-0.5 overflow-hidden border border-white/50 h-9 flex items-center justify-center">
-                {/* Button rendered by useRoleAuth */}
+            {!isAuthenticated && (
+              <div className="flex items-center gap-2">
+                {!showLoginPrompt ? (
+                  <Button
+                    onClick={() => setShowLoginPrompt(true)}
+                    className="bg-primary/20 hover:bg-primary/30 text-white border border-primary/40 text-xs font-bold h-9 px-3 backdrop-blur-sm"
+                  >
+                    התחבר לעריכה
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setShowLoginPrompt(false)}
+                    variant="ghost"
+                    className="text-white/70 hover:text-white text-[10px] h-9 px-2"
+                  >
+                    ביטול
+                  </Button>
+                )}
+                
+                <div 
+                  id="google-signin-btn-commander" 
+                  className={cn(
+                    "bg-white rounded-lg p-0.5 overflow-hidden border border-white/50 h-9 flex items-center justify-center transition-all",
+                    !showLoginPrompt && "hidden"
+                  )}
+                >
+                  {/* Button rendered by useRoleAuth */}
+                </div>
               </div>
             )}
 

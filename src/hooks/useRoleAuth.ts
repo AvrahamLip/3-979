@@ -74,14 +74,17 @@ export function useRoleAuth(buttonId?: string) {
     if (!buttonId || isAuthenticated) return;
 
     const interval = setInterval(() => {
-      if ((window as any).google) {
+      const g = (window as any).google;
+      const btn = document.getElementById(buttonId);
+
+      if (g && btn) {
         clearInterval(interval);
-        (window as any).google.accounts.id.initialize({
+        g.accounts.id.initialize({
           client_id: CLIENT_ID,
           callback: handleCredentialResponse,
         });
-        (window as any).google.accounts.id.renderButton(
-          document.getElementById(buttonId),
+        g.accounts.id.renderButton(
+          btn,
           { theme: "outline", size: "large", text: "signin_with", width: 250 }
         );
       }
