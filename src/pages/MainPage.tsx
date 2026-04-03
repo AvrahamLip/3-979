@@ -92,7 +92,7 @@ export default function MainPage() {
             <span className="text-xs font-bold text-foreground">עדכון נתונים</span>
           </a>
           <Link 
-            to="/guards" 
+            to="/guards?mode=commander" 
             className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-center group elevated-shadow"
           >
             <Shield className="w-6 h-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
