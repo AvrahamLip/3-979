@@ -574,25 +574,26 @@
                 const res = await fetch(VALIDATE_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                    body: JSON.stringify({ 
                         email: payload.email,
-                        role: "update",
+                        roll: "update",
                         credential: response.credential
                     })
                 });
 
-                if (res.ok) {
+                if (res.status === 200) {
                     const data = await res.json();
-                    if (data.authorized) {
+                    // Authorized if we get a user object with an email
+                    if (data.email || data.authorized === true) {
                         localStorage.setItem('is_commander', 'true');
                         localStorage.setItem('user_info', JSON.stringify({
                             name: payload.name,
                             email: payload.email,
-                            role: 'commander'
+                            role: "update"
                         }));
                         showAuthorizedContent(payload.name);
                     } else {
-                        console.error('Auth server error:', res.status);
+                        console.error('Auth rejection:', data);
                         authError.innerText = data.error || 'אין לך הרשאת מפקד';
                         authError.classList.remove('hidden');
                     }
