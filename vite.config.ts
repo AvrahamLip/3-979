@@ -71,6 +71,7 @@ export default defineConfig(({ mode }) => {
           zama: path.resolve(__dirname, "zama.html"),
           contact: path.resolve(__dirname, "contact.html"),
           "main-page": path.resolve(__dirname, "main.html"),
+          update: path.resolve(__dirname, "update.html"),
         },
       },
     },
