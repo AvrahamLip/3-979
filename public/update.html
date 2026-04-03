@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
     <style>
         :root {
             /* Core palette - Doch! RTL Military Attendance */
@@ -96,7 +98,9 @@
             transition: opacity 0.2s;
         }
 
-        .logo:hover { opacity: 0.9; }
+        .logo:hover {
+            opacity: 0.9;
+        }
 
         .logo-box {
             width: 2.25rem;
@@ -127,7 +131,9 @@
             padding: 0.5rem 0;
         }
 
-        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
 
         .nav-item {
             display: flex;
@@ -154,7 +160,10 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .icon { width: 1rem; height: 1rem; }
+        .icon {
+            width: 1rem;
+            height: 1rem;
+        }
 
         .user-actions {
             display: flex;
@@ -246,7 +255,8 @@
             color: hsl(var(--primary));
         }
 
-        input, select {
+        input,
+        select {
             padding: 0.5rem;
             border: 1px solid hsl(var(--border));
             border-radius: calc(var(--radius) / 2);
@@ -309,13 +319,47 @@
             transition: all 0.2s;
         }
 
-        .status-1 { background-color: hsl(var(--status-base-bg)); color: hsl(var(--status-base)); border: 1px solid hsla(var(--status-base), 0.2); }
-        .status-0 { background-color: hsl(var(--status-home-bg)); color: hsl(var(--status-home)); border: 1px solid hsla(var(--status-home), 0.2); }
-        .status-2 { background-color: hsl(var(--status-sick-bg)); color: hsl(var(--status-sick)); border: 1px solid hsla(var(--status-sick), 0.2); }
-        .status-4 { background-color: hsl(var(--status-home-bg)); color: hsl(var(--status-home)); border: 1px solid hsla(var(--status-home), 0.2); }
-        .status-5 { background-color: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
-        .status-3 { background-color: hsl(var(--status-other-bg)); color: hsl(var(--status-other)); border: 1px solid hsla(var(--status-other), 0.2); }
-        .status-empty { background-color: #f3f4f6; color: #000; border: 1px dashed #d1d5db; }
+        .status-1 {
+            background-color: hsl(var(--status-base-bg));
+            color: hsl(var(--status-base));
+            border: 1px solid hsla(var(--status-base), 0.2);
+        }
+
+        .status-0 {
+            background-color: hsl(var(--status-home-bg));
+            color: hsl(var(--status-home));
+            border: 1px solid hsla(var(--status-home), 0.2);
+        }
+
+        .status-2 {
+            background-color: hsl(var(--status-sick-bg));
+            color: hsl(var(--status-sick));
+            border: 1px solid hsla(var(--status-sick), 0.2);
+        }
+
+        .status-4 {
+            background-color: hsl(var(--status-home-bg));
+            color: hsl(var(--status-home));
+            border: 1px solid hsla(var(--status-home), 0.2);
+        }
+
+        .status-5 {
+            background-color: #f5f3ff;
+            color: #5b21b6;
+            border: 1px solid #ddd6fe;
+        }
+
+        .status-3 {
+            background-color: hsl(var(--status-other-bg));
+            color: hsl(var(--status-other));
+            border: 1px solid hsla(var(--status-other), 0.2);
+        }
+
+        .status-empty {
+            background-color: #f3f4f6;
+            color: #000;
+            border: 1px dashed #d1d5db;
+        }
 
         .save-btn {
             background: hsl(var(--accent));
@@ -337,8 +381,13 @@
             pointer-events: auto;
         }
 
-        .save-btn:hover { background: hsl(var(--accent) / 0.9); }
-        .save-btn:active { transform: scale(0.95); }
+        .save-btn:hover {
+            background: hsl(var(--accent) / 0.9);
+        }
+
+        .save-btn:active {
+            transform: scale(0.95);
+        }
 
         /* Auth styling */
         .auth-box {
@@ -365,7 +414,10 @@
         }
 
         /* Helpers */
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
+
         .loading-spinner {
             width: 1rem;
             height: 1rem;
@@ -378,45 +430,86 @@
             margin-left: 0.5rem;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-        .success-flash { color: #15803d; font-weight: bold; animation: fadeOut 2s forwards; }
-        .error-flash { color: #b91c1c; font-weight: bold; }
+        .success-flash {
+            color: #15803d;
+            font-weight: bold;
+            animation: fadeOut 2s forwards;
+        }
 
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .error-flash {
+            color: #b91c1c;
+            font-weight: bold;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
 
         @media (max-width: 480px) {
-            .card-header { flex-direction: column; align-items: stretch; }
-            th:nth-child(2), td:nth-child(2) { display: none; }
-            th:nth-child(3), td:nth-child(3) { display: none; }
-            th:nth-child(1) { width: 55% !important; }
-            th:nth-child(4) { width: 45% !important; }
-            td { padding: 0.75rem 0.5rem; }
-            .status-select { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            th:nth-child(2),
+            td:nth-child(2) {
+                display: none;
+            }
+
+            th:nth-child(3),
+            td:nth-child(3) {
+                display: none;
+            }
+
+            th:nth-child(1) {
+                width: 55% !important;
+            }
+
+            th:nth-child(4) {
+                width: 45% !important;
+            }
+
+            td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .status-select {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-box">
             <h2>כניסה למערכת</h2>
             <p>התחבר עם חשבון Google כדי להמשיך</p>
-            
+
             <div id="g_id_onload"
-                 data-client_id="435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com"
-                 data-callback="handleCredentialResponse"
-                 data-auto_prompt="false">
+                data-client_id="435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse" data-auto_prompt="false">
             </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="outline"
-                 data-text="sign_in_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left">
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
             </div>
 
-            <p id="auth-error" class="hidden" style="color: #b91c1c; font-size: 0.875rem; margin-top: 1.5rem; font-weight: 600;">אין לך הרשאה לגשת לדף זה</p>
+            <p id="auth-error" class="hidden"
+                style="color: #b91c1c; font-size: 0.875rem; margin-top: 1.5rem; font-weight: 600;">אין לך הרשאה לגשת לדף
+                זה</p>
             <div id="auth-loading" class="hidden" style="margin-top: 1.5rem;">
                 <div class="loading-spinner"></div> בודק הרשאות...
             </div>
@@ -475,7 +568,7 @@
                     </select>
                 </div>
             </div>
-            
+
             <div id="table-container">
                 <table>
                     <thead>
@@ -500,10 +593,13 @@
         </div>
     </main>
 
-    <footer style="border-top: 1px solid hsl(var(--border)); padding: 1.5rem 1rem; text-align: center; font-size: 0.75rem; color: hsl(var(--muted-foreground)); background: hsl(var(--muted) / 0.3); margin-top: 2rem;">
+    <footer
+        style="border-top: 1px solid hsl(var(--border)); padding: 1.5rem 1rem; text-align: center; font-size: 0.75rem; color: hsl(var(--muted-foreground)); background: hsl(var(--muted) / 0.3); margin-top: 2rem;">
         <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
             <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: center;">
-                <a href="mailto:[EMAIL_ADDRESS]" style="color: inherit; font-weight: bold; text-decoration: underline; text-decoration-style: dotted;">צור קשר</a>
+                <a href="mailto:[EMAIL_ADDRESS]"
+                    style="color: inherit; font-weight: bold; text-decoration: underline; text-decoration-style: dotted;">צור
+                    קשר</a>
                 <span style="opacity: 0.3;">|</span>
                 <a href="tel:[PHONE_NUMBER]" style="color: inherit; font-weight: bold;">[PHONE_NUMBER]</a>
                 <span style="opacity: 0.3;">|</span>
@@ -542,7 +638,7 @@
             try {
                 const base64Url = token.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
                 return JSON.parse(jsonPayload);
@@ -568,28 +664,27 @@
                 const res = await fetch(VALIDATE_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         email: payload.email,
-                        role: "update",
+                        roll: "update",
                         credential: response.credential
                     })
                 });
 
                 if (res.status === 200) {
                     const data = await res.json();
-                    if (data.authorized === false) {
+                    if (data.email || data.authorized === true) {
+                        authOverlay.classList.add('hidden');
+                        mainHeader.classList.remove('hidden');
+                        document.getElementById('sub-header').classList.remove('hidden');
+                        mainContent.classList.remove('hidden');
+                        userNameSpan.textContent = payload.name || payload.email;
+                        fetchData();
+                    } else {
                         console.error('Auth server rejected:', data.error);
                         authError.textContent = data.error || 'אין לך הרשאה לגשת לדף העדכון';
                         authError.classList.remove('hidden');
-                        return;
                     }
-
-                    authOverlay.classList.add('hidden');
-                    mainHeader.classList.remove('hidden');
-                    document.getElementById('sub-header').classList.remove('hidden');
-                    mainContent.classList.remove('hidden');
-                    userNameSpan.textContent = payload.name || payload.email;
-                    fetchData();
                 } else {
                     const errorText = await res.text();
                     console.error('Auth status error (res.status):', res.status, errorText);
@@ -619,10 +714,10 @@
                 const formattedDate = formatDateForApi(dateInput.value);
                 const response = await fetch(`${GET_API}?date=${encodeURIComponent(formattedDate)}`);
                 if (!response.ok) throw new Error('API Error');
-                
+
                 const data = await response.json();
                 allRecords = Array.isArray(data) ? data : (data.data || []);
-                
+
                 populateDeptFilter();
                 renderTable();
             } catch (err) {
@@ -665,16 +760,16 @@
             const filtered = allRecords.filter(r => {
                 const nameValid = r.name && r.name.trim() !== "";
                 if (!nameValid) return false;
-                
-                const matchesSearch = r.name.toLowerCase().includes(query) || 
-                                     (r.role && r.role.toLowerCase().includes(query));
+
+                const matchesSearch = r.name.toLowerCase().includes(query) ||
+                    (r.role && r.role.toLowerCase().includes(query));
                 const matchesDept = !selectedDept || r.department === selectedDept;
 
                 return matchesSearch && matchesDept;
             });
 
             attendanceBody.innerHTML = '';
-            
+
             if (filtered.length === 0) {
                 emptyMessage.classList.remove('hidden');
                 return;
@@ -685,7 +780,7 @@
             filtered.forEach((record, index) => {
                 const tr = document.createElement('tr');
                 const currentCode = normalizeStatus(record.todayValue);
-                
+
                 tr.innerHTML = `
                     <td>
                         <div class="name-cell">${record.name}</div>
@@ -711,7 +806,7 @@
 
                 const select = tr.querySelector('select');
                 const saveBtn = tr.querySelector('.save-btn');
-                
+
                 select.addEventListener('change', (e) => {
                     const newStatus = e.target.value;
                     e.target.className = `status-select status-${newStatus}`;
@@ -791,4 +886,5 @@
         });
     </script>
 </body>
+
 </html>

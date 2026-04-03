@@ -40,14 +40,15 @@ export function useRoleAuth(buttonId?: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: payload.email,
-          role: "guard",
+          roll: "guard",
           credential: response.credential,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        if (data.authorized) {
+        // Authorized if we get a user object with an email
+        if (data.email || data.authorized === true) {
           setIsAuthenticated(true);
           const info: UserInfo = { name: payload.name, email: payload.email, role: "commander" };
           setUser(info);
