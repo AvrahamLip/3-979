@@ -15,6 +15,49 @@ export default defineConfig(({ mode }) => {
   const isCloudflare = process.env.CF_PAGES === "1" || mode === "production-cloudflare";
   const base = isCloudflare ? "/" : "/3-979/";
 
+  const plugins = [
+    tsconfigPaths(),
+    react(),
+    VitePWA({
+      registerType: "autoUpdate",
+      includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
+      manifest: {
+        name: "דוח-1 - דוח נוכחות יומי",
+        short_name: "דוח-1",
+        description: "מערכת דיווח נוכחות יומי - דוח-1",
+        theme_color: "#ffffff",
+        background_color: "#ffffff",
+        display: "standalone",
+        start_url: ".",
+        icons: [
+          {
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+          {
+            src: "icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable",
+          },
+        ],
+      },
+      devOptions: {
+        enabled: true,
+      },
+    }),
+  ];
+
+  if (mode === "development") {
+    plugins.push(componentTagger());
+  }
+
   return {
     base,
     server: {
@@ -24,45 +67,7 @@ export default defineConfig(({ mode }) => {
         overlay: false,
       },
     },
-    plugins: [
-      tsconfigPaths(),
-      react(),
-      mode === "development" && componentTagger(),
-      VitePWA({
-        registerType: "autoUpdate",
-        includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
-        manifest: {
-          name: "דוח-1 - דוח נוכחות יומי",
-          short_name: "דוח-1",
-          description: "מערכת דיווח נוכחות יומי - דוח-1",
-          theme_color: "#ffffff",
-          background_color: "#ffffff",
-          display: "standalone",
-          start_url: ".",
-          icons: [
-            {
-              src: "icon-192.png",
-              sizes: "192x192",
-              type: "image/png",
-            },
-            {
-              src: "icon-512.png",
-              sizes: "512x512",
-              type: "image/png",
-            },
-            {
-              src: "icon-512.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "any maskable",
-            },
-          ],
-        },
-        devOptions: {
-          enabled: true,
-        },
-      }),
-    ].filter(Boolean),
+    plugins: plugins,
     build: {
       rollupOptions: {
         input: {
