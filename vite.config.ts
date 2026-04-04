@@ -11,7 +11,9 @@ const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const base = "/3-979/";
+  // Use / as base for Cloudflare (custom domain/dedicated URL), and /3-979/ for GitHub Pages
+  const isCloudflare = process.env.CF_PAGES === "1" || mode === "production-cloudflare";
+  const base = isCloudflare ? "/" : "/3-979/";
 
   return {
     base,

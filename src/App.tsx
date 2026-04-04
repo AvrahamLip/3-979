@@ -11,6 +11,7 @@ import WorkPlanPage from "./pages/WorkPlanPage";
 import GuardAssignmentPage from "./pages/GuardAssignmentPage";
 import ContactPage from "./pages/ContactPage";
 import VacationPage from "./pages/VacationPage";
+import DataUpdatePage from "./pages/DataUpdatePage";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { CommanderGuard } from "./components/CommanderGuard";
@@ -47,6 +48,14 @@ const App = () => (
               <Route path="zama" element={<ZamaPage />} />
               <Route path="workplan" element={<WorkPlanPage />} />
               <Route path="contact" element={<ContactPage />} />
+              <Route 
+                path="update" 
+                element={
+                  <CommanderGuard requiredRoll="update">
+                    <DataUpdatePage />
+                  </CommanderGuard>
+                } 
+              />
               <Route 
                 path="guards/manage" 
                 element={

@@ -99,13 +99,20 @@ export default function CommanderLayout() {
                 <span>טלפונים</span>
               </NavLink>
 
-              <a
-                href="https://avrahamlip.github.io/3-979/update.html"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-overlay/80 hover:text-overlay hover:bg-white/10 whitespace-nowrap"
+              <NavLink
+                to="/main/update"
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                  )
+                }
               >
                 <Edit className="w-4 h-4" />
                 <span>עדכון נתונים</span>
-              </a>
+              </NavLink>
             </nav>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -220,14 +227,19 @@ export default function CommanderLayout() {
 
               <div className="h-px bg-white/10 my-2 mx-4" />
 
-              <a
-                href="https://avrahamlip.github.io/3-979/update.html"
+              <NavLink
+                to="/main/update"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-overlay/70"
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold",
+                    isActive ? "bg-accent text-accent-foreground" : "text-overlay/70"
+                  )
+                }
               >
                 <Edit className="w-5 h-5" />
                 <span>עדכון נתונים</span>
-              </a>
+              </NavLink>
               {isAuthenticated && (
                 <button
                   onClick={() => {

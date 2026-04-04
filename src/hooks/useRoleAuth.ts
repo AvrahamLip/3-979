@@ -132,7 +132,7 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
   }, [defaultRoll]);
 
   useEffect(() => {
-    if (!buttonId || (isAuthenticated && user?.authorizedRolls?.includes(defaultRoll))) return;
+    if (!buttonId) return;
 
     const interval = setInterval(() => {
       const g = (window as any).google;
