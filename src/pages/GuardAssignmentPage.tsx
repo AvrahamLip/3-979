@@ -94,7 +94,27 @@ const getYesterdayIso = (dateStr: string) => {
   return d.toISOString().split('T')[0];
 };
 
-function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string, yesterdayGuards: GuardShift[] = []): AssignmentData {
+function getComputedPresence(person: AttendanceRecord | undefined, yesterdayRecords?: AttendanceRecord[]): "full" | "leaving" | "returning" | "none" {
+  if (!person) return "none";
+  let v = String(person.todayValue || "").trim().toUpperCase();
+  
+  if (v.includes("בית") || v === "0" || v === "5") return "leaving";
+  if (v.includes("חוזר") || v === "4") return "returning";
+  
+  // Cross check with yesterday
+  if (yesterdayRecords && yesterdayRecords.length > 0) {
+     const yestPerson = yesterdayRecords.find(r => normalizeNameStr(r.name) === normalizeNameStr(person.name));
+     const vYest = yestPerson ? String(yestPerson.todayValue || "").trim().toUpperCase() : "1";
+     
+     if ((vYest === "0" || vYest === "5" || vYest === "") && (v === "1" || v === "V")) return "returning";
+     if ((vYest === "1" || vYest === "V") && (v === "0" || v === "5" || v === "")) return "leaving";
+  }
+
+  if (v === "1" || v === "V") return "full";
+  return "none";
+}
+
+function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string, yesterdayGuards: GuardShift[] = [], yesterdayRecords: AttendanceRecord[] = []): AssignmentData {
 
   try {
     if (!records) records = [];
@@ -117,12 +137,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
       const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
         const normalizedQuery = normalizeNameStr(name);
         const p = records.find(r => normalizeNameStr(r.name) === normalizedQuery);
-        if (!p) return "none";
-        const v = String(p.todayValue).trim().toUpperCase();
-        if (v === "1" || v === "V") return "full";
-        if (v.includes("בית")) return "leaving";
-        if (v.includes("חוזר")) return "returning";
-        return "none";
+        return getComputedPresence(p, yesterdayRecords);
       };
 
       if (commanderRow && commanderRow[mission.key]) {
@@ -348,15 +363,13 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
       const currentShiftIndex = getShiftIndex(hour);
 
       const hourlyEligible = guardCandidates.filter(p => {
-         const rawStatus = String(p.todayValue || "").trim().toUpperCase();
          const normName = normalizeNameStr(p.name);
          
-         // 1. Basic Attendance Check
+         const presence = getComputedPresence(p, yesterdayRecords);
          let isAvailable = false;
-         if (rawStatus === "1" || rawStatus === "V") isAvailable = true;
-         if (rawStatus.includes("בית") && hour < 14) isAvailable = true; // Use 14:00 as requested
-         if (rawStatus.includes("חוזר") && hour >= 18) isAvailable = true; // Use 18:00 as requested
-
+         if (presence === "full") isAvailable = true;
+         if (presence === "leaving" && hour < 14) isAvailable = true;
+         if (presence === "returning" && hour >= 18) isAvailable = true;
          
          if (!isAvailable) return false;
 
@@ -421,7 +434,8 @@ function PersonnelSwap({
   hour,
   type,
   currentAssignments,
-  yesterdayGuards = []
+  yesterdayGuards = [],
+  yesterdayRecords = []
 }: {
   currentName: string;
   allPersonnel: AttendanceRecord[];
@@ -432,6 +446,7 @@ function PersonnelSwap({
   type: "hapak" | "guard";
   currentAssignments?: AssignmentData | null;
   yesterdayGuards?: GuardShift[];
+  yesterdayRecords?: AttendanceRecord[];
 }) {
   const [open, setOpen] = useState(false);
   const getShiftIndex = (h: number) => (h - 12 + 24) % 24;
@@ -441,17 +456,11 @@ function PersonnelSwap({
     try {
       return allPersonnel
         .filter(p => {
-          if (!p || !p.name) return false;
-          const v = String(p.todayValue || "").trim().toUpperCase();
-          if (v.includes("בית") || v === "0" || v === "5") {
-            if (hour !== undefined && hour >= 14) return false;
-          }
-          if (v.includes("חוזר") || v === "4") {
-            if (hour !== undefined && hour < 18) return false;
-          }
-          return v === "1" || v === "V" || 
-                 (v.includes("חוזר") || v === "4" ? (hour !== undefined && hour >= 18) : false) || 
-                 (v.includes("בית") || v === "0" || v === "5" ? (hour !== undefined && hour < 14) : false);
+          const presence = getComputedPresence(p, yesterdayRecords);
+          if (presence === "none") return false;
+          if (presence === "leaving" && hour !== undefined && hour >= 14) return false;
+          if (presence === "returning" && hour !== undefined && hour < 18) return false;
+          return true;
         })
         .map(p => {
           const normName = normalizeNameStr(p.name);
@@ -490,15 +499,15 @@ function PersonnelSwap({
   }, [allPersonnel, hour, type, currentAssignments, yesterdayGuards]);
 
   const person = useMemo(() => (allPersonnel || []).find(p => p && p.name === currentName), [allPersonnel, currentName]);
-  const v = person ? String(person.todayValue || "").trim().toUpperCase() : "";
+  const presence = getComputedPresence(person, yesterdayRecords);
   
   const statusDot = useMemo(() => {
     if (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") return null;
     let color = "bg-green-500";
-    if (v.includes("בית") || v === "0" || v === "5") color = "bg-amber-500";
-    else if (v.includes("חוזר") || v === "4") color = "bg-blue-500";
+    if (presence === "leaving") color = "bg-amber-500";
+    else if (presence === "returning") color = "bg-blue-500";
     return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", color)} />;
-  }, [currentName, v]);
+  }, [currentName, presence]);
 
   if (readonly) {
     return (
@@ -681,6 +690,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   const resetError = () => {};
   const [date, setDate] = useState(getTodayIso());
   const { data, isLoading, isError, error, refetch, isFetching } = useMainAttendance(date);
+  const yesterdayIsoDate = useMemo(() => getYesterdayIso(date), [date]);
+  const { data: yesterdayAttendanceData } = useMainAttendance(yesterdayIsoDate);
   const [assignments, setAssignments] = useState<AssignmentData | null>(null);
   const [loadedAssignments, setLoadedAssignments] = useState<AssignmentData | null>(null);
   // history now stores points per date: { [date]: { [name]: points } }
@@ -703,13 +714,10 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     blockedNames.forEach(name => assigned.add(normalizeNameStr(name)));
     
     return data.filter(p => {
-      const v = String(p.todayValue).trim().toUpperCase();
-      const isEligibleAttendance = 
-        v === "1" || v === "V" || 
-        v.includes("בית") || v === "0" || v === "5" || // 0=בבית, 5=שחרור(יוצא)
-        v.includes("חוזר") || v === "4"; // 4=פיצול(חוזר)
+      const presence = getComputedPresence(p, yesterdayAttendanceData);
+      if (presence === "none") return false;
 
-      if (!isEligibleAttendance || assigned.has(normalizeNameStr(p.name))) return false;
+      if (assigned.has(normalizeNameStr(p.name))) return false;
 
       const role = (p.role || "").trim();
       
@@ -1011,7 +1019,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             const yesterdayGuardsArray = yesterdayData?.guards || [];
             
             const aggregatedHistory = generateAggregatedHistory(history);
-            setAssignments(generateAssignment(data, aggregatedHistory, hapakData, blockedNames, date, yesterdayGuardsArray));
+            setAssignments(generateAssignment(data, aggregatedHistory, hapakData, blockedNames, date, yesterdayGuardsArray, yesterdayAttendanceData || []));
             setIsSaved(false);
           } else {
             setAssignments(null);
@@ -1051,7 +1059,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       }
 
       const aggregatedHistory = generateAggregatedHistory(history);
-      setAssignments(generateAssignment(latestData, aggregatedHistory, latestHapakRows, blockedNames, date, yesterdayGuardsArray));
+      setAssignments(generateAssignment(latestData, aggregatedHistory, latestHapakRows, blockedNames, date, yesterdayGuardsArray, yesterdayAttendanceData || []));
 
       setIsSaved(false);
     } catch (error) {
@@ -1601,6 +1609,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                               type="guard"
                               currentAssignments={assignments}
                               yesterdayGuards={loadedAssignments?.guards || []}
+                              yesterdayRecords={yesterdayAttendanceData}
                             />
                           </td>
                           {(!isExporting && isAuthorized) && (
