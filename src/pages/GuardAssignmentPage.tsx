@@ -443,9 +443,15 @@ function PersonnelSwap({
         .filter(p => {
           if (!p || !p.name) return false;
           const v = String(p.todayValue || "").trim().toUpperCase();
-          if (v.includes("בית") && hour !== undefined && hour >= 14) return false;
-          if (v.includes("חוזר") && hour !== undefined && hour < 18) return false;
-          return v === "1" || v === "V" || (v.includes("חוזר") && hour !== undefined && hour >= 18) || (v.includes("בית") && hour !== undefined && hour < 14);
+          if (v.includes("בית") || v === "0" || v === "5") {
+            if (hour !== undefined && hour >= 14) return false;
+          }
+          if (v.includes("חוזר") || v === "4") {
+            if (hour !== undefined && hour < 18) return false;
+          }
+          return v === "1" || v === "V" || 
+                 (v.includes("חוזר") || v === "4" ? (hour !== undefined && hour >= 18) : false) || 
+                 (v.includes("בית") || v === "0" || v === "5" ? (hour !== undefined && hour < 14) : false);
         })
         .map(p => {
           const normName = normalizeNameStr(p.name);
@@ -489,8 +495,8 @@ function PersonnelSwap({
   const statusDot = useMemo(() => {
     if (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") return null;
     let color = "bg-green-500";
-    if (v.includes("בית")) color = "bg-amber-500";
-    else if (v.includes("חוזר")) color = "bg-blue-500";
+    if (v.includes("בית") || v === "0" || v === "5") color = "bg-amber-500";
+    else if (v.includes("חוזר") || v === "4") color = "bg-blue-500";
     return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", color)} />;
   }, [currentName, v]);
 
@@ -698,7 +704,11 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     
     return data.filter(p => {
       const v = String(p.todayValue).trim().toUpperCase();
-      const isEligibleAttendance = v === "1" || v === "V" || v.includes("בית") || v.includes("חוזר");
+      const isEligibleAttendance = 
+        v === "1" || v === "V" || 
+        v.includes("בית") || v === "0" || v === "5" || // 0=בבית, 5=שחרור(יוצא)
+        v.includes("חוזר") || v === "4"; // 4=פיצול(חוזר)
+
       if (!isEligibleAttendance || assigned.has(normalizeNameStr(p.name))) return false;
 
       const role = (p.role || "").trim();
@@ -1439,13 +1449,20 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                       <div className="flex flex-wrap gap-2 justify-start" dir="rtl">
                         {availablePersonnel.map((p) => {
                           const v = String(p.todayValue || "").trim().toUpperCase();
-                          let statusColor = "bg-green-500/10 text-green-700 border-green-500/20";
-                          if (v.includes("בית")) statusColor = "bg-indigo-500/10 text-indigo-700 border-indigo-500/30";
-                          else if (v.includes("חוזר")) statusColor = "bg-blue-500/10 text-blue-700 border-blue-500/20";
+                          let statusColor = "bg-green-500/10 text-green-700 border-green-500/20"; // 1 or V
+                          if (v.includes("בית") || v === "0" || v === "5") {
+                             statusColor = "bg-indigo-500/10 text-indigo-700 border-indigo-500/30"; // Leaving
+                          } else if (v.includes("חוזר") || v === "4") {
+                             statusColor = "bg-blue-500/10 text-blue-700 border-blue-500/20"; // Returning
+                          }
+
+                          let statusLabel = "";
+                          if (v.includes("בית") || v === "0" || v === "5") statusLabel = " (יוצא/בבית)";
+                          else if (v.includes("חוזר") || v === "4") statusLabel = " (חוזר)";
 
                           return (
                             <div key={p.name} className={cn("border px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2", statusColor)}>
-                              <span>{p.name}</span>
+                              <span>{p.name}{statusLabel}</span>
                             </div>
                           );
                         })}
