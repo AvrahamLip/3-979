@@ -405,6 +405,11 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
           if (shift.isNight) {
             if (yesterdayNightGuards.has(normalizeNameStr(prev.name))) prevScore += 10000;
             if (yesterdayNightGuards.has(normalizeNameStr(curr.name))) currScore += 10000;
+
+            const prevPresence = getComputedPresence(prev, yesterdayRecords);
+            const currPresence = getComputedPresence(curr, yesterdayRecords);
+            if (prevPresence === "returning") prevScore -= 3; // מוריד 3 נקודות כדי לתת עדיפות, אבל עדיין מתחשב בהיסטוריה גדולה
+            if (currPresence === "returning") currScore -= 3;
           }
           return currScore < prevScore ? curr : prev;
         });
