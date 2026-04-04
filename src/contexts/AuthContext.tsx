@@ -15,15 +15,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useRoleAuth("google-signin-btn-commander", "guard");
 
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  
+  const mockUser = {
+    name: "מפתח מקומי",
+    email: "local@dev.test",
+    authorizedRolls: ["guard"]
+  };
+
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: auth.isAuthenticated,
-        isLoading: auth.isLoading,
-        user: auth.user,
+        isAuthenticated: isLocal || auth.isAuthenticated,
+        isLoading: isLocal ? false : auth.isLoading,
+        user: isLocal ? mockUser : auth.user,
         logout: auth.logout,
-        checkPermission: auth.checkRollAuthorization,
-        role: auth.isAuthenticated ? "commander" : "soldier",
+        checkPermission: isLocal ? async () => true : auth.checkRollAuthorization,
+        role: (isLocal || auth.isAuthenticated) ? "commander" : "soldier",
       }}
     >
       {children}

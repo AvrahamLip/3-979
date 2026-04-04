@@ -1,5 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
-import html2canvas from "html2canvas";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
 import { getTodayIso, formatDateForApi } from "@/lib/attendanceUtils";
@@ -435,64 +434,56 @@ function PersonnelSwap({
   yesterdayGuards?: GuardShift[];
 }) {
   const [open, setOpen] = useState(false);
-
   const getShiftIndex = (h: number) => (h - 12 + 24) % 24;
 
   const available = useMemo(() => {
-    return allPersonnel
-      .filter(p => {
-        const v = String(p.todayValue || "").trim().toUpperCase();
-        const normName = normalizeNameStr(p.name);
-        
-        // 1. Basic Attendance & Leaving/Returning Logic
-        if (v.includes("בית") && hour !== undefined && hour >= 14) return false;
-        if (v.includes("חוזר") && hour !== undefined && hour < 18) return false;
-        if (v === "1" || v === "V" || (v.includes("חוזר") && hour !== undefined && hour >= 18) || (v.includes("בית") && hour !== undefined && hour < 14)) {
-            return true;
-        }
+    if (!allPersonnel || !Array.isArray(allPersonnel)) return [];
+    try {
+      return allPersonnel
+        .filter(p => {
+          if (!p || !p.name) return false;
+          const v = String(p.todayValue || "").trim().toUpperCase();
+          if (v.includes("בית") && hour !== undefined && hour >= 14) return false;
+          if (v.includes("חוזר") && hour !== undefined && hour < 18) return false;
+          return v === "1" || v === "V" || (v.includes("חוזר") && hour !== undefined && hour >= 18) || (v.includes("בית") && hour !== undefined && hour < 14);
+        })
+        .map(p => {
+          const normName = normalizeNameStr(p.name);
+          let gapConflict = false;
+          let gapHours = 0;
 
-        return false;
-      })
-      .map(p => {
-        const normName = normalizeNameStr(p.name);
-        let gapConflict = false;
-        let gapHours = 0;
-
-        if (type === "guard" && hour !== undefined) {
-           const currentIndex = getShiftIndex(hour);
-
-           // Check Yesterday
-           const workedYesterday = yesterdayGuards.filter(yg => normalizeNameStr(yg.name) === normName);
-           for (const yg of workedYesterday) {
-              const yIndex = getShiftIndex(yg.hour);
-              const gap = (currentIndex + 24) - yIndex;
-              if (gap < 12) { gapConflict = true; gapHours = gap; }
-           }
-
-           // Check Current Session
-           if (currentAssignments) {
-              for (const g of currentAssignments.guards) {
-                 if (g.name && normalizeNameStr(g.name) === normName && g.hour !== hour) {
-                    const assignedIndex = getShiftIndex(g.hour);
-                    const gap = Math.abs(currentIndex - assignedIndex);
-                    if (gap < 12) { gapConflict = true; gapHours = gap; }
-                 }
-              }
-           }
-        }
-
-        return { ...p, gapConflict, gapHours };
-      })
-      .sort((a, b) => {
-        // Sort by burden points, but put conflicted at the bottom?
-        if (a.gapConflict && !b.gapConflict) return 1;
-        if (!a.gapConflict && b.gapConflict) return -1;
-        return (a.burdenPoints || 0) - (b.burdenPoints || 0);
-      });
+          if (type === "guard" && hour !== undefined) {
+             const currentIndex = getShiftIndex(hour);
+             const workedYesterday = (yesterdayGuards || []).filter(yg => yg && yg.name && normalizeNameStr(yg.name) === normName);
+             for (const yg of workedYesterday) {
+                const yIndex = getShiftIndex(yg.hour);
+                const gap = (currentIndex + 24) - yIndex;
+                if (gap < 12) { gapConflict = true; gapHours = gap; }
+             }
+             if (currentAssignments && Array.isArray(currentAssignments.guards)) {
+                for (const g of currentAssignments.guards) {
+                   if (g && g.name && normalizeNameStr(g.name) === normName && g.hour !== hour) {
+                      const assignedIndex = getShiftIndex(g.hour);
+                      const gap = Math.abs(currentIndex - assignedIndex);
+                      if (gap < 12) { gapConflict = true; gapHours = gap; }
+                   }
+                }
+             }
+          }
+          return { ...p, gapConflict, gapHours };
+        })
+        .sort((a, b) => {
+          if (a.gapConflict && !b.gapConflict) return 1;
+          if (!a.gapConflict && b.gapConflict) return -1;
+          return (a.burdenPoints || 0) - (b.burdenPoints || 0);
+        });
+    } catch (err) {
+      console.error("Error in PersonnelSwap available useMemo:", err);
+      return [];
+    }
   }, [allPersonnel, hour, type, currentAssignments, yesterdayGuards]);
 
-
-  const person = useMemo(() => allPersonnel.find(p => p.name === currentName), [allPersonnel, currentName]);
+  const person = useMemo(() => (allPersonnel || []).find(p => p && p.name === currentName), [allPersonnel, currentName]);
   const v = person ? String(person.todayValue || "").trim().toUpperCase() : "";
   
   const statusDot = useMemo(() => {
@@ -507,7 +498,7 @@ function PersonnelSwap({
     return (
       <span className="font-bold text-right py-1 flex items-center gap-1.5 whitespace-nowrap">
         {statusDot}
-        {currentName}
+        {String(currentName || "")}
       </span>
     );
   }
@@ -741,51 +732,104 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   const [isHapakCollapsed, setIsHapakCollapsed] = useState(false);
   const [isGuardCollapsed, setIsGuardCollapsed] = useState(false);
   const [isAvailableCollapsed, setIsAvailableCollapsed] = useState(false);
-  const guardTableRef = useRef<HTMLDivElement>(null);
-  const hapakGridRef = useRef<HTMLDivElement>(null);
 
   const handleExportHapak = async () => {
-    if (!hapakGridRef.current) return;
+    if (!assignments || !assignments.hapak || assignments.hapak.length === 0) {
+      toast.error("אין נתוני חפ\"ק לייצוא.");
+      return;
+    }
     try {
       setIsExportingHapak(true);
       toast.info("מכין תמונת חפ\"ק להורדה...");
-      await new Promise(resolve => setTimeout(resolve, 200));
 
-      const canvas = await html2canvas(hapakGridRef.current, {
-        scale: 2, // Use 2 for better performance, 3 is too heavy for large tables
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        windowWidth: 800, 
-        onclone: (clonedDoc) => {
-          const element = clonedDoc.getElementById('hapak-export-container');
-          if (element) {
-            element.style.width = '800px'; 
-            element.style.padding = '20px';
-            element.style.minHeight = 'auto';
-            element.style.overflow = 'visible';
-          }
-          // Inject capture-specific styles
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `
-            .grid-cols-1.md\\:grid-cols-2 { grid-template-cols: 1fr !important; }
-            h2, h3 { font-size: 20px !important; margin-bottom: 15px !important; color: #000 !important; }
-            .text-xs { font-size: 14px !important; }
-            .text-\\[10px\\] { font-size: 11px !important; }
-            .bg-amber-500\\/10 { background-color: #fff9db !important; border: 1px solid #fab005 !important; }
-            .bg-muted\\/30 { background-color: #f8f9fa !important; border-bottom: 1px solid #dee2e6 !important; }
-            .no-export { display: none !important; }
-            * { max-width: none !important; max-height: none !important; overflow: visible !important; min-width: 0 !important; }
-            button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #333 !important; box-shadow: none !important; font-weight: 700 !important; whitespace: nowrap !important; text-align: left !important; }
-            button svg { display: none !important; }
-            /* Reset grid to 1 column for export image */
-            .grid { grid-template-cols: 1fr !important; }
-            .grid-cols-\\[100px\\,1fr\\] { grid-template-cols: 100px 1fr !important; }
-            .flex-row-reverse { flex-direction: row-reverse !important; }
-          `;
-          clonedDoc.head?.appendChild(style);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const scale = 3; // higher DPI for sharp mobile screens
+      const W = 390; // mobile-friendly width (iPhone standard)
+
+      // --- Layout constants ---
+      const PAD = 16;
+      const ROW_H = 44;
+      const MISSION_GAP = 12;
+      const TITLE_H = 56;
+      const SUBTITLE_H = 38;
+      const HEADER_H = TITLE_H + 10;
+
+      // Group hapak by mission id
+      const groups = HAPAK_MISSIONS.map(m => ({
+        name: `חפ"ק ${m.name}`,
+        rows: assignments.hapak
+          .filter(h => h.id === m.id)
+          .sort((a, b) => a.memberIndex - b.memberIndex)
+      }));
+
+      // Calculate total height
+      let totalH = HEADER_H + PAD;
+      for (const g of groups) {
+        totalH += SUBTITLE_H + g.rows.length * ROW_H + MISSION_GAP;
+      }
+      totalH += PAD;
+
+      canvas.width = W * scale;
+      canvas.height = totalH * scale;
+      ctx.scale(scale, scale);
+
+      // Background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, totalH);
+
+      // Title
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, W, TITLE_H);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px Arial';
+      ctx.textAlign = 'right';
+      ctx.direction = 'rtl';
+      ctx.fillText(`שיבוץ חפ"ק - ${date.split('-').reverse().join('/')}`, W - PAD, TITLE_H / 2 + 8);
+
+      let y = HEADER_H + PAD;
+
+      for (const group of groups) {
+        // Mission header
+        ctx.fillStyle = '#e8eeff';
+        ctx.fillRect(PAD / 2, y - 2, W - PAD, SUBTITLE_H);
+        ctx.fillStyle = '#1a1a2e';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText(group.name, W - PAD, y + SUBTITLE_H / 2 + 5);
+        y += SUBTITLE_H + 4;
+
+        for (const row of group.rows) {
+          // Alternating row
+          const isOdd = group.rows.indexOf(row) % 2 !== 0;
+          ctx.fillStyle = isOdd ? '#f5f5f5' : '#ffffff';
+          ctx.fillRect(PAD / 2, y, W - PAD, ROW_H);
+
+          // Role (right side) - truncate if too long
+          ctx.fillStyle = '#666';
+          ctx.font = '13px Arial';
+          const role = row.name.includes(' - ') ? row.name.split(' - ').slice(1).join(' - ') : row.name;
+          ctx.textAlign = 'right';
+          ctx.fillText(role, W - PAD, y + ROW_H / 2 + 5);
+
+          // Name (left side)
+          ctx.fillStyle = row.assignedTo ? '#1a1a2e' : '#aaa';
+          ctx.font = row.assignedTo ? 'bold 14px Arial' : '13px Arial';
+          ctx.textAlign = 'left';
+          ctx.fillText(row.assignedTo || '(לא שובץ)', PAD, y + ROW_H / 2 + 5);
+
+          // Bottom border
+          ctx.strokeStyle = '#e5e7eb';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(PAD / 2, y + ROW_H);
+          ctx.lineTo(W - PAD / 2, y + ROW_H);
+          ctx.stroke();
+
+          y += ROW_H;
         }
-      });
+        y += MISSION_GAP;
+      }
 
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
@@ -802,55 +846,90 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   };
 
   const handleExportImage = async () => {
-    if (!guardTableRef.current) return;
+    if (!assignments || !assignments.guards || assignments.guards.length === 0) {
+      toast.error("אין נתוני שמירות לייצוא.");
+      return;
+    }
     try {
       setIsExporting(true);
-      toast.info("מכין תמונה להורדה...");
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      const canvas = await html2canvas(guardTableRef.current, {
-        scale: 2, // Use 2 for stable performance
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        windowWidth: 1000, 
-         onclone: (clonedDoc) => {
-           const element = clonedDoc.getElementById('guard-export-container');
-           if (element) {
-             element.style.width = '1000px';
-             element.style.padding = '20px';
-             element.style.minHeight = 'auto';
-             element.style.overflow = 'visible';
-           }
-           // Inject capture-specific styles
-           const style = clonedDoc.createElement('style');
-           style.innerHTML = `
-             table { width: 100% !important; min-width: 960px !important; table-layout: fixed !important; border-collapse: collapse !important; }
-             th, td { font-size: 15px !important; padding: 12px 8px !important; border-bottom: 1px solid #eee !important; color: #000 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: clip !important; }
-             /* Set fixed widths for columns in export */
-             th:nth-child(1), td:nth-child(1) { width: 140px !important; } /* Time column */
-             th:nth-child(3), td:nth-child(3) { width: 100px !important; } /* Points column */
-             h2 { font-size: 22px !important; margin-bottom: 10px !important; color: #000 !important; }
-             .font-mono { font-size: 13px !important; }
-             .font-bold { font-weight: 800 !important; }
-             .no-export { display: none !important; }
-             * { max-width: none !important; max-height: none !important; overflow: visible !important; }
-             button, span { border: none !important; background: transparent !important; padding: 0 !important; cursor: default !important; color: #000 !important; box-shadow: none !important; text-align: right !important; white-space: nowrap !important; }
-             button svg { display: none !important; }
-             .max-h-\\[800px\\], .overflow-y-auto { max-height: none !important; overflow: visible !important; }
-           `;
-           clonedDoc.head?.appendChild(style);
-         }
-      });
+      toast.info("מכין תמונת שמירות להורדה...");
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const scale = 3; // higher DPI for sharp mobile screens
+      const W = 390; // mobile-friendly width (iPhone standard)
+      const PAD = 14;
+      const ROW_H = 46;
+      const TITLE_H = 56;
+      const TABLE_HEADER_H = 40;
+
+      const rows = assignments.guards;
+      const totalH = TITLE_H + PAD / 2 + TABLE_HEADER_H + rows.length * ROW_H + PAD;
+
+      canvas.width = W * scale;
+      canvas.height = totalH * scale;
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, totalH);
+
+      // Title bar
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, W, TITLE_H);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px Arial';
+      ctx.textAlign = 'right';
+      ctx.direction = 'rtl';
+      ctx.fillText(`לו"ז שמירות - ${date.split('-').reverse().join('/')}`, W - PAD, TITLE_H / 2 + 8);
+
+      // Table header
+      let y = TITLE_H + PAD / 2;
+      ctx.fillStyle = '#e8eeff';
+      ctx.fillRect(0, y, W, TABLE_HEADER_H);
+      ctx.fillStyle = '#333';
+      ctx.font = 'bold 15px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText('שומר', W - PAD, y + TABLE_HEADER_H / 2 + 5);
+      ctx.textAlign = 'left';
+      ctx.fillText('שעה', PAD, y + TABLE_HEADER_H / 2 + 5);
+      y += TABLE_HEADER_H;
+
+      for (let i = 0; i < rows.length; i++) {
+        const g = rows[i];
+        ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#f7f8fa';
+        ctx.fillRect(0, y, W, ROW_H);
+
+        // Time (left side)
+        ctx.fillStyle = '#555';
+        ctx.font = '14px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(g.time, PAD, y + ROW_H / 2 + 5);
+
+        // Name (right side)
+        ctx.fillStyle = g.name ? '#1a1a2e' : '#bbb';
+        ctx.font = g.name ? 'bold 16px Arial' : '14px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText(g.name || '(לא שובץ)', W - PAD, y + ROW_H / 2 + 5);
+
+        // Border
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(0, y + ROW_H);
+        ctx.lineTo(W, y + ROW_H);
+        ctx.stroke();
+
+        y += ROW_H;
+      }
 
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `guard-schedule-${date}.png`;
       link.href = dataUrl;
       link.click();
-      toast.success("התמונה נשמרה בהצלחה!");
+      toast.success("תמונת השמירות נשמרה בהצלחה!");
     } catch (error) {
-      console.error("Failed to export image", error);
+      console.error("Failed to export guard image", error);
       toast.error("שגיאה בשמירת התמונה.");
     } finally {
       setIsExporting(false);
@@ -1384,7 +1463,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             isAuthenticated ? "lg:col-span-2" : "col-span-1"
           )}>
             {/* Hapak Assignment Card */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={hapakGridRef} id="hapak-export-container">
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" id="hapak-export-container">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button onClick={() => setIsHapakCollapsed(!isHapakCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
@@ -1451,7 +1530,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             </div>
 
             {/* Guard Table Card */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" ref={guardTableRef} id="guard-export-container">
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" id="guard-export-container">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button onClick={() => setIsGuardCollapsed(!isGuardCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
@@ -1479,40 +1558,37 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                 )}
               </div>
               {!isGuardCollapsed && (
-                <div className={cn("overflow-x-auto", !isExporting && "max-h-[800px] overflow-y-auto")}>
-                  <table className="w-full text-sm">
+                <div className={cn(!isExporting && "max-h-[800px] overflow-y-auto")}>
+                  <table className="w-full text-sm border-collapse">
                     <thead className="sticky top-0 bg-muted z-10">
                       <tr className="text-right">
-                        <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שעה</th>
-                        <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">שומר</th>
-                        {(!isExporting && isAuthorized) && <th className="px-3 sm:px-5 py-3 font-black text-muted-foreground">ניקוד</th>}
+                        <th className="px-2 sm:px-4 py-2.5 font-black text-muted-foreground text-xs sm:text-sm w-2/5">שעה</th>
+                        <th className="px-2 sm:px-4 py-2.5 font-black text-muted-foreground text-xs sm:text-sm">שומר</th>
+                        {(!isExporting && isAuthorized) && <th className="px-2 sm:px-4 py-2.5 font-black text-muted-foreground text-xs sm:text-sm">ניקוד</th>}
                       </tr>
                     </thead>
                     <tbody>
                       {assignments?.guards.map((g, idx) => (
                         <tr key={idx} className={cn("border-t border-border transition-colors hover:bg-muted/50", idx % 2 === 0 ? "bg-card" : "bg-background")}>
-                          <td className="px-3 sm:px-5 py-3 font-mono text-[11px] sm:text-xs text-muted-foreground flex items-center gap-2 whitespace-nowrap">
-                            <div className={cn("w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full", g.points === 2 ? "bg-indigo-500" : "bg-yellow-500")} />
+                          <td className="px-2 sm:px-4 py-2.5 font-mono text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap align-middle">
                             {g.time}
                           </td>
-                          <td className="px-3 sm:px-5 py-3 font-bold whitespace-nowrap">
-                            <div className="flex items-center justify-start gap-2">
-                             <PersonnelSwap
-                                currentName={g.name}
-                                allPersonnel={data || []}
-                                onSwap={(newName) => handleSwap("guard", g.hour, newName)}
-                                readonly={!isAuthorized || isExporting}
-                                allowEmpty={true}
-                                hour={g.hour}
-                                type="guard"
-                                currentAssignments={assignments}
-                                yesterdayGuards={loadedAssignments?.guards || []}
-                              />
-                            </div>
+                          <td className="px-2 sm:px-4 py-2.5 font-bold align-middle">
+                            <PersonnelSwap
+                              currentName={g.name}
+                              allPersonnel={data || []}
+                              onSwap={(newName) => handleSwap("guard", g.hour, newName)}
+                              readonly={!isAuthorized || isExporting}
+                              allowEmpty={true}
+                              hour={g.hour}
+                              type="guard"
+                              currentAssignments={assignments}
+                              yesterdayGuards={loadedAssignments?.guards || []}
+                            />
                           </td>
                           {(!isExporting && isAuthorized) && (
-                            <td className="px-5 py-3">
-                              <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold", g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700")}>
+                            <td className="px-2 sm:px-4 py-2.5 align-middle">
+                              <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap", g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700")}>
                                 {g.points} נק'
                               </span>
                             </td>
@@ -1528,7 +1604,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
         </div>
       )}
 
-      {/* Login Overlay */}
+      {/* Hidden shadow containers removed - using Canvas API instead */}
+
       <CommanderAuthOverlay 
         isOpen={showLoginPrompt && !isAuthorized} 
         onClose={() => setShowLoginPrompt(false)} 
