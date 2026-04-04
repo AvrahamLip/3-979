@@ -735,6 +735,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingHapak, setIsExportingHapak] = useState(false);
+  const [isSavingToSheet, setIsSavingToSheet] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [isLedgerCollapsed, setIsLedgerCollapsed] = useState(false);
   const [isHapakCollapsed, setIsHapakCollapsed] = useState(false);
   const [isGuardCollapsed, setIsGuardCollapsed] = useState(false);
@@ -750,8 +752,9 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       await new Promise(resolve => setTimeout(resolve, 200));
 
       const canvas = await html2canvas(hapakGridRef.current, {
-        scale: 3, // Higher resolution
+        scale: 2, // Use 2 for better performance, 3 is too heavy for large tables
         useCORS: true,
+        logging: false,
         backgroundColor: '#ffffff',
         windowWidth: 800, 
         onclone: (clonedDoc) => {
@@ -780,7 +783,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             .grid-cols-\\[100px\\,1fr\\] { grid-template-cols: 100px 1fr !important; }
             .flex-row-reverse { flex-direction: row-reverse !important; }
           `;
-          clonedDoc.head.appendChild(style);
+          clonedDoc.head?.appendChild(style);
         }
       });
 
@@ -806,8 +809,9 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       await new Promise(resolve => setTimeout(resolve, 200));
       
       const canvas = await html2canvas(guardTableRef.current, {
-        scale: 3, // Higher resolution
+        scale: 2, // Use 2 for stable performance
         useCORS: true,
+        logging: false,
         backgroundColor: '#ffffff',
         windowWidth: 1000, 
          onclone: (clonedDoc) => {
@@ -835,7 +839,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
              button svg { display: none !important; }
              .max-h-\\[800px\\], .overflow-y-auto { max-height: none !important; overflow: visible !important; }
            `;
-           clonedDoc.head.appendChild(style);
+           clonedDoc.head?.appendChild(style);
          }
       });
 
@@ -1017,6 +1021,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
 
   const handleConfirm = async () => {
     if (!assignments) return;
+    setIsConfirming(true);
 
     const formattedDate = formatDateForApi(date);
     const consolidated = new Map<string, any>();
@@ -1109,11 +1114,14 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     } catch (e) {
       console.error("Confirm API Error:", e);
       toast.warning("עדכון יומן הפעילות נכשל, נשמר באופן מקומי בלבד.");
+    } finally {
+      setIsConfirming(false);
     }
   };
 
   const handleSaveToSheet = async () => {
     if (!assignments) return;
+    setIsSavingToSheet(true);
     try {
       const response = await fetch("https://151.145.89.228.sslip.io/webhook/save-guards", {
         method: "POST",
@@ -1129,6 +1137,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     } catch (e) {
       console.error("Save API Error:", e);
       toast.error("שמירת השיבוץ בגיליון נכשלה.");
+    } finally {
+      setIsSavingToSheet(false);
     }
   };
 
@@ -1249,15 +1259,30 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                   {mode === "commander" ? "ניהול מפקדים" : "ניהול שיבוץ"}
                 </h2>
                 <div className="space-y-2">
-                  <Button onClick={handleGenerate} className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md">
+                  <Button 
+                    onClick={handleGenerate} 
+                    disabled={isGenerating || isSavingToSheet || isConfirming}
+                    className="w-full h-11 text-md font-bold gradient-hero border-none shadow-md"
+                  >
+                    {isGenerating ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : null}
                     ג'נרט שיבוץ חדש
                   </Button>
-                  <Button onClick={handleSaveToSheet} variant="outline" className="w-full h-11 text-md font-bold border-primary text-primary hover:bg-primary/5">
-                    <Save className="w-4 h-4 mr-2" />
+                  <Button 
+                    onClick={handleSaveToSheet} 
+                    disabled={isSavingToSheet || isGenerating || isConfirming}
+                    variant="outline" 
+                    className="w-full h-11 text-md font-bold border-primary text-primary hover:bg-primary/5"
+                  >
+                    {isSavingToSheet ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                     שמור שיבוץ לגיליון
                   </Button>
-                  <Button onClick={handleConfirm} variant="outline" className="w-full h-11 text-md font-bold border-primary text-primary hover:bg-primary/5">
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                  <Button 
+                    onClick={handleConfirm} 
+                    disabled={isConfirming || isGenerating || isSavingToSheet}
+                    variant="outline" 
+                    className="w-full h-11 text-md font-bold border-primary text-primary hover:bg-primary/5"
+                  >
+                    {isConfirming ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                     אשר ועדכן ניקוד בגליון
                   </Button>
                 </div>
@@ -1373,9 +1398,15 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                     <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">תאריך: {date.split('-').reverse().join('/')}</span>
                   </div>
                 </div>
-                {!isExportingHapak && !isHapakCollapsed && (
-                  <Button onClick={handleExportHapak} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export">
-                    <Camera className="w-3.5 h-3.5 mr-2" />
+                {!isHapakCollapsed && (
+                  <Button 
+                    onClick={handleExportHapak} 
+                    disabled={isExportingHapak}
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export"
+                  >
+                    {isExportingHapak ? <RefreshCw className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Camera className="w-3.5 h-3.5 mr-2" />}
                     תמונה
                   </Button>
                 )}
@@ -1434,9 +1465,15 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                     <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">תאריך: {date.split('-').reverse().join('/')}</span>
                   </div>
                 </div>
-                {!isExporting && !isGuardCollapsed && (
-                  <Button onClick={handleExportImage} variant="outline" size="sm" className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export">
-                    <Camera className="w-3.5 h-3.5 mr-2" />
+                {!isGuardCollapsed && (
+                  <Button 
+                    onClick={handleExportImage} 
+                    disabled={isExporting}
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export"
+                  >
+                    {isExporting ? <RefreshCw className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Camera className="w-3.5 h-3.5 mr-2" />}
                     תמונה
                   </Button>
                 )}
