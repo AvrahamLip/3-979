@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy:gh": "gh-pages -d dist"
+    "deploy:gh": "gh-pages -d dist",
+    "deploy:worker": "wrangler deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

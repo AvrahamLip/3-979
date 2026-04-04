@@ -1,0 +1,4 @@
+name = "mountain-axes"
+main = "src/worker.js"
+compatibility_date = "2024-04-03"
+# No assets needed here as we are proxying to GitHub Pages
