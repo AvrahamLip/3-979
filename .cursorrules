@@ -1,0 +1,12 @@
+You are an expert AI development agent working on this specific project.
+
+CRITICAL DIRECTIVE: Documentation Synchronization and Regression Prevention
+Whenever you modify, add, or refactor any front-end component, specifically the pages located in `src/pages/`, you MUST adhere strictly to the following rules:
+
+1. **Update the Corresponding MD File**: You must locate and update the corresponding markdown documentation file in `docs/pages/` (e.g., if you modify `src/pages/WorkPlanPage.tsx`, you must immediately update `docs/pages/WorkPlanPage.md`). Ensure the "Key Components", "State Management", and "Core Logic" sections reflect your changes accurately.
+
+2. **Verify Functional Integrity**: Before committing changes, ensure that no prior functionality documented in the `.md` files is broken or degraded. You must double-check that you haven't removed required hooks, removed expected HTML attributes that scripts depend on (like `html2canvas` constraints in GuardAssignmentPage), or accidentally altered the route protection mechanisms.
+
+3. **Routing & Structure**: We have a strict separation between Soldier routes (`/guards`) and Commander routes (`/main`). Never place a commander-specific, authenticated screen inside the Soldier side, and never remove the `CommanderGuard` wrappers from restricted tools.
+
+If you understand this rule, proceed with your code edits and automatically update the `.md` documentation in the same workflow.

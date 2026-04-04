@@ -50,6 +50,14 @@ export default function MainPage() {
             >
               <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
             </button>
+            <Link
+              to="/guards/manage"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-lg font-bold text-sm shadow-lg hover:shadow-accent/20 hover:scale-105 transition-all shadow-md active:scale-95"
+              aria-label="ניהול שיבוץ שמירות"
+            >
+              <Shield className="w-4 h-4" />
+              <span className="hidden sm:inline">ניהול שיבוץ שמירות</span>
+            </Link>
           </div>
         </div>
       </div>

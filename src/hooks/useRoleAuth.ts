@@ -139,15 +139,27 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
       const btn = document.getElementById(buttonId);
 
       if (g && btn) {
-        clearInterval(interval);
         g.accounts.id.initialize({
           client_id: CLIENT_ID,
           callback: handleCredentialResponse,
         });
+        
+        // Render to the specific ID
         g.accounts.id.renderButton(
           btn,
           { theme: "outline", size: "large", text: "signin_with", width: 250 }
         );
+
+        // Also try to render to any other secondary login buttons if they exist
+        const secondaryBtn = document.getElementById("google-signin-btn-secondary");
+        if (secondaryBtn) {
+          g.accounts.id.renderButton(
+            secondaryBtn,
+            { theme: "outline", size: "large", text: "signin_with", width: 250 }
+          );
+        }
+        
+        clearInterval(interval);
       }
     }, 100);
 

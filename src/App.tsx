@@ -3,7 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
+import SoldierLayout from "./components/layouts/SoldierLayout";
+import CommanderLayout from "./components/layouts/CommanderLayout";
 import MainPage from "./pages/MainPage";
 import ZamaPage from "./pages/ZamaPage";
 import WorkPlanPage from "./pages/WorkPlanPage";
@@ -31,21 +32,23 @@ const App = () => (
         <Sonner />
         <HashRouter>
           <Routes>
-            <Route element={<Layout />}>
-              {/* Soldier routes / Main defaults */}
-              <Route path="/" element={<Navigate to="/guards" replace />} />
-              <Route path="/guards" element={<GuardAssignmentPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/vacation" element={<VacationPage />} />
-              
-              {/* Commander routes (Now public for viewing) */}
-              <Route path="/main" element={<MainPage />} />
-              <Route path="/zama" element={<ZamaPage />} />
-              <Route path="/workplan" element={<WorkPlanPage />} />
-              
-              {/* Commander-only Management routes */}
+            <Route path="/" element={<Navigate to="/guards" replace />} />
+            
+            {/* Soldier System */}
+            <Route path="/guards" element={<SoldierLayout />}>
+              <Route index element={<GuardAssignmentPage />} />
+              <Route path="contact" element={<ContactPage />} />
+              <Route path="vacation" element={<VacationPage />} />
+            </Route>
+            
+            {/* Commander System */}
+            <Route path="/main" element={<CommanderLayout />}>
+              <Route index element={<MainPage />} />
+              <Route path="zama" element={<ZamaPage />} />
+              <Route path="workplan" element={<WorkPlanPage />} />
+              <Route path="contact" element={<ContactPage />} />
               <Route 
-                path="/guards/manage" 
+                path="guards/manage" 
                 element={
                   <CommanderGuard requiredRoll="guard">
                     <GuardAssignmentPage mode="commander" />

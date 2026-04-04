@@ -619,6 +619,47 @@ function PersonnelSwap({
   );
 }
 
+function CommanderAuthOverlay({ isOpen, onClose, isAuthenticated }: { isOpen: boolean; onClose: () => void; isAuthenticated: boolean }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-md flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-300">
+      <div className="bg-card border border-border p-8 sm:p-10 rounded-2xl shadow-2xl flex flex-col items-center text-center max-w-[420px] w-full animate-in zoom-in-95 duration-300 relative">
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+          aria-label="סגור"
+        >
+          <CloseX className="w-5 h-5" />
+        </button>
+        
+        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+          <Shield className="w-8 h-8 text-primary" />
+        </div>
+        
+        <h2 className="text-2xl font-black text-primary mb-2">גישת מפקדים בלבד</h2>
+        <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
+          {isAuthenticated 
+            ? "דרושה הרשאת שיבוץ (Guard) כדי לבצע פעולות עריכה." 
+            : "אנא הזדהה באמצעות חשבון Google כדי לעדכן ולערוך את שיבוץ השמירות."}
+        </p>
+        
+        <div id="google-signin-btn-commander" className="bg-white rounded-lg p-0.5 overflow-hidden border border-border h-[44px] flex items-center justify-center min-w-[250px] transition-all hover:shadow-md">
+          {/* Button rendered by useRoleAuth */}
+        </div>
+        
+        <button 
+          onClick={onClose}
+          className="mt-8 text-sm font-bold text-muted-foreground hover:text-primary transition-colors py-2 px-4"
+        >
+          חזרה לתצוגת חייל
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 // ─── Logic ────────────────────────────────────────────────────────────────────
 function generateAggregatedHistory(history: Record<string, PersonnelPoints>): PersonnelPoints {
   const aggregated: PersonnelPoints = {};
@@ -1167,32 +1208,12 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             
             {!isAuthorized && showAuthButton && (
               <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
-                {!showLoginPrompt ? (
-                  <Button
-                    onClick={() => setShowLoginPrompt(true)}
-                    className="bg-primary/20 hover:bg-primary/30 text-white border border-primary/40 text-xs font-bold h-9 px-3 backdrop-blur-sm"
-                  >
-                    {!isAuthenticated ? "התחבר לעריכה" : "בקש הרשאת שיבוץ"}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => setShowLoginPrompt(false)}
-                    variant="ghost"
-                    className="text-white/70 hover:text-white text-[10px] h-9 px-2"
-                  >
-                    ביטול
-                  </Button>
-                )}
-                
-                <div 
-                  id="google-signin-btn-commander" 
-                  className={cn(
-                    "bg-white rounded-lg p-0.5 overflow-hidden border border-white/50 h-9 flex items-center justify-center transition-all",
-                    !showLoginPrompt && "hidden"
-                  )}
+                <Button
+                  onClick={() => setShowLoginPrompt(true)}
+                  className="bg-primary/20 hover:bg-primary/30 text-white border border-primary/40 text-xs font-bold h-9 px-3 backdrop-blur-sm"
                 >
-                  {/* Button rendered by useRoleAuth */}
-                </div>
+                  {!isAuthenticated ? "התחבר לעריכה" : "בקש הרשאת שיבוץ"}
+                </Button>
               </div>
             )}
 
@@ -1469,6 +1490,13 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
           </div>
         </div>
       )}
+
+      {/* Login Overlay */}
+      <CommanderAuthOverlay 
+        isOpen={showLoginPrompt && !isAuthorized} 
+        onClose={() => setShowLoginPrompt(false)} 
+        isAuthenticated={isAuthenticated}
+      />
     </div>
   );
 }
