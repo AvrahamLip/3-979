@@ -10,10 +10,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "predeploy": "npm run build",
-    "deploy": "npm run build",
-    "deploy:gh": "gh-pages -d dist",
-    "preview": "npm run build && wrangler dev"
+    "deploy:gh": "gh-pages -d dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -94,7 +91,6 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "workbox-build": "^7.4.0",
-    "workbox-window": "^7.4.0",
-    "wrangler": "^4.0.0"
+    "workbox-window": "^7.4.0"
   }
 }
