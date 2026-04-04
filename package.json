@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "predeploy": "npm run build",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm run build && wrangler pages deploy ./dist",
     "deploy:gh": "gh-pages -d dist",
     "preview": "npm run build && wrangler dev"
   },
@@ -93,8 +93,8 @@
     "vite-plugin-pwa": "^0.21.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
-    "wrangler": "^3.109.0",
     "workbox-build": "^7.4.0",
-    "workbox-window": "^7.4.0"
+    "workbox-window": "^7.4.0",
+    "wrangler": "^4.0.0"
   }
 }
