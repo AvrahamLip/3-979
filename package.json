@@ -8,11 +8,12 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:gh": "gh-pages -d dist",
+    "preview": "npm run build && wrangler dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -92,6 +93,7 @@
     "vite-plugin-pwa": "^0.21.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
+    "wrangler": "^3.109.0",
     "workbox-build": "^7.4.0",
     "workbox-window": "^7.4.0"
   }
