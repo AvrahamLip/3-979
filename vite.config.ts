@@ -9,15 +9,24 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  // Use / as base for Cloudflare (custom domain/dedicated URL), and /3-979/ for GitHub Pages
-  const isCloudflare = process.env.CF_PAGES === "1" || mode === "production-cloudflare";
-  const base = isCloudflare ? "/" : "/3-979/";
-
-  const plugins = [
+// Single-level static configuration to allow Cloudflare's automated tools to easily parse and modify it
+export default defineConfig({
+  base: process.env.CF_PAGES === "1" ? "/" : "/3-979/",
+  server: {
+    host: "::",
+    port: 8080,
+    hmr: {
+      overlay: false,
+    },
+  },
+  plugins: [
     tsconfigPaths(),
     react(),
+    // Include the Lovable component tagger only during development (serve mode)
+    {
+      ...componentTagger(),
+      apply: 'serve'
+    },
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
@@ -52,37 +61,21 @@ export default defineConfig(({ mode }) => {
         enabled: true,
       },
     }),
-  ];
-
-  if (mode === "development") {
-    plugins.push(componentTagger());
-  }
-
-  return {
-    base,
-    server: {
-      host: "::",
-      port: 8080,
-      hmr: {
-        overlay: false,
+  ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+        zama: path.resolve(__dirname, "zama.html"),
+        contact: path.resolve(__dirname, "contact.html"),
+        "main-page": path.resolve(__dirname, "main.html"),
+        update: path.resolve(__dirname, "update.html"),
       },
     },
-    plugins: plugins,
-    build: {
-      rollupOptions: {
-        input: {
-          main: path.resolve(__dirname, "index.html"),
-          zama: path.resolve(__dirname, "zama.html"),
-          contact: path.resolve(__dirname, "contact.html"),
-          "main-page": path.resolve(__dirname, "main.html"),
-          update: path.resolve(__dirname, "update.html"),
-        },
-      },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
     },
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "src"),
-      },
-    },
-  };
+  },
 });
