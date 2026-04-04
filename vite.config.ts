@@ -11,10 +11,7 @@ const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // Use / as base for Netlify, and /3-979/ for GitHub Pages
-  // Check NETLIFY env var (provided by Netlify) or manual mode
-  const isNetlify = process.env.NETLIFY === "true" || mode === "production-netlify";
-  const base = isNetlify ? "/" : "/3-979/";
+  const base = "/3-979/";
 
   return {
     base,
