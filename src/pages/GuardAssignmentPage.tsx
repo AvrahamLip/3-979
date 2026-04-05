@@ -355,10 +355,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
          const normName = normalizeNameStr(p.name);
          
          const presence = getComputedPresence(p, yesterdayRecords);
-         let isAvailable = false;
-         if (presence === "full") isAvailable = true;
-         if (presence === "leaving" && hour < 18) isAvailable = true;
-         if (presence === "returning" && hour >= 18) isAvailable = true;
+         const isAvailable = (presence === "full" || presence === "returning");
          
          if (!isAvailable) return false;
 
@@ -451,10 +448,8 @@ function PersonnelSwap({
       return allPersonnel
         .filter(p => {
           const presence = getComputedPresence(p, yesterdayRecords);
-          if (presence === "none") return false;
-          // For Hapak (type === "hapak"), hour is undefined, but they still shouldn't be assigned if leaving
-          if (presence === "leaving" && (type === "hapak" || (hour !== undefined && hour >= 18))) return false;
-          if (presence === "returning" && hour !== undefined && hour < 18) return false;
+          // 18:00 start: anyone "leaving" is already gone. Anyone "returning" is back.
+          if (presence === "none" || presence === "leaving") return false;
           return true;
         })
         .map(p => {
