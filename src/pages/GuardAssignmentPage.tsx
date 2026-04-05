@@ -603,7 +603,7 @@ function PersonnelSwap({
         <DrawerTrigger asChild>
           {trigger}
         </DrawerTrigger>
-        <DrawerContent className="px-0 pb-6 h-[85vh]">
+        <DrawerContent className="px-0 pb-6 max-h-[85vh]">
           <DrawerHeader className="border-b pb-4 px-4 flex items-center justify-between">
             <DrawerTitle className="text-right w-full">בחירת חייל לשיבוץ</DrawerTitle>
             <DrawerClose asChild>
