@@ -582,14 +582,20 @@
                 });
 
                 if (res.status === 200) {
-                    const data = await res.json();
+                    let data = await res.json();
+                    // n8n often returns an array, take the first element if so
+                    if (Array.isArray(data) && data.length > 0) data = data[0].json || data[0];
+
+                    console.log("Auth response data:", data);
+
                     // Authorized if we get a user object with an email
                     if (data.email || data.authorized === true) {
+                        const serverRoll = data.roll || data.role || "update";
                         localStorage.setItem('is_commander', 'true');
                         localStorage.setItem('user_info', JSON.stringify({
                             name: payload.name,
                             email: payload.email,
-                            role: "update"
+                            role: serverRoll
                         }));
                         showAuthorizedContent(payload.name);
                     } else {
