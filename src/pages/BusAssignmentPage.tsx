@@ -543,7 +543,7 @@ export default function BusAssignmentPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 px-2">
               <Shield className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-black underline decoration-primary/30 decoration-4 underline-offset-4">חפ"קים (איזור בבסיס)</h2>
+              <h2 className="text-lg font-black underline decoration-primary/30 decoration-4 underline-offset-4">חפ"קים (נוכחות בבסיס)</h2>
             </div>
             
             <div className="grid grid-cols-1 gap-4">
@@ -660,7 +660,7 @@ export default function BusAssignmentPage() {
             <div className="bg-muted/50 p-4 rounded-xl border border-border flex items-center gap-6 justify-center text-[11px] text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span>בבסיס</span>
+                <span>נוכח</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-amber-500" />

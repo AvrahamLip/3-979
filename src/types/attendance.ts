@@ -1,4 +1,16 @@
-export type StatusType = "בבסיס" | "בבית" | "מחלה / גימלים" | "אחר";
+export type StatusType = 
+  | "נוכח" 
+  | "יצא לאפטר" 
+  | "אפטר" 
+  | "מחלה / גימלים" 
+  | "מנותק קשר" 
+  | "קורס" 
+  | "משתחרר" 
+  | "שוחרר" 
+  | "פוטנציאל נפקדות" 
+  | "פיצול" 
+  | "יציאה לפיצול"
+  | "אחר";
 
 export interface RawRecord {
   name: string;
@@ -22,9 +34,17 @@ export interface AttendanceRecord {
 }
 
 export interface StatusCounts {
-  "בבסיס": number;
-  "בבית": number;
+  "נוכח": number;
+  "יצא לאפטר": number;
+  "אפטר": number;
   "מחלה / גימלים": number;
+  "מנותק קשר": number;
+  "קורס": number;
+  "משתחרר": number;
+  "שוחרר": number;
+  "פוטנציאל נפקדות": number;
+  "פיצול": number;
+  "יציאה לפיצול": number;
   "אחר": number;
   total: number;
 }

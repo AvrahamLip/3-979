@@ -1,4 +1,5 @@
 import type { StatusCounts } from "@/types/attendance";
+import { getSummaryCategory } from "@/lib/attendanceUtils";
 
 interface StatusCountsRowProps {
   counts: StatusCounts;
@@ -6,25 +7,40 @@ interface StatusCountsRowProps {
 }
 
 export function StatusCountsRow({ counts, compact = false }: StatusCountsRowProps) {
+  // Aggregate individual statuses into summary categories
+  const aggregated: Record<string, number> = {
+    "נוכח": 0,
+    "אפטר": 0,
+    "מחלה / גימלים": 0,
+    "אחר": 0,
+  };
+
+  // We iterate through all keys in counts except 'total'
+  Object.entries(counts).forEach(([key, value]) => {
+    if (key === "total") return;
+    const cat = getSummaryCategory(key as any);
+    aggregated[cat] += value;
+  });
+
   const items = [
     {
-      label: "בבסיס",
-      value: counts["בבסיס"],
+      label: "נוכח",
+      value: aggregated["נוכח"],
       className: "text-status-base bg-status-base-bg",
     },
     {
-      label: "בבית",
-      value: counts["בבית"],
+      label: "אפטר",
+      value: aggregated["אפטר"],
       className: "text-status-home bg-status-home-bg",
     },
     {
       label: "מחלה",
-      value: counts["מחלה / גימלים"],
+      value: aggregated["מחלה / גימלים"],
       className: "text-status-sick bg-status-sick-bg",
     },
     {
       label: "אחר",
-      value: counts["אחר"],
+      value: aggregated["אחר"],
       className: "text-status-other bg-status-other-bg",
     },
   ];

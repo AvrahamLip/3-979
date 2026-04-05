@@ -310,7 +310,7 @@ export default function WorkPlanPage() {
             className="w-full pr-9 pl-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring appearance-none"
           >
             <option value="">כל הסטטוסים ({formatDayLabel(days[1].isoDate, 0).split('—')[0].trim()})</option>
-            {["בבסיס", "בבית", "מחלה / גימלים", "אחר"].map(s => <option key={s} value={s}>{s}</option>)}
+            {["נוכח", "אפטר", "מחלה / גימלים", "אחר"].map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
       </div>
@@ -413,8 +413,8 @@ export default function WorkPlanPage() {
           <div className="border-t border-border px-4 py-3 bg-muted/30 flex flex-wrap gap-4 items-center justify-end">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">מקרא:</span>
             {[
-              { status: "בבסיס", label: "בבסיס" },
-              { status: "בבית", label: "בבית" },
+              { status: "נוכח", label: "נוכח" },
+              { status: "אפטר", label: "אפטר" },
               { status: "מחלה / גימלים", label: "מחלה" },
               { status: "אחר", label: "אחר" },
             ].map(({ status, label }) => (

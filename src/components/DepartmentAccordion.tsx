@@ -11,7 +11,7 @@ interface DepartmentAccordionProps {
 function DeptCard({ dept, index }: { dept: DepartmentStats; index: number }) {
   const [open, setOpen] = useState(false);
   const pct = dept.counts.total > 0
-    ? Math.round((dept.counts["בבסיס"] / dept.counts.total) * 100)
+    ? Math.round((dept.counts["נוכח"] / dept.counts.total) * 100)
     : 0;
 
   return (
@@ -34,7 +34,7 @@ function DeptCard({ dept, index }: { dept: DepartmentStats; index: number }) {
               {pct}%
             </span>
             <span className="text-xs font-bold text-muted-foreground mr-1">
-              {dept.counts["בבסיס"]}/{dept.counts.total}
+              {dept.counts["נוכח"]}/{dept.counts.total}
             </span>
           </div>
           <div className="flex items-center gap-1.5 justify-end mt-0.5">
@@ -75,10 +75,10 @@ function DeptCard({ dept, index }: { dept: DepartmentStats; index: number }) {
                     <StatusCountsRow counts={role.counts} compact />
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-black text-primary px-1.5 py-0.5 bg-primary/5 rounded">
-                        {role.counts.total > 0 ? Math.round((role.counts["בבסיס"] / role.counts.total) * 100) : 0}%
+                        {role.counts.total > 0 ? Math.round((role.counts["נוכח"] / role.counts.total) * 100) : 0}%
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {role.counts["בבסיס"]}/{role.counts.total}
+                        {role.counts["נוכח"]}/{role.counts.total}
                       </span>
                       <span className="text-sm font-semibold">{role.role}</span>
                     </div>

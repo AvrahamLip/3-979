@@ -143,7 +143,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
           const role = (p.role || "").trim();
           const name = normalizeNameStr(p.name);
           const v = String(p.todayValue || "").trim().toUpperCase();
-          const isPresent = v === "1" || v === "V";
+          const isPresent = v === "נ" || v === "1" || v === "V";
           
           return isPresent && 
                  dept.includes("אנוח") && 
@@ -161,7 +161,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
       }
       
       const commanderStatus = commanderName !== "טרם שובץ" ? getStatus(commanderName) : "none";
-      const commanderSuffix = commanderStatus === "leaving" ? " (היום בבית)" : commanderStatus === "returning" ? " (חוזר היום)" : "";
+      const commanderSuffix = commanderStatus === "leaving" ? " (ביציאה)" : commanderStatus === "returning" ? " (בדרך חזרה)" : "";
 
       hapakAssignments.push({
         id: mission.id,
@@ -192,7 +192,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
               else if (finalStatus === "returning") { hasReturningInSlot = true; filledSpecialists++; }
               
               assignedNames.add(normalizeNameStr(purePersonName));
-              const personSuffix = finalStatus === "leaving" ? " (היום בבית)" : finalStatus === "returning" ? " (חוזר היום)" : "";
+              const personSuffix = finalStatus === "leaving" ? " (ביציאה)" : finalStatus === "returning" ? " (בדרך חזרה)" : "";
               hapakAssignments.push({
                 id: mission.id,
                 memberIndex: currentMemberIndex++,
@@ -254,7 +254,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
             }
 
             assignedNames.add(normalizeNameStr(assignedOriginalName));
-            const personSuffix = finalStatus === "leaving" ? " (היום בבית)" : finalStatus === "returning" ? " (חוזר היום)" : "";
+            const personSuffix = finalStatus === "leaving" ? " (ביציאה)" : finalStatus === "returning" ? " (בדרך חזרה)" : "";
             hapakAssignments.push({
               id: mission.id,
               memberIndex: currentMemberIndex++,
@@ -273,7 +273,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
           const role = (p.role || "").trim();
           const name = normalizeNameStr(p.name);
           const v = String(p.todayValue || "").trim().toUpperCase();
-          const isPresent = v === "1" || v === "V";
+          const isPresent = v === "נ" || v === "1" || v === "V";
           
           return isPresent && 
                  dept.includes("אנוח") && 
@@ -346,7 +346,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
          const presence = getComputedPresence(p, yesterdayRecords);
          let isAvailable = false;
          if (presence === "full") isAvailable = true;
-         if (presence === "leaving" && hour < 14) isAvailable = true;
+         if (presence === "leaving" && hour < 18) isAvailable = true;
          if (presence === "returning" && hour >= 18) isAvailable = true;
          
          if (!isAvailable) return false;
@@ -441,7 +441,7 @@ function PersonnelSwap({
         .filter(p => {
           const presence = getComputedPresence(p, yesterdayRecords);
           if (presence === "none") return false;
-          if (presence === "leaving" && hour !== undefined && hour >= 14) return false;
+          if (presence === "leaving" && hour !== undefined && hour >= 18) return false;
           if (presence === "returning" && hour !== undefined && hour < 18) return false;
           return true;
         })
@@ -1440,16 +1440,19 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                       <div className="flex flex-wrap gap-2 justify-start" dir="rtl">
                         {availablePersonnel.map((p) => {
                           const v = String(p.todayValue || "").trim().toUpperCase();
-                          let statusColor = "bg-green-500/10 text-green-700 border-green-500/20"; // 1 or V
-                          if (v.includes("בית") || v === "0" || v === "5") {
+                          const isLeaving = ["יא", "יפ", "מ", "5"].includes(v);
+                          const isReturning = ["4"].includes(v);
+
+                          let statusColor = "bg-green-500/10 text-green-700 border-green-500/20"; // נ, 1 or V
+                          if (isLeaving) {
                              statusColor = "bg-indigo-500/10 text-indigo-700 border-indigo-500/30"; // Leaving
-                          } else if (v.includes("חוזר") || v === "4") {
+                          } else if (isReturning) {
                              statusColor = "bg-blue-500/10 text-blue-700 border-blue-500/20"; // Returning
                           }
 
                           let statusLabel = "";
-                          if (v.includes("בית") || v === "0" || v === "5") statusLabel = " (יוצא/בבית)";
-                          else if (v.includes("חוזר") || v === "4") statusLabel = " (חוזר)";
+                          if (isLeaving) statusLabel = " (ביציאה)";
+                          else if (isReturning) statusLabel = " (בדרך חזרה)";
 
                           return (
                             <div key={p.name} className={cn("border px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2", statusColor)}>

@@ -1,6 +1,7 @@
 import type { StatusCounts, RoleStats } from "@/types/attendance";
 import { StatusCountsRow } from "./StatusCountsRow";
 import { Users, CheckCircle2 } from "lucide-react";
+import { getSummaryCategory } from "@/lib/attendanceUtils";
 
 interface SummaryCardsProps {
   totalCounts: StatusCounts;
@@ -29,6 +30,20 @@ function StatPill({
 }
 
 export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) {
+  // Aggregate individual statuses into summary categories
+  const aggregated: Record<string, number> = {
+    "נוכח": 0,
+    "אפטר": 0,
+    "מחלה / גימלים": 0,
+    "אחר": 0,
+  };
+
+  Object.entries(totalCounts).forEach(([key, value]) => {
+    if (key === "total") return;
+    const cat = getSummaryCategory(key as any);
+    aggregated[cat] += value;
+  });
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Total Company Card */}
@@ -40,32 +55,32 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
           <div>
             <h3 className="font-bold text-sm">סיכום כולל</h3>
             <p className="text-xs text-muted-foreground">
-              {totalCounts["בבסיס"]}/{totalCounts.total} בבסיס
+              {aggregated["נוכח"]}/{totalCounts.total} נוכחים
             </p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <StatPill
-            label="בבסיס"
-            value={totalCounts["בבסיס"]}
+            label="נוכח"
+            value={aggregated["נוכח"]}
             total={totalCounts.total}
             colorClass="text-status-base bg-status-base-bg"
           />
           <StatPill
-            label="בבית"
-            value={totalCounts["בבית"]}
+            label="אפטר"
+            value={aggregated["אפטר"]}
             total={totalCounts.total}
             colorClass="text-status-home bg-status-home-bg"
           />
           <StatPill
-            label="מחלה"
-            value={totalCounts["מחלה / גימלים"]}
+            label="גימלים"
+            value={aggregated["מחלה / גימלים"]}
             total={totalCounts.total}
             colorClass="text-status-sick bg-status-sick-bg"
           />
           <StatPill
             label="אחר"
-            value={totalCounts["אחר"]}
+            value={aggregated["אחר"]}
             total={totalCounts.total}
             colorClass="text-status-other bg-status-other-bg"
           />
@@ -76,9 +91,9 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
             <span>סה&quot;כ {totalCounts.total} אנשים</span>
             <span>
               {totalCounts.total > 0
-                ? Math.round((totalCounts["בבסיס"] / totalCounts.total) * 100)
+                ? Math.round((aggregated["נוכח"] / totalCounts.total) * 100)
                 : 0}
-              % בבסיס
+              % נוכחות
             </span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -87,7 +102,7 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
               style={{
                 width:
                   totalCounts.total > 0
-                    ? `${(totalCounts["בבסיס"] / totalCounts.total) * 100}%`
+                    ? `${(aggregated["נוכח"] / totalCounts.total) * 100}%`
                     : "0%",
               }}
             />
@@ -107,23 +122,32 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
           </div>
         </div>
         <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-          {roles.map((role) => (
-            <div
-              key={role.role}
-              className="flex items-center justify-between gap-2 bg-muted/40 rounded-lg px-3 py-2"
-            >
-              <StatusCountsRow counts={role.counts} compact />
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs font-black text-primary px-1.5 py-0.5 bg-primary/5 rounded">
-                  {role.counts.total > 0 ? Math.round((role.counts["בבסיס"] / role.counts.total) * 100) : 0}%
-                </span>
-                <span className="text-xs text-muted-foreground font-medium">
-                  {role.counts["בבסיס"]}/{role.counts.total}
-                </span>
-                <span className="text-sm font-semibold">{role.role || "לא מוגדר"}</span>
+          {roles.map((role) => {
+            const roleAggregated: Record<string, number> = { "נוכח": 0 };
+            Object.entries(role.counts).forEach(([key, value]) => {
+              if (key === "total") return;
+              const cat = getSummaryCategory(key as any);
+              if (cat === "נוכח") roleAggregated["נוכח"] += value;
+            });
+
+            return (
+              <div
+                key={role.role}
+                className="flex items-center justify-between gap-2 bg-muted/40 rounded-lg px-3 py-2"
+              >
+                <StatusCountsRow counts={role.counts} compact />
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs font-black text-primary px-1.5 py-0.5 bg-primary/5 rounded">
+                    {role.counts.total > 0 ? Math.round((roleAggregated["נוכח"] / role.counts.total) * 100) : 0}%
+                  </span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {roleAggregated["נוכח"]}/{role.counts.total}
+                  </span>
+                  <span className="text-sm font-semibold">{role.role || "לא מוגדר"}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

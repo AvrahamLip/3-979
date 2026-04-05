@@ -3,6 +3,7 @@ import type { AttendanceRecord } from "@/types/attendance";
 import StatusBadge from "./StatusBadge";
 import { Search, ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { STATUS_LABELS } from "@/lib/attendanceUtils";
 
 interface AttendanceTableProps {
   records: AttendanceRecord[];
@@ -131,7 +132,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
           className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">כל הסטטוסים</option>
-          {["בבסיס", "בבית", "מחלה / גימלים", "אחר"].map((s) => (
+          {STATUS_LABELS.map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
@@ -140,7 +141,7 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
       {/* Desktop Table - hidden on mobile */}
       <div className="hidden md:block border border-border rounded-xl overflow-hidden card-shadow">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-right">
             <thead>
               <tr className="gradient-hero text-primary-foreground">
                 {([

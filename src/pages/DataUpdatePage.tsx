@@ -11,23 +11,35 @@ import { toast } from "sonner";
 const UPDATE_API = "https://151.145.89.228.sslip.io/webhook/update-status";
 
 const STATUS_OPTIONS = [
-  { value: "1", label: "בבסיס", color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800" },
-  { value: "0", label: "בבית", color: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800" },
-  { value: "2", label: "מחלה", color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" },
-  { value: "4", label: "חוזר לבסיס", color: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800" },
-  { value: "5", label: "יוצא הביתה", color: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800" },
+  { value: "נ", label: "נוכח", color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800" },
+  { value: "יא", label: "יצא לאפטר", color: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800" },
+  { value: "א", label: "אפטר", color: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800" },
+  { value: "ג", label: "גימלים", color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" },
+  { value: "מק", label: "מנותק קשר", color: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700" },
+  { value: "ק", label: "קורס", color: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700" },
+  { value: "מ", label: "משתחרר", color: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800" },
+  { value: "ש", label: "שוחרר", color: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800" },
+  { value: "פנ", label: "פוטנציאל נפקדות", color: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" },
+  { value: "פ", label: "פיצול", color: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700" },
+  { value: "יפ", label: "יציאה לפיצול", color: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800" },
   { value: "3", label: "אחר", color: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700" },
   { value: "empty", label: "---", color: "bg-muted text-muted-foreground border-border" },
 ];
 
 function normalizeValue(val: any): string {
-  const v = String(val ?? "").trim();
-  if (v === "V" || v === "1") return "1";
-  if (v === "0") return "0";
-  if (v === "2" || v === "גימלים") return "2";
-  if (v === "4" || v === "חוזר") return "4";
-  if (v === "5" || v === "יוצא") return "5";
-  if (v === "") return "empty";
+  const v = String(val ?? "").trim().toUpperCase();
+  if (v === "נ" || v === "V" || v === "1" || v === "4") return "נ";
+  if (v === "יא") return "יא";
+  if (v === "א" || v === "0" || v === "5") return "א";
+  if (v === "ג" || v === "2" || v === "גימלים") return "ג";
+  if (v === "מק") return "מק";
+  if (v === "ק") return "ק";
+  if (v === "מ") return "מ";
+  if (v === "ש") return "ש";
+  if (v === "פנ") return "פנ";
+  if (v === "פ") return "פ";
+  if (v === "יפ") return "יפ";
+  if (v === "" || v === "EMPTY") return "empty";
   return "3";
 }
 
@@ -204,7 +216,7 @@ export default function DataUpdatePage() {
           </div>
           <div className="bg-muted/30 px-4 py-2 text-[11px] text-muted-foreground border-t border-border flex justify-between">
             <span>מציג {filtered.length} רשומות</span>
-            <span>סך הכל {records.length} בבסיס</span>
+            <span>סך הכל {records.length} רשומות</span>
           </div>
         </div>
       )}

@@ -5,20 +5,60 @@ const STATUS_INFO: Record<
   StatusType,
   { icon: string; className: string; description: string }
 > = {
-  "בבסיס": {
+  "נוכח": {
     icon: "✓",
     className: "text-status-base bg-status-base-bg border border-status-base/20",
-    description: 'נמצא בבסיס / V / "1"',
+    description: 'נוכח / V / "1" / "נ"',
   },
-  "בבית": {
+  "יצא לאפטר": {
+    icon: "↗",
+    className: "bg-indigo-500/10 text-indigo-700 border border-indigo-500/20",
+    description: "יצא לאפטר / יא",
+  },
+  "אפטר": {
     icon: "⌂",
     className: "text-status-home bg-status-home-bg border border-status-home/20",
-    description: 'בבית / "" / "0"',
+    description: "באפטר / א",
   },
   "מחלה / גימלים": {
     icon: "⚕",
     className: "text-status-sick bg-status-sick-bg border border-status-sick/20",
-    description: '"2" / גימלים',
+    description: 'גימלים / "2"',
+  },
+  "מנותק קשר": {
+    icon: "!",
+    className: "text-status-other bg-status-other-bg border border-status-other/20",
+    description: "מנותק קשר / מק",
+  },
+  "קורס": {
+    icon: "✍",
+    className: "text-status-other bg-status-other-bg border border-status-other/20",
+    description: "בקורס / ק",
+  },
+  "משתחרר": {
+    icon: "✖",
+    className: "text-status-home bg-status-home-bg border border-status-home/20",
+    description: "משתחרר",
+  },
+  "שוחרר": {
+    icon: "✖",
+    className: "text-status-home bg-status-home-bg border border-status-home/20",
+    description: "שוחרר",
+  },
+  "פוטנציאל נפקדות": {
+    icon: "!",
+    className: "text-status-sick bg-status-sick-bg border border-status-sick/20",
+    description: "פנ",
+  },
+  "פיצול": {
+    icon: "÷",
+    className: "text-status-other bg-status-other-bg border border-status-other/20",
+    description: "פיצול / פ",
+  },
+  "יציאה לפיצול": {
+    icon: "↗",
+    className: "bg-indigo-500/10 text-indigo-700 border border-indigo-500/20",
+    description: "יפ",
   },
   "אחר": {
     icon: "?",

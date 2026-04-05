@@ -27,7 +27,7 @@ function ZamaDeptSection({
   const [open, setOpen] = useState(true);
   const counts = useMemo(() => buildStatusCounts(records), [records]);
   const roles = useMemo(() => buildRoleStats(records), [records]);
-  const pct = counts.total > 0 ? Math.round((counts["בבסיס"] / counts.total) * 100) : 0;
+  const pct = counts.total > 0 ? Math.round((counts["נוכח"] / counts.total) * 100) : 0;
 
   return (
     <div
@@ -45,7 +45,7 @@ function ZamaDeptSection({
         <div className="flex-1 text-right mr-3">
           <div className="flex items-center gap-2 justify-end">
             <span className="text-sm text-muted-foreground font-semibold">
-              {counts["בבסיס"]}/{counts.total} בבסיס
+              {counts["נוכח"]}/{counts.total} נוכחים
             </span>
             <span
               className={cn(
@@ -104,11 +104,11 @@ function ZamaDeptSection({
                         <StatusCountsRow counts={role.counts} compact />
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-black text-primary">
-                            {role.counts.total > 0 ? Math.round((role.counts["בבסיס"] / role.counts.total) * 100) : 0}%
+                            {role.counts.total > 0 ? Math.round((role.counts["נוכח"] / role.counts.total) * 100) : 0}%
                           </span>
                           <span className="text-xs text-muted-foreground px-1 opacity-40">|</span>
                           <span className="text-xs text-muted-foreground">
-                            {role.counts["בבסיס"]}/{role.counts.total}
+                            {role.counts["נוכח"]}/{role.counts.total}
                           </span>
                           <span className="text-sm font-semibold">{role.role}</span>
                         </div>
