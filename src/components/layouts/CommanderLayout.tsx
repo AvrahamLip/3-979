@@ -1,16 +1,23 @@
 import { useState } from "react";
-import { Outlet, NavLink, Link } from "react-router-dom";
+import { Outlet, NavLink, Link, Navigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays, Shield, LogOut, Palmtree } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "../PWAInstallButton";
 import pkg from "../../../package.json";
 import { useAuth } from "@/contexts/AuthContext";
+import { isCommanderDashboardAllowed } from "@/lib/deployment";
 
 export default function CommanderLayout() {
   const { theme, setTheme } = useTheme();
   const { isAuthenticated, logout, user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const allowed = isCommanderDashboardAllowed();
+
+  if (!allowed) {
+    console.warn("Commander dashboard access restricted on this domain. Redirecting...");
+    return <Navigate to="/guards" replace />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

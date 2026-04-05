@@ -5,10 +5,12 @@ import { Sun, Moon, Phone, Menu, X, Shield, Palmtree } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "../PWAInstallButton";
 import pkg from "../../../package.json";
+import { isCommanderDashboardAllowed } from "@/lib/deployment";
 
 export default function SoldierLayout() {
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const showCommanderLink = isCommanderDashboardAllowed();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -54,6 +56,23 @@ export default function SoldierLayout() {
                 <Phone className="w-4 h-4" />
                 <span>טלפונים</span>
               </NavLink>
+
+              {showCommanderLink && (
+                <NavLink
+                  to="/main"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                      isActive
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                    )
+                  }
+                >
+                  <Shield className="w-4 h-4 text-accent" />
+                  <span>פורטל מפקדים</span>
+                </NavLink>
+              )}
               {/*
               <NavLink
                 to="/guards/vacation"
@@ -118,6 +137,22 @@ export default function SoldierLayout() {
                 <Phone className="w-5 h-5" />
                 <span>טלפונים</span>
               </NavLink>
+
+              {showCommanderLink && (
+                <NavLink
+                  to="/main"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold",
+                      isActive ? "bg-accent text-accent-foreground" : "text-overlay/70"
+                    )
+                  }
+                >
+                  <Shield className="w-5 h-5 text-accent" />
+                  <span>פורטל מפקדים</span>
+                </NavLink>
+              )}
               {/*
               <NavLink
                 to="/guards/vacation"
