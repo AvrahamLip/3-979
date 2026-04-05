@@ -30,7 +30,7 @@ function normalizeValue(val: any): string {
   const v = String(val ?? "").trim().toUpperCase();
   if (v === "נ" || v === "V" || v === "1" || v === "4") return "נ";
   if (v === "יא") return "יא";
-  if (v === "א" || v === "0" || v === "5") return "א";
+  if (v === "א" || v === "0") return "א";
   if (v === "ג" || v === "2" || v === "גימלים") return "ג";
   if (v === "מק") return "מק";
   if (v === "ק") return "ק";

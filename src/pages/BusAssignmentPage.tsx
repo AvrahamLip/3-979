@@ -78,7 +78,9 @@ function generateBusAssignment(records: AttendanceRecord[], hapakRegistryRows: a
 
   const getStatus = (name: string) => {
     const p = records.find(r => normalizeNameStr(r.name) === normalizeNameStr(name));
-    return getComputedPresence(p);
+    const presence = getComputedPresence(p);
+    // 18:00 start: anyone "leaving" is already gone.
+    return presence === "leaving" ? "none" : presence;
   };
 
   // 1. Generate Hapaks (Using GuardAssignmentPage's robust logic)
@@ -231,7 +233,10 @@ function PersonnelSwap({
   const isMobile = useIsMobile();
 
   const filtered = useMemo(() => {
-    let list = allPersonnel.filter(p => getComputedPresence(p) !== "none");
+    let list = allPersonnel.filter(p => {
+      const presence = getComputedPresence(p);
+      return presence !== "none" && presence !== "leaving";
+    });
     if (filterDept) {
       list = list.filter(p => (p.department || "").includes(filterDept));
     }
@@ -379,6 +384,25 @@ export default function BusAssignmentPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  
+  const unassigned = useMemo(() => {
+    if (!data || !assignments) return [];
+    const assigned = new Set<string>();
+    assignments.hapaks.forEach(h => { if(h.assignedTo) assigned.add(normalizeNameStr(h.assignedTo)); });
+    assignments.platoons.forEach(p => {
+      if(p.commander) assigned.add(normalizeNameStr(p.commander));
+      p.teams.forEach(t => {
+        if(t.commander) assigned.add(normalizeNameStr(t.commander));
+        if(t.medic) assigned.add(normalizeNameStr(t.medic));
+        t.soldiers.forEach(s => { if(s) assigned.add(normalizeNameStr(s)); });
+      });
+    });
+
+    return data.filter(p => {
+      const presence = getComputedPresence(p);
+      return presence !== "none" && presence !== "leaving" && !assigned.has(normalizeNameStr(p.name));
+    }).sort((a,b) => a.name.localeCompare(b.name, 'he'));
+  }, [data, assignments]);
 
   const fetchRegistry = async () => {
     try {
@@ -731,6 +755,30 @@ export default function BusAssignmentPage() {
                 </div>
               ))}
             </div>
+
+            {/* Appendices Section */}
+            {unassigned.length > 0 && (
+              <div className="bg-white border border-border rounded-xl p-4 shadow-sm space-y-3">
+                <div className="flex items-center gap-2 border-b border-border pb-2">
+                  <UserCheck className="w-4 h-4 text-primary" />
+                  <h3 className="text-sm font-black text-primary">נספחים (חיילים זמינים שלא שובצו)</h3>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                  {unassigned.map(p => (
+                    <div key={p.name} className="flex items-center gap-1.5 p-1.5 bg-muted/30 rounded-lg border border-border/20">
+                      <div className={cn(
+                        "w-1 h-1 rounded-full shrink-0",
+                        getComputedPresence(p) === "returning" ? "bg-blue-500" : "bg-green-500"
+                      )} />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[11px] font-bold truncate">{p.name}</span>
+                        <span className="text-[9px] text-muted-foreground truncate leading-none">{p.role}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {/* Legend / Info */}
             <div className="bg-muted/50 p-4 rounded-xl border border-border flex items-center gap-6 justify-center text-[11px] text-muted-foreground">

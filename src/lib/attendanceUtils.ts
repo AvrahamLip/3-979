@@ -21,7 +21,6 @@ export function normalizeStatus(value: string | number | undefined | null): Stat
   if (v === "פ") return "פיצול";
   if (v === "יפ") return "יציאה לפיצול";
   if (v === "4") return "נוכח";
-  if (v === "5") return "אפטר";
   return "אחר";
 }
 
@@ -173,7 +172,7 @@ export function getComputedPresence(person: AttendanceRecord | undefined, yester
   let v = String(person.todayValue || "").trim().toUpperCase();
   
   // Categorization
-  const isLeaving = ["יא", "יפ", "מ", "5"].includes(v);
+  const isLeaving = ["יא", "יפ", "מ"].includes(v);
   const isHome = ["א", "ג", "מק", "ק", "ש", "פנ", "פ", "0", ""].includes(v);
   const isReturning = ["4"].includes(v);
   const isPresent = ["נ", "1", "V"].includes(v);
