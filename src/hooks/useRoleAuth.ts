@@ -24,6 +24,12 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
     const saved = localStorage.getItem("user_info");
     return saved ? JSON.parse(saved) : null;
   });
+  const getCurrentContextRoll = useCallback(() => {
+    const hash = window.location.hash.toLowerCase();
+    if (hash.includes("/update")) return "update";
+    if (hash.includes("/guards") || hash.includes("/bus") || hash.includes("/main/guards")) return "guard";
+    return defaultRoll;
+  }, [defaultRoll]);
 
   const checkRollAuthorization = useCallback(async (roll: string, credential?: string): Promise<boolean> => {
     const currentEmail = user?.email;
@@ -51,9 +57,13 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
       });
 
       if (res.ok) {
-        const data = await res.json();
+        let data = await res.json();
+        // n8n often returns an array, take the first element if so
+        if (Array.isArray(data) && data.length > 0) data = data[0].json || data[0];
+
         if (data.email || data.authorized === true) {
-          const updatedRolls = Array.from(new Set([...(user?.authorizedRolls || []), roll]));
+          const serverRoll = data.roll || data.role || roll;
+          const updatedRolls = Array.from(new Set([...(user?.authorizedRolls || []), serverRoll]));
           
           setIsAuthenticated(true);
           const info: UserInfo = { 
@@ -89,27 +99,40 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
     try {
       const base64Url = response.credential.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(window.atob(base64));
+      
+      // Handle UTF-8 decoding for Hebrew characters in name
+      const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      const payload = JSON.parse(jsonPayload);
+
+      console.log("Auth attempt for:", payload.email, "Roll:", getCurrentContextRoll());
 
       const res = await fetch(VALIDATE_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: payload.email,
-          roll: defaultRoll,
+          roll: getCurrentContextRoll(),
           credential: response.credential,
         }),
       });
 
       if (res.ok) {
-        const data = await res.json();
+        let data = await res.json();
+        // n8n often returns an array, take the first element if so
+        if (Array.isArray(data) && data.length > 0) data = data[0].json || data[0];
+
+        console.log("Auth response data:", data);
+
         if (data.email || data.authorized === true) {
+          const serverRoll = data.roll || data.role || defaultRoll;
           setIsAuthenticated(true);
           const info: UserInfo = { 
             name: payload.name, 
             email: payload.email, 
             role: "commander",
-            authorizedRolls: [defaultRoll]
+            authorizedRolls: [serverRoll]
           };
           setUser(info);
           localStorage.setItem("is_commander", "true");
@@ -129,7 +152,7 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
     } finally {
       setIsLoading(false);
     }
-  }, [defaultRoll]);
+  }, [defaultRoll, getCurrentContextRoll]);
 
   useEffect(() => {
     if (!buttonId) return;
