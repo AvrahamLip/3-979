@@ -12,7 +12,7 @@ import SummaryCards from "@/components/SummaryCards";
 import DepartmentAccordion from "@/components/DepartmentAccordion";
 import AttendanceTable from "@/components/AttendanceTable";
 import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMessages";
-import { RefreshCw, CalendarDays, Truck, Edit, Shield, ChevronLeft } from "lucide-react";
+import { RefreshCw, CalendarDays, Truck, Edit, Shield, ChevronLeft, Bus } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function MainPage() {
@@ -57,6 +57,14 @@ export default function MainPage() {
             >
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">ניהול שיבוץ שמירות</span>
+            </Link>
+            <Link
+              to="/main/bus"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm shadow-lg hover:shadow-primary/20 hover:scale-105 transition-all shadow-md active:scale-95"
+              aria-label="שיבוץ אוטובוסים"
+            >
+              <Bus className="w-4 h-4" />
+              <span className="hidden sm:inline">שיבוץ אוטובוסים</span>
             </Link>
           </div>
         </div>

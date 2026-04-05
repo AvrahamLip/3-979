@@ -110,3 +110,25 @@ export const STATUS_ICONS: Record<StatusType, string> = {
   "מחלה / גימלים": "⚕",
   "אחר": "?",
 };
+
+export const normalizeNameStr = (name: any) => String(name || "").replace(/\(.*\)/g, '').replace(/\s+/g, ' ').trim();
+
+export function getComputedPresence(person: AttendanceRecord | undefined, yesterdayRecords?: AttendanceRecord[]): "full" | "leaving" | "returning" | "none" {
+  if (!person) return "none";
+  let v = String(person.todayValue || "").trim().toUpperCase();
+  
+  if (v.includes("בית") || v === "0" || v === "5") return "leaving";
+  if (v.includes("חוזר") || v === "4") return "returning";
+  
+  // Cross check with yesterday
+  if (yesterdayRecords && yesterdayRecords.length > 0) {
+     const yestPerson = yesterdayRecords.find(r => normalizeNameStr(r.name) === normalizeNameStr(person.name));
+     const vYest = yestPerson ? String(yestPerson.todayValue || "").trim().toUpperCase() : "1";
+     
+     if ((vYest === "0" || vYest === "5" || vYest === "") && (v === "1" || v === "V")) return "returning";
+     if ((vYest === "1" || vYest === "V") && (v === "0" || v === "5" || v === "")) return "leaving";
+  }
+
+  if (v === "1" || v === "V") return "full";
+  return "none";
+}

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
-import { getTodayIso, formatDateForApi } from "@/lib/attendanceUtils";
+import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
@@ -86,33 +86,11 @@ function getPointsForHour(hour: number): number {
   return (hour >= 0 && hour < 8) ? POINTS.NIGHT_GUARD : POINTS.DAY_GUARD;
 }
 
-const normalizeNameStr = (name: any) => String(name || "").replace(/\(.*\)/g, '').replace(/\s+/g, ' ').trim();
-
 const getYesterdayIso = (dateStr: string) => {
   const d = new Date(dateStr);
   d.setDate(d.getDate() - 1);
   return d.toISOString().split('T')[0];
 };
-
-function getComputedPresence(person: AttendanceRecord | undefined, yesterdayRecords?: AttendanceRecord[]): "full" | "leaving" | "returning" | "none" {
-  if (!person) return "none";
-  let v = String(person.todayValue || "").trim().toUpperCase();
-  
-  if (v.includes("בית") || v === "0" || v === "5") return "leaving";
-  if (v.includes("חוזר") || v === "4") return "returning";
-  
-  // Cross check with yesterday
-  if (yesterdayRecords && yesterdayRecords.length > 0) {
-     const yestPerson = yesterdayRecords.find(r => normalizeNameStr(r.name) === normalizeNameStr(person.name));
-     const vYest = yestPerson ? String(yestPerson.todayValue || "").trim().toUpperCase() : "1";
-     
-     if ((vYest === "0" || vYest === "5" || vYest === "") && (v === "1" || v === "V")) return "returning";
-     if ((vYest === "1" || vYest === "V") && (v === "0" || v === "5" || v === "")) return "leaving";
-  }
-
-  if (v === "1" || v === "V") return "full";
-  return "none";
-}
 
 function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string, yesterdayGuards: GuardShift[] = [], yesterdayRecords: AttendanceRecord[] = []): AssignmentData {
 

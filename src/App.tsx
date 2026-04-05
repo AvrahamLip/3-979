@@ -12,6 +12,7 @@ import GuardAssignmentPage from "./pages/GuardAssignmentPage";
 import ContactPage from "./pages/ContactPage";
 import VacationPage from "./pages/VacationPage";
 import DataUpdatePage from "./pages/DataUpdatePage";
+import BusAssignmentPage from "./pages/BusAssignmentPage";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { CommanderGuard } from "./components/CommanderGuard";
@@ -61,6 +62,14 @@ const App = () => (
                 element={
                   <CommanderGuard requiredRoll="guard">
                     <GuardAssignmentPage mode="commander" />
+                  </CommanderGuard>
+                } 
+              />
+              <Route 
+                path="bus" 
+                element={
+                  <CommanderGuard requiredRoll="guard">
+                    <BusAssignmentPage />
                   </CommanderGuard>
                 } 
               />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, Link, Navigate } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays, Shield, LogOut, Palmtree } from "lucide-react";
+import { Sun, Moon, FileText, Truck, Edit, Phone, Menu, X, CalendarDays, Shield, LogOut, Palmtree, Bus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PWAInstallButton from "../PWAInstallButton";
 import pkg from "../../../package.json";
@@ -90,6 +90,20 @@ export default function CommanderLayout() {
               >
                 <Shield className="w-4 h-4" />
                 <span>ניהול שמירות</span>
+              </NavLink>
+              <NavLink
+                to="/main/bus"
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-md"
+                      : "text-overlay/80 hover:text-overlay hover:bg-white/10"
+                  )
+                }
+              >
+                <Bus className="w-4 h-4" />
+                <span>שיבוץ מפקדים</span>
               </NavLink>
               <NavLink
                 to="/main/contact"
@@ -217,6 +231,19 @@ export default function CommanderLayout() {
               >
                 <Shield className="w-5 h-5 text-accent" />
                 <span>ניהול שמירות</span>
+              </NavLink>
+              <NavLink
+                to="/main/bus"
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold",
+                    isActive ? "bg-accent text-accent-foreground" : "text-overlay/70"
+                  )
+                }
+              >
+                <Bus className="w-5 h-5 text-accent" />
+                <span>שיבוץ מפקדים</span>
               </NavLink>
               <NavLink
                 to="/main/contact"
