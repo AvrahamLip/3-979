@@ -115,7 +115,9 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
       const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
         const normalizedQuery = normalizeNameStr(name);
         const p = records.find(r => normalizeNameStr(r.name) === normalizedQuery);
-        return getComputedPresence(p, yesterdayRecords);
+        const presence = getComputedPresence(p, yesterdayRecords);
+        // If schedule starts at 18:00, anyone "leaving" today has already gone.
+        return presence === "leaving" ? "none" : presence;
       };
 
       if (commanderRow && commanderRow[mission.key]) {
@@ -142,8 +144,8 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
           const dept = (p.department || "").trim();
           const role = (p.role || "").trim();
           const name = normalizeNameStr(p.name);
-          const v = String(p.todayValue || "").trim().toUpperCase();
-          const isPresent = v === "נ" || v === "1" || v === "V";
+          const presence = getComputedPresence(p, yesterdayRecords);
+          const isPresent = presence !== "none" && presence !== "leaving";
           
           return isPresent && 
                  dept.includes("אנוח") && 
@@ -450,7 +452,8 @@ function PersonnelSwap({
         .filter(p => {
           const presence = getComputedPresence(p, yesterdayRecords);
           if (presence === "none") return false;
-          if (presence === "leaving" && hour !== undefined && hour >= 18) return false;
+          // For Hapak (type === "hapak"), hour is undefined, but they still shouldn't be assigned if leaving
+          if (presence === "leaving" && (type === "hapak" || (hour !== undefined && hour >= 18))) return false;
           if (presence === "returning" && hour !== undefined && hour < 18) return false;
           return true;
         })
@@ -711,7 +714,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     
     return data.filter(p => {
       const presence = getComputedPresence(p, yesterdayAttendanceData);
-      if (presence === "none") return false;
+      if (presence === "none" || presence === "leaving") return false;
 
       if (assigned.has(normalizeNameStr(p.name))) return false;
 
