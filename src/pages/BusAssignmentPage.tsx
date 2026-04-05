@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
-import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence } from "@/lib/attendanceUtils";
+import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence, formatDateShort, formatDateRange } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
@@ -575,7 +575,7 @@ export default function BusAssignmentPage() {
             <Bus className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-black">שיבוץ מפקדים וניוד</h1>
+            <h1 className="text-xl font-black">שיבוץ מפקדים וניוד ({formatDateShort(date)})</h1>
             <p className="text-xs text-muted-foreground font-black">ניהול חפ"קים ומחלקות יומי (תקף מהשעה 18:00)</p>
           </div>
         </div>
@@ -628,13 +628,7 @@ export default function BusAssignmentPage() {
           {/* Export-only header */}
           <div className={cn("hidden mb-8 border-b-4 border-primary pb-4", isExporting && "block")}>
             <h1 className="text-4xl font-black text-primary">שיבוץ מפקדים וניוד</h1>
-            <p className="text-xl text-muted-foreground font-bold">טווח: {(() => {
-              const d1 = date.split('-').reverse().slice(0, 2).join('/');
-              const nextDateObj = new Date(date);
-              nextDateObj.setDate(nextDateObj.getDate() + 1);
-              const d2 = nextDateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-              return `${d1} - ${d2}`;
-            })()}</p>
+            <p className="text-xl text-muted-foreground font-bold">טווח: {formatDateRange(date)}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

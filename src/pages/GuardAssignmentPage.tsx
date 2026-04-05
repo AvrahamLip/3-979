@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
-import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence } from "@/lib/attendanceUtils";
+import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence, formatDateShort, formatDateRange } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
@@ -329,7 +329,7 @@ function generateAssignment(records: AttendanceRecord[], history: PersonnelPoint
         const nextDay = new Date(date);
         nextDay.setDate(nextDay.getDate() + 1);
         const dayStr = nextDay.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-        time = `${time} (${dayStr})`;
+        time = `${time} (${formatDateShort(nextDay.toISOString().split('T')[0])})`;
       }
       
       const isNight = hour >= 0 && hour < 8; 
@@ -794,11 +794,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, W, TITLE_H);
       ctx.fillStyle = '#ffffff';
-      const d1 = date.split('-').reverse().slice(0, 2).join('/');
-      const nextDateObj = new Date(date);
-      nextDateObj.setDate(nextDateObj.getDate() + 1);
-      const d2 = nextDateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-      const dateRange = `${d1} - ${d2}`;
+      const dateRange = formatDateRange(date);
 
       ctx.fillText(`שיבוץ חפ"ק - ${dateRange}`, W - PAD, TITLE_H / 2 + 8);
 
@@ -895,11 +891,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       ctx.font = 'bold 20px Arial';
       ctx.textAlign = 'right';
       ctx.direction = 'rtl';
-      const d1 = date.split('-').reverse().slice(0, 2).join('/');
-      const nextDateObj = new Date(date);
-      nextDateObj.setDate(nextDateObj.getDate() + 1);
-      const d2 = nextDateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-      const dateRange = `${d1} - ${d2}`;
+      const dateRange = formatDateRange(date);
 
       ctx.fillText(`לו"ז שמירות - ${dateRange}`, W - PAD, TITLE_H / 2 + 8);
 
@@ -1302,13 +1294,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
               <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-overlay" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-3xl font-black text-overlay leading-none">שיבוץ שוויוני ({(() => {
-                const d1 = date.split('-').reverse().slice(0, 2).join('/');
-                const nextDateObj = new Date(date);
-                nextDateObj.setDate(nextDateObj.getDate() + 1);
-                const d2 = nextDateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-                return `${d1} - ${d2}`;
-              })()})</h1>
+              <h1 className="text-xl sm:text-3xl font-black text-overlay leading-none">שיבוץ שוויוני ({formatDateRange(date)})</h1>
               <p className="text-overlay/70 text-xs sm:text-sm mt-1 sm:mt-0.5">
                 רשימת שמירות ושיבוצי חפ"ק (החל מ-18:00)
               </p>

@@ -25,12 +25,43 @@ export function normalizeStatus(value: string | number | undefined | null): Stat
 }
 
 export function formatDateForApi(isoDate: string): string {
-  // YYYY-MM-DD → D/M/YY
+  // YYYY-MM-DD → D/M/YY (Matches n8n expected format)
   const date = new Date(isoDate);
   const d = date.getDate();
   const m = date.getMonth() + 1;
   const y = String(date.getFullYear()).slice(-2);
   return `${d}/${m}/${y}`;
+}
+
+export function formatDateShort(isoDate: string): string {
+  // YYYY-MM-DD → DD/MM
+  if (!isoDate) return "";
+  const parts = isoDate.split('-');
+  if (parts.length < 3) return isoDate;
+  return `${parts[2]}/${parts[1]}`;
+}
+
+export function formatDateFull(isoDate: string): string {
+  // YYYY-MM-DD → DD/MM/YY
+  if (!isoDate) return "";
+  const parts = isoDate.split('-');
+  if (parts.length < 3) return isoDate;
+  return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+}
+
+export function formatDateRange(isoDate: string, days: number = 1): string {
+  // Returns "DD/MM - DD/MM" (useful for 18:00 start overlaps)
+  const d1 = new Date(isoDate);
+  const d2 = new Date(isoDate);
+  d2.setDate(d1.getDate() + days);
+
+  const f = (d: Date) => {
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    return `${day}/${month}`;
+  };
+
+  return `${f(d1)} - ${f(d2)}`;
 }
 
 export function getTodayIso(): string {
