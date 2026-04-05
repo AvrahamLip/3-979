@@ -527,8 +527,8 @@ function PersonnelSwap({
 
   const SelectionContent = (
     <Command className="border-none">
-      <CommandInput placeholder="חפש חייל..." className="h-10 text-right" dir="rtl" autoFocus />
-      <CommandList className="max-h-[60vh] sm:max-h-[300px]">
+      <CommandInput placeholder="חפש חייל..." className="h-10 text-right" dir="rtl" autoFocus={!isMobile} />
+      <CommandList className="max-h-[50vh] sm:max-h-[300px] overflow-y-auto">
         <CommandEmpty>לא נמצאו חיילים.</CommandEmpty>
         <CommandGroup>
           {allowEmpty && (
@@ -603,7 +603,7 @@ function PersonnelSwap({
         <DrawerTrigger asChild>
           {trigger}
         </DrawerTrigger>
-        <DrawerContent className="px-0 pb-6 max-h-[85vh]">
+        <DrawerContent className="px-0 pb-6 max-h-[70vh] w-full max-w-[380px] mx-auto">
           <DrawerHeader className="border-b pb-4 px-4 flex items-center justify-between">
             <DrawerTitle className="text-right w-full">בחירת חייל לשיבוץ</DrawerTitle>
             <DrawerClose asChild>
