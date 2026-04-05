@@ -515,7 +515,7 @@ function PersonnelSwap({
   const SelectionContent = (
     <Command className="border-none">
       <CommandInput placeholder="חפש חייל..." className="h-10 text-right" dir="rtl" autoFocus={!isMobile} />
-      <CommandList className="max-h-[50vh] sm:max-h-[300px] overflow-y-auto">
+      <CommandList className={cn("overflow-y-auto", isMobile ? "max-h-[50vh]" : "max-h-[300px]")}>
         <CommandEmpty>לא נמצאו חיילים.</CommandEmpty>
         <CommandGroup>
           {allowEmpty && (
@@ -525,7 +525,7 @@ function PersonnelSwap({
                 onSwap("");
                 setOpen(false);
               }}
-              className="flex items-center justify-between text-muted-foreground italic font-normal py-3 px-4"
+              className="flex items-center justify-between text-muted-foreground italic font-normal py-2 px-3"
             >
               <span>(ריק) - ללא שיבוץ</span>
               {(!currentName || currentName === "לא מאויש") && <Check className="w-4 h-4 text-primary" />}
@@ -540,32 +540,33 @@ function PersonnelSwap({
                 setOpen(false);
               }}
               className={cn(
-                "flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0",
+                "flex items-center justify-between py-2 px-3 border-b border-border/40 last:border-0",
                 p.gapConflict && "opacity-60 bg-red-500/5"
               )}
             >
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                   <span className="font-bold">{p.name}</span>
-                   {p.gapConflict && (
-                     <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full flex items-center gap-1 font-bold">
-                       <Clock className="w-2.5 h-2.5" />
-                       מרווח: {p.gapHours}ש'
-                     </span>
-                   )}
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex items-center gap-2 text-right" dir="rtl">
+                   <div className={cn(
+                     "w-1.5 h-1.5 rounded-full shrink-0",
+                     getComputedPresence(p, yesterdayRecords) === "leaving" ? "bg-amber-500" : 
+                     getComputedPresence(p, yesterdayRecords) === "returning" ? "bg-blue-500" : "bg-green-500"
+                   )} />
+                   <span className="font-bold truncate text-sm">{p.name}</span>
+                   <span className={cn(
+                     "text-[10px] px-1.5 py-0.5 rounded-full font-bold tabular-nums shrink-0 ml-auto",
+                     p.burdenPoints > 10 ? "bg-orange-100 text-orange-700" : "bg-blue-50/80 text-blue-700"
+                   )}>
+                     {p.burdenPoints || 0}
+                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
-                  <span className={cn(
-                    "px-1.5 rounded-md",
-                    p.burdenPoints > 10 ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700"
-                  )}>
-                    {p.burdenPoints || 0} נק'
-                  </span>
-                  <span>•</span>
-                  <span>{!p.gapConflict ? "זמין לשיבוץ" : "בעיית מרווח"}</span>
-                </div>
+                {p.gapConflict && (
+                  <div className="flex items-center gap-1.5 text-[9px] text-red-600 mt-0.5 font-bold text-right" dir="rtl">
+                    <Clock className="w-2.5 h-2.5" />
+                    מרווח קטן מדי: {p.gapHours} שעות
+                  </div>
+                )}
               </div>
-              {currentName === p.name && <Check className="w-4 h-4 text-primary animate-in zoom-in" />}
+              {currentName === p.name && <Check className="w-4 h-4 text-primary animate-in zoom-in ml-2" />}
             </CommandItem>
           ))}
         </CommandGroup>
@@ -579,8 +580,10 @@ function PersonnelSwap({
       (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") && "text-muted-foreground italic font-normal"
     )}>
       {statusDot}
-      {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
-      <Shuffle className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+      <span className="truncate max-w-[120px]">
+        {(!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") ? "ריק / ללא שיבוץ" : currentName}
+      </span>
+      <Shuffle className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity shrink-0" />
     </button>
   );
 
@@ -590,14 +593,15 @@ function PersonnelSwap({
         <DrawerTrigger asChild>
           {trigger}
         </DrawerTrigger>
-        <DrawerContent className="px-0 pb-6 max-h-[70vh] w-full max-w-[380px] mx-auto">
-          <DrawerHeader className="border-b pb-4 px-4 flex items-center justify-between">
-            <DrawerTitle className="text-right w-full">בחירת חייל לשיבוץ</DrawerTitle>
+        <DrawerContent className="px-0 pb-4 max-h-[60vh] w-full max-w-[420px] mx-auto rounded-t-[2rem]">
+          <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-muted mb-4 mt-2" />
+          <DrawerHeader className="pb-2 px-4 flex items-center justify-between space-y-0 text-right">
+            <DrawerTitle className="text-right w-full text-base font-black">בחירת חייל לשיבוץ</DrawerTitle>
             <DrawerClose asChild>
-                <button className="p-2 rounded-full hover:bg-muted"><CloseX className="w-5 h-5"/></button>
+                <button className="p-2 rounded-full hover:bg-muted ml-2"><CloseX className="w-4 h-4"/></button>
             </DrawerClose>
           </DrawerHeader>
-          <div className="mt-2 flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden">
             {SelectionContent}
           </div>
         </DrawerContent>

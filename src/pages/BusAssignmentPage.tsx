@@ -24,6 +24,15 @@ import {
 } from "@/components/ui/command";
 import { useIsMobile } from "@/hooks/use-mobile";
 import html2canvas from "html2canvas";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { X } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -251,48 +260,93 @@ function PersonnelSwap({
 
   const content = (
     <Command className="border-none">
-      <CommandInput placeholder="חפש חייל..." className="h-9" dir="rtl" />
-      <CommandList className="max-h-[300px]">
+      <CommandInput placeholder="חפש חייל..." className="h-9 text-right" dir="rtl" autoFocus={!isMobile} />
+      <CommandList className={cn("overflow-y-auto", isMobile ? "max-h-[50vh]" : "max-h-[300px]")}>
         <CommandEmpty>לא נמצאו תוצאות.</CommandEmpty>
         <CommandGroup>
           {allowEmpty && (
-            <CommandItem onSelect={() => { onSwap(""); setOpen(false); }} className="italic text-muted-foreground">
-              (ריק)
+            <CommandItem 
+              value="empty-selection" 
+              onSelect={() => { onSwap(""); setOpen(false); }} 
+              className="italic text-muted-foreground py-2 px-3 text-right"
+            >
+              (ריק) - ללא שיבוץ
             </CommandItem>
           )}
-          {filtered.map(p => (
-            <CommandItem 
-              key={p.name} 
-              onSelect={() => { onSwap(p.name); setOpen(false); }}
-              className="flex items-center justify-between"
-            >
-              <div className="flex flex-col">
-                <span className="font-bold">{p.name}</span>
-                <span className="text-[10px] text-muted-foreground">{p.role}</span>
-              </div>
-              {currentName === p.name && <Check className="w-3 h-3 text-primary" />}
-            </CommandItem>
-          ))}
+          {filtered.map(p => {
+             const pPresence = getComputedPresence(p);
+             const pStatusDot = (
+               <div className={cn(
+                 "w-1.5 h-1.5 rounded-full shrink-0",
+                 pPresence === "leaving" ? "bg-amber-500" : 
+                 pPresence === "returning" ? "bg-blue-500" : "bg-green-500"
+               )} />
+             );
+             
+             return (
+              <CommandItem 
+                key={p.name} 
+                value={p.name}
+                onSelect={() => { onSwap(p.name); setOpen(false); }}
+                className="flex items-center justify-between py-2 px-3 border-b border-border/40 last:border-0"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0 text-right" dir="rtl">
+                  {pStatusDot}
+                  <span className="font-bold truncate text-sm">{p.name}</span>
+                  <span className="text-[10px] text-muted-foreground mr-auto bg-muted/50 px-1.5 py-0.5 rounded shrink-0">
+                    {p.role}
+                  </span>
+                </div>
+                {currentName === p.name && <Check className="w-3 h-3 text-primary ml-2 shrink-0" />}
+              </CommandItem>
+            );
+          })}
         </CommandGroup>
       </CommandList>
     </Command>
   );
 
+  const trigger = (
+    <button className={cn(
+      "flex items-center gap-1.5 hover:text-primary transition-colors text-right group",
+      (!currentName || currentName === "") && "text-muted-foreground italic font-normal"
+    )}>
+      {statusDot}
+      <span className="text-sm font-bold truncate max-w-[120px]">
+        {currentName || "בחר..."}
+      </span>
+      <ChevronDown className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+    </button>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          {trigger}
+        </DrawerTrigger>
+        <DrawerContent className="px-0 pb-4 max-h-[60vh] w-full max-w-[420px] mx-auto rounded-t-[2rem]">
+          <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-muted mb-4 mt-2" />
+          <DrawerHeader className="pb-2 px-4 flex items-center justify-between space-y-0 text-right">
+            <DrawerTitle className="text-right w-full text-base font-black">בחירת חייל לשיבוץ</DrawerTitle>
+            <DrawerClose asChild>
+                <button className="p-2 rounded-full hover:bg-muted ml-2"><X className="w-4 h-4"/></button>
+            </DrawerClose>
+          </DrawerHeader>
+          <div className="flex-1 overflow-hidden">
+            {content}
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn(
-          "flex items-center gap-1.5 hover:text-primary transition-colors text-right group",
-          (!currentName || currentName === "") && "text-muted-foreground italic font-normal"
-        )}>
-          {statusDot}
-          <span className="text-sm font-bold truncate max-w-[120px]">
-            {currentName || "בחר..."}
-          </span>
-          <ChevronDown className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />
-        </button>
+        {trigger}
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-[200px]" align="start">
+      <PopoverContent className="p-0 w-[220px]" align="start">
         {content}
       </PopoverContent>
     </Popover>
