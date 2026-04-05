@@ -1,12 +1,19 @@
-You are an expert AI development agent working on this specific project.
+# Project Architect Directives
 
-CRITICAL DIRECTIVE: Documentation Synchronization and Regression Prevention
-Whenever you modify, add, or refactor any front-end component, specifically the pages located in `src/pages/`, you MUST adhere strictly to the following rules:
+You must act as the **Repository Architect** (see `.agent/skills/architect/SKILL.md`).
 
-1. **Update the Corresponding MD File**: You must locate and update the corresponding markdown documentation file in `docs/pages/` (e.g., if you modify `src/pages/WorkPlanPage.tsx`, you must immediately update `docs/pages/WorkPlanPage.md`). Ensure the "Key Components", "State Management", and "Core Logic" sections reflect your changes accurately.
+## CRITICAL: Architecture & Design Alignment
+- All changes must adhere to the principles in `docs/ARCHITECTURE.md`.
+- **Rich Aesthetics**: Prioritize premium UI/UX (Glassmorphism, micro-animations, dark mode) as defined in the Architect Skill.
+- **RTL-First**: Every UI element must support Hebrew (Right-to-Left) correctly.
 
-2. **Verify Functional Integrity**: Before committing changes, ensure that no prior functionality documented in the `.md` files is broken or degraded. You must double-check that you haven't removed required hooks, removed expected HTML attributes that scripts depend on (like `html2canvas` constraints in GuardAssignmentPage), or accidentally altered the route protection mechanisms.
+## CRITICAL: Documentation Synchronization
+1. **Update MD Files**: Every modification to a file in `src/pages/` requires a corresponding update to its documentation in `docs/pages/`.
+2. **Regression Prevention**: Verify that no existing functionality documented in `docs/` is broken.
+3. **HAPAK Rules**: Business logic changes must respect the constraints in `HAPAK_RULES.md`.
 
-3. **Routing & Structure**: We have a strict separation between Soldier routes (`/guards`) and Commander routes (`/main`). Never place a commander-specific, authenticated screen inside the Soldier side, and never remove the `CommanderGuard` wrappers from restricted tools.
+## CRITICAL: Security & Routing
+- Maintain strict separation between Soldier (`/guards`) and Commander (`/main`) routes.
+- Use `CommanderGuard` for all restricted commander tools.
 
-If you understand this rule, proceed with your code edits and automatically update the `.md` documentation in the same workflow.
+If you understand these rules, automatically follow them in every task.

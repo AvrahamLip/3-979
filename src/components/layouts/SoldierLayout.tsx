@@ -54,6 +54,7 @@ export default function SoldierLayout() {
                 <Phone className="w-4 h-4" />
                 <span>טלפונים</span>
               </NavLink>
+              {/*
               <NavLink
                 to="/guards/vacation"
                 className={({ isActive }) =>
@@ -68,6 +69,7 @@ export default function SoldierLayout() {
                 <Palmtree className="w-4 h-4 text-accent" />
                 <span>תוכנית חופשים</span>
               </NavLink>
+              */}
             </nav>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -116,6 +118,7 @@ export default function SoldierLayout() {
                 <Phone className="w-5 h-5" />
                 <span>טלפונים</span>
               </NavLink>
+              {/*
               <NavLink
                 to="/guards/vacation"
                 onClick={() => setMobileMenuOpen(false)}
@@ -129,6 +132,7 @@ export default function SoldierLayout() {
                 <Palmtree className="w-5 h-5 text-accent" />
                 <span>תוכנית חופשים</span>
               </NavLink>
+              */}
             </nav>
           )}
         </div>
