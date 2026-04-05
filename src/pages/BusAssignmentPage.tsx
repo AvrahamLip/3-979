@@ -484,7 +484,7 @@ export default function BusAssignmentPage() {
           </div>
           <div>
             <h1 className="text-xl font-black">שיבוץ מפקדים וניוד</h1>
-            <p className="text-xs text-muted-foreground">ניהול חפ"קים ומחלקות יומי</p>
+            <p className="text-xs text-muted-foreground font-black">ניהול חפ"קים ומחלקות יומי (תקף מהשעה 18:00)</p>
           </div>
         </div>
         
@@ -536,7 +536,13 @@ export default function BusAssignmentPage() {
           {/* Export-only header */}
           <div className={cn("hidden mb-8 border-b-4 border-primary pb-4", isExporting && "block")}>
             <h1 className="text-4xl font-black text-primary">שיבוץ מפקדים וניוד</h1>
-            <p className="text-xl text-muted-foreground font-bold">תאריך: {date.split('-').reverse().join('/')}</p>
+            <p className="text-xl text-muted-foreground font-bold">טווח: {(() => {
+              const d1 = date.split('-').reverse().slice(0, 2).join('/');
+              const nextDateObj = new Date(date);
+              nextDateObj.setDate(nextDateObj.getDate() + 1);
+              const d2 = nextDateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+              return `${d1} - ${d2}`;
+            })()}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
