@@ -302,7 +302,7 @@ function PersonnelSwap({
 // ─── Main Page Component ──────────────────────────────────────────────────────
 
 export default function BusAssignmentPage() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [date, setDate] = useState(getTodayIso());
   
   const { data, isLoading, isError, error, refetch, isFetching } = useMainAttendance(date);
@@ -502,16 +502,18 @@ export default function BusAssignmentPage() {
             {isFetching ? "מרענן..." : "רענן נתונים"}
           </Button>
 
-          <Button 
-            variant={isSaved ? "outline" : "default"} 
-            size="sm" 
-            onClick={handleSave}
-            disabled={isSaving}
-            className={cn("rounded-xl h-10", !isSaved && "animate-pulse-subtle")}
-          >
-            <Save className="w-4 h-4 ml-2" />
-            {isSaving ? "שומר..." : "שמור שיבוץ"}
-          </Button>
+          {isAuthenticated && (
+            <Button 
+              variant={isSaved ? "outline" : "default"} 
+              size="sm" 
+              onClick={handleSave}
+              disabled={isSaving}
+              className={cn("rounded-xl h-10", !isSaved && "animate-pulse-subtle")}
+            >
+              <Save className="w-4 h-4 ml-2" />
+              {isSaving ? "שומר..." : "שמור שיבוץ"}
+            </Button>
+          )}
 
           <Button 
             variant="secondary" 
@@ -569,7 +571,7 @@ export default function BusAssignmentPage() {
                                  currentName={h.assignedTo}
                                  allPersonnel={data || []}
                                  onSwap={(v) => updateHapak(h.id, h.name, v)}
-                                 readonly={isExporting}
+                                 readonly={isExporting || !isAuthenticated}
                                />
                              </div>
                            </div>
@@ -601,7 +603,7 @@ export default function BusAssignmentPage() {
                           allPersonnel={data || []}
                           filterDept={`מחלקה ${p.id}`}
                           onSwap={(v) => updatePlatoonCmd(p.id, v)}
-                          readonly={isExporting}
+                          readonly={isExporting || !isAuthenticated}
                         />
                       </div>
                     </div>
@@ -618,7 +620,7 @@ export default function BusAssignmentPage() {
                                 allPersonnel={data || []}
                                 filterDept={`מחלקה ${p.id}`}
                                 onSwap={(v) => updateTeam(p.id, t.id, "commander", v)}
-                                readonly={isExporting}
+                                readonly={isExporting || !isAuthenticated}
                               />
                             </div>
                           </div>
@@ -632,7 +634,7 @@ export default function BusAssignmentPage() {
                                   allPersonnel={data || []}
                                   filterDept={`מחלקה ${p.id}`}
                                   onSwap={(v) => updateTeam(p.id, t.id, "soldier", v, sIdx)}
-                                  readonly={isExporting}
+                                  readonly={isExporting || !isAuthenticated}
                                 />
                               </div>
                             ))}
@@ -644,7 +646,7 @@ export default function BusAssignmentPage() {
                                 allPersonnel={data || []}
                                 filterDept={`מחלקה ${p.id}`}
                                 onSwap={(v) => updateTeam(p.id, t.id, "medic", v)}
-                                readonly={isExporting}
+                                readonly={isExporting || !isAuthenticated}
                               />
                             </div>
                           </div>

@@ -65,14 +65,7 @@ const App = () => (
                   </CommanderGuard>
                 } 
               />
-              <Route 
-                path="bus" 
-                element={
-                  <CommanderGuard requiredRoll="guard">
-                    <BusAssignmentPage />
-                  </CommanderGuard>
-                } 
-              />
+              <Route path="bus" element={<BusAssignmentPage />} />
             </Route>
           </Routes>
         </HashRouter>
