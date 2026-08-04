@@ -55,7 +55,7 @@
             {
               "id": "email-check",
               "leftValue": "={{ $json.email }}",
-              "rightValue": "YOUR_ALLOWED_EMAIL_HERE",
+              "rightValue": "lip.avi@gmail.com",
               "operator": {
                 "type": "string",
                 "operation": "equals"
@@ -77,10 +77,11 @@
     },
     {
       "parameters": {
-        "httpCode": "403",
-        "responseMode": "onNode",
+        "respondWith": "json",
         "responseBody": "{\"authorized\": false, \"error\": \"Unauthorized email address\"}",
-        "options": {}
+        "options": {
+          "responseCode": 403
+        }
       },
       "id": "unauthorized-response",
       "name": "Unauthorized Response",
