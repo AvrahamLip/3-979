@@ -1,0 +1,186 @@
+{
+  "name": "Auth - Validate Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "validate",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "0669a688-d858-4a87-b188-d7893468efb1",
+      "name": "Webhook Validate",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2656,
+        2208
+      ],
+      "webhookId": "52e30c18-ac98-4013-9de6-a6a3d4c3d3d1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "email-check",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "={{ $('Webhook Validate').item.json.body.email }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "69ed24eb-433c-4f1e-9952-c02980b52624",
+              "leftValue": "={{ $('Webhook Validate').item.json.body.role }}",
+              "rightValue": "={{ $json.roll }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0c18d510-da1e-4304-b768-58e6e94c8b9a",
+      "name": "Check Whitelist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -2240,
+        1984
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { authorized: false, error: 'Unauthorized email address' } }}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "24be78e2-d455-469c-bd7c-652b09ec9b48",
+      "name": "Unauthorized Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -1952,
+        2352
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { authorized: true, email: .body.email, roll: .body.roll } }}",
+        "options": {}
+      },
+      "id": "112afb0f-ce7c-4848-bd38-31387691e109",
+      "name": "Respond with Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -1952,
+        2144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "acF8dbsbNNLeMq8F",
+          "mode": "list",
+          "cachedResultName": "emails",
+          "cachedResultUrl": "/projects/Vk5zqfZ0nXjMbcAF/datatables/acF8dbsbNNLeMq8F"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{ $json.body.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2432,
+        2112
+      ],
+      "id": "6f5110a5-bc03-4d86-b6e0-92165ad1761d",
+      "name": "Get row(s)"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Validate": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Whitelist": {
+      "main": [
+        [
+          {
+            "node": "Respond with Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unauthorized Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Check Whitelist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "b7e2cf66-2b62-4527-ab5f-9248b0eb8377",
+  "meta": {
+    "instanceId": "3d58c928056a8a686ed6f51eff3debe7d6dc6b96afa5deea546dcfb5b172f4fa"
+  },
+  "nodeGroups": [],
+  "id": "Ueh9PK0WNRqJgroi",
+  "tags": []
+}
