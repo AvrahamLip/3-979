@@ -78,7 +78,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\"authorized\": false, \"error\": \"Unauthorized email address\"}",
+        "responseBody": "={{ { authorized: false, error: 'Unauthorized email address' } }}",
         "options": {
           "responseCode": 403
         }
@@ -95,7 +95,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\"authorized\": true, \"email\": \"{{ $json.body.email }}\"}",
+        "responseBody": "={{ { authorized: true, email: $json.body.email } }}",
         "options": {}
       },
       "id": "success-response",
