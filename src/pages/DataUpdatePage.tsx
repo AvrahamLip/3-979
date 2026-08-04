@@ -82,7 +82,8 @@ export default function DataUpdatePage() {
         body: JSON.stringify({
           name,
           status: newStatus === "empty" ? "" : newStatus,
-          date: formatDateForApi(date)
+          date: formatDateForApi(date),
+          email: user?.email
         })
       });
 

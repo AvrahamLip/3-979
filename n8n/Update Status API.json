@@ -429,7 +429,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -160,
+        -50,
         80
       ],
       "id": "970a0182-8fad-4b49-873f-0569aa2e0e7c",
@@ -823,6 +823,56 @@
       ],
       "id": "a5f44104-2d29-4f2c-b7af-1f863b0b8968",
       "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "email-check",
+              "leftValue": "={{ .body.email }}",
+              "rightValue": "lip.avi@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "check-whitelist-update",
+      "name": "Check Whitelist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -250,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { authorized: false, error: 'Unauthorized email address' } }}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "unauthorized-response-update",
+      "name": "Unauthorized Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -50,
+        200
+      ]
     }
   ],
   "pinData": {},
@@ -992,7 +1042,7 @@
       "main": [
         [
           {
-            "node": "Format Data",
+            "node": "Check Whitelist",
             "type": "main",
             "index": 0
           }
@@ -1048,6 +1098,24 @@
         [
           {
             "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Whitelist": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unauthorized Response",
             "type": "main",
             "index": 0
           }
