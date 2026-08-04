@@ -76,15 +76,19 @@ export default function DataUpdatePage() {
     setUpdatingId(updateId);
     
     try {
+      console.log(`Sending update for ${name} on ${date} to ${newStatus}`);
+      const payload = {
+        name,
+        status: newStatus === "empty" ? "" : newStatus,
+        date: formatDateForApi(date),
+        email: user?.email
+      };
+      console.log("Update Payload:", payload);
+
       const res = await fetch(UPDATE_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          status: newStatus === "empty" ? "" : newStatus,
-          date: formatDateForApi(date),
-          email: user?.email
-        })
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
