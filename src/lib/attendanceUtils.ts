@@ -74,9 +74,9 @@ export function getTodayIso(): string {
 
 export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
   return raw
-    .filter((r) => r.name && r.name.trim() !== "")
+    .filter((r) => r.name && String(r.name).trim() !== "")
     .map((r) => ({
-      name: r.name ? r.name.trim() : "",
+      name: r.name ? String(r.name).trim() : "",
       department: (r.department ?? "").trim(),
       role: (r.role ?? "").trim(),
       personalNumber: String(r.personalNumber ?? ""),

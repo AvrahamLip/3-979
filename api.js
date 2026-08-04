@@ -22,7 +22,7 @@ export async function fetchReport(isoDate) {
   const dateParam = formatDateForApi(isoDate);
   const url = `${WEBHOOK_URL}?date=${dateParam}`;
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -43,7 +43,7 @@ export async function fetchReportById(id, isoDate) {
   const dateParam = formatDateForApi(isoDate);
   const url = `${ZAMA_WEBHOOK_URL}?id=${encodeURIComponent(id)}&date=${dateParam}`;
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

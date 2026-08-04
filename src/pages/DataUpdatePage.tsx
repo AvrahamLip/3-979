@@ -60,10 +60,10 @@ export default function DataUpdatePage() {
   );
 
   const filtered = useMemo(() => {
-    let out = records.filter(r => r.name && r.name.trim() !== "");
+    let out = records.filter(r => r.name && String(r.name).trim() !== "");
     if (search) {
       const q = search.toLowerCase();
-      out = out.filter(r => r.name.toLowerCase().includes(q) || r.role.toLowerCase().includes(q));
+      out = out.filter(r => String(r.name).toLowerCase().includes(q) || String(r.role).toLowerCase().includes(q));
     }
     if (deptFilter) {
       out = out.filter(r => r.department === deptFilter);
