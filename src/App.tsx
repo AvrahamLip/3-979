@@ -6,7 +6,7 @@ import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import SoldierLayout from "./components/layouts/SoldierLayout";
 import CommanderLayout from "./components/layouts/CommanderLayout";
 import MainPage from "./pages/MainPage";
-import ZamaPage from "./pages/ZamaPage";
+// import ZamaPage from "./pages/ZamaPage";
 import WorkPlanPage from "./pages/WorkPlanPage";
 import GuardAssignmentPage from "./pages/GuardAssignmentPage";
 import ContactPage from "./pages/ContactPage";
@@ -46,7 +46,7 @@ const App = () => (
             {/* Commander System */}
             <Route path="/main" element={<CommanderLayout />}>
               <Route index element={<MainPage />} />
-              <Route path="zama" element={<ZamaPage />} />
+              {/* <Route path="zama" element={<ZamaPage />} /> */}
               <Route path="workplan" element={<WorkPlanPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route 

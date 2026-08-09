@@ -49,7 +49,7 @@ export default function CommanderLayout() {
                 <FileText className="w-4 h-4" />
                 <span>דוח נוכחות</span>
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 to="/main/zama"
                 className={({ isActive }) =>
                   cn(
@@ -62,7 +62,7 @@ export default function CommanderLayout() {
               >
                 <Truck className="w-4 h-4" />
                 <span>צמ&quot;ה</span>
-              </NavLink>
+              </NavLink> */}
               <NavLink
                 to="/main/workplan"
                 className={({ isActive }) =>
@@ -180,7 +180,7 @@ export default function CommanderLayout() {
                 <FileText className="w-5 h-5" />
                 <span>דוח נוכחות</span>
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 to="/main/zama"
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
@@ -192,7 +192,7 @@ export default function CommanderLayout() {
               >
                 <Truck className="w-5 h-5" />
                 <span>צמ&quot;ה</span>
-              </NavLink>
+              </NavLink> */}
               <NavLink
                 to="/main/workplan"
                 onClick={() => setMobileMenuOpen(false)}
