@@ -235,6 +235,26 @@ function generateAssignment(
         continue;
       }
 
+      // Ensure Commander is Raz Hayun
+      const razNorm = normalizeNameStr("רז חיון");
+      const razRecord = presentTeam.find(p => normalizeNameStr(p.name) === razNorm);
+      
+      let commanderName = "רז חיון";
+      if (razRecord && !assignedNames.has(razNorm)) {
+        assignedNames.add(razNorm);
+        commanderName = razRecord.name.trim();
+      } else {
+        assignedNames.add(razNorm);
+      }
+
+      hapakAssignments.push({
+        id: mission.id,
+        memberIndex: currentMemberIndex++,
+        name: `חפ"ק ${mission.name} - מפקד`,
+        assignedTo: commanderName,
+        points: POINTS.HAPAK,
+      });
+
       for (const p of presentTeam) {
         const norm = normalizeNameStr(p.name);
         if (!assignedNames.has(norm)) {
@@ -682,25 +702,55 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   };
 
   const handleExportImage = async () => {
-    if (!assignments || !assignments.guards || assignments.guards.length === 0) {
+    if (!assignments) {
       toast.error("אין נתוני שמירות לייצוא.");
       return;
     }
+    const hasMissions = assignments.missions && assignments.missions.length > 0;
+    const hasChamal = assignments.chamal && assignments.chamal.length > 0;
+    
+    if (!hasMissions && !hasChamal) {
+      toast.error("אין נתוני שמירות לייצוא.");
+      return;
+    }
+    
     try {
       setIsExporting(true);
       toast.info("מכין תמונת שמירות להורדה...");
 
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d')!;
-      const scale = 3; // higher DPI for sharp mobile screens
-      const W = 390; // mobile-friendly width (iPhone standard)
+      const scale = 3;
+      const W = 390;
       const PAD = 14;
-      const ROW_H = 46;
+      const ROW_H = 38;
+      const MISSION_GAP = 12;
       const TITLE_H = 56;
-      const TABLE_HEADER_H = 40;
+      const SUBTITLE_H = 38;
+      const HEADER_H = TITLE_H + 10;
 
-      const rows = assignments.guards;
-      const totalH = TITLE_H + PAD / 2 + TABLE_HEADER_H + rows.length * ROW_H + PAD;
+      const groups: { name: string; rows: { name: string; assignedTo: string }[] }[] = [];
+      
+      if (hasChamal) {
+        groups.push({
+          name: "חמ\"ל",
+          rows: assignments.chamal.map(c => ({ name: c.timeLabel, assignedTo: c.assignedTo }))
+        });
+      }
+      if (hasMissions) {
+        assignments.missions.forEach(m => {
+          groups.push({
+            name: `עמדה - ${m.postType}`,
+            rows: m.slots.map(s => ({ name: s.roleLabel, assignedTo: s.assignedTo }))
+          });
+        });
+      }
+
+      let totalH = HEADER_H + PAD;
+      for (const g of groups) {
+        totalH += SUBTITLE_H + g.rows.length * ROW_H + MISSION_GAP;
+      }
+      totalH += PAD;
 
       canvas.width = W * scale;
       canvas.height = totalH * scale;
@@ -709,7 +759,6 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, W, totalH);
 
-      // Title bar
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, W, TITLE_H);
       ctx.fillStyle = '#ffffff';
@@ -718,46 +767,44 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       ctx.direction = 'rtl';
       const dateRange = formatDateRange(date);
 
-      ctx.fillText(`לו"ז שמירות - ${dateRange}`, W - PAD, TITLE_H / 2 + 8);
+      ctx.fillText(`לו"ז עמדות וחמ"ל - ${dateRange}`, W - PAD, TITLE_H / 2 + 8);
 
-      // Table header
-      let y = TITLE_H + PAD / 2;
-      ctx.fillStyle = '#e8eeff';
-      ctx.fillRect(0, y, W, TABLE_HEADER_H);
-      ctx.fillStyle = '#333';
-      ctx.font = 'bold 15px Arial';
-      ctx.textAlign = 'right';
-      ctx.fillText('שומר', W - PAD, y + TABLE_HEADER_H / 2 + 5);
-      ctx.textAlign = 'left';
-      ctx.fillText('שעה', PAD, y + TABLE_HEADER_H / 2 + 5);
-      y += TABLE_HEADER_H;
+      let y = HEADER_H + PAD;
 
-      for (let i = 0; i < rows.length; i++) {
-        const g = rows[i];
-        ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#f7f8fa';
-        ctx.fillRect(0, y, W, ROW_H);
-
-        // Time (left side)
-        ctx.fillStyle = '#555';
-        ctx.font = '14px monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText(g.time, PAD, y + ROW_H / 2 + 5);
-
-        // Name (right side)
-        ctx.fillStyle = g.name ? '#1a1a2e' : '#bbb';
-        ctx.font = g.name ? 'bold 16px Arial' : '14px Arial';
+      for (const group of groups) {
+        ctx.fillStyle = '#e8eeff';
+        ctx.fillRect(PAD / 2, y - 2, W - PAD, SUBTITLE_H);
+        ctx.fillStyle = '#1a1a2e';
+        ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'right';
-        ctx.fillText(g.name || '(לא שובץ)', W - PAD, y + ROW_H / 2 + 5);
+        ctx.fillText(group.name, W - PAD, y + SUBTITLE_H / 2 + 5);
+        y += SUBTITLE_H + 4;
 
-        // Border
-        ctx.strokeStyle = '#e5e7eb';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(0, y + ROW_H);
-        ctx.lineTo(W, y + ROW_H);
-        ctx.stroke();
+        for (const row of group.rows) {
+          const isOdd = group.rows.indexOf(row) % 2 !== 0;
+          ctx.fillStyle = isOdd ? '#f5f5f5' : '#ffffff';
+          ctx.fillRect(PAD / 2, y, W - PAD, ROW_H);
 
-        y += ROW_H;
+          ctx.fillStyle = '#666';
+          ctx.font = '13px Arial';
+          ctx.textAlign = 'right';
+          ctx.fillText(row.name, W - PAD, y + ROW_H / 2 + 5);
+
+          ctx.fillStyle = row.assignedTo ? '#1a1a2e' : '#aaa';
+          ctx.font = row.assignedTo ? 'bold 14px Arial' : '13px Arial';
+          ctx.textAlign = 'left';
+          ctx.fillText(row.assignedTo || '(לא שובץ)', PAD, y + ROW_H / 2 + 5);
+
+          ctx.strokeStyle = '#e5e7eb';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(PAD / 2, y + ROW_H);
+          ctx.lineTo(W - PAD / 2, y + ROW_H);
+          ctx.stroke();
+
+          y += ROW_H;
+        }
+        y += MISSION_GAP;
       }
 
       const dataUrl = canvas.toDataURL('image/png');
