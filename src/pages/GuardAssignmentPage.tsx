@@ -284,6 +284,29 @@ function generateAssignment(
       }
     }
 
+    // ─── 5. הוספת חיילים פנויים נוספים לפילבוקס ──────────────────────────────
+    const unassignedSoldiers = records.filter(p => {
+      const norm = normalizeNameStr(p.name);
+      if (assignedNames.has(norm)) return false;
+      const pres = getPresenceFor(p);
+      const rawValue = String(p.todayValue || "").trim();
+      return (pres !== "none" && pres !== "leaving") || rawValue === "";
+    }).sort((a, b) => {
+      const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+      const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+      return aScore - bScore;
+    });
+
+    let extraIndex = 1;
+    for (const p of unassignedSoldiers) {
+      assignedNames.add(normalizeNameStr(p.name));
+      pilboxSlots.push({
+        roleLabel: `חייל נוסף ${extraIndex++}`,
+        requiredRole: null,
+        assignedTo: p.name.trim()
+      });
+    }
+
     return { hapak: hapakAssignments, chamal, missions };
   } catch (error) {
     console.error("Critical error in generateAssignment:", error);
