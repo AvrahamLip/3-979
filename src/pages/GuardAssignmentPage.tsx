@@ -35,11 +35,21 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface GuardShift {
-  hour: number;
-  time: string;
-  name: string;
-  points: number;
+interface ChamalShift {
+  shiftIndex: 0 | 1 | 2;
+  timeLabel: string;
+  assignedTo: string;
+}
+
+interface MissionSlot {
+  roleLabel: string;
+  requiredRole: string | null;
+  assignedTo: string;
+}
+
+interface MissionPost {
+  postType: "יזומה" | "פילבוקס";
+  slots: MissionSlot[];
 }
 
 interface HapakMission {
@@ -52,29 +62,47 @@ interface HapakMission {
 
 interface AssignmentData {
   hapak: HapakMission[];
-  guards: GuardShift[];
+  chamal: ChamalShift[];
+  missions: MissionPost[];
 }
 
 type PersonnelPoints = Record<string, number>;
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
-
-const GUARD_RELEVANT_ROLES = ["חייל", "מ\"כ", "חובש", "אוכלוסיה", "אנוח", "מפקד"];
-const GUARD_EXCLUDED_ROLES = ["סמל", "סמ\"ל", "סמר", "סמ\"ר"];
-
 const HAPAK_MISSIONS = [
-  { id: 1, name: "מ\"פ", key: "מפ" },
-  { id: 2, name: "1ג", key: "1ג" },
-  { id: 3, name: "2ג", key: "2ג" },
-  { id: 4, name: "3ג", key: "3ג" },
-  { id: 5, name: "אנו\"ח", key: "אנוח" }
+  { id: 1, name: "מ\"פ", key: "מפ" }
+];
+
+const CHAMAL_SHIFTS: { shiftIndex: 0 | 1 | 2; timeLabel: string; points: number }[] = [
+  { shiftIndex: 0, timeLabel: "00:00 – 08:00", points: 2 },
+  { shiftIndex: 1, timeLabel: "08:00 – 16:00", points: 1 },
+  { shiftIndex: 2, timeLabel: "16:00 – 00:00", points: 1 },
+];
+
+const IZUMA_SLOTS = [
+  { roleLabel: "מפקד", roleFilter: "מפקד", points: 1 },
+  { roleLabel: "נהג",   roleFilter: "נהג",   points: 1 },
+  { roleLabel: "רחפן", roleFilter: "רחפן", points: 1 },
+  { roleLabel: "חייל", roleFilter: "חייל", points: 1 },
+];
+
+const PILBOX_SLOTS = [
+  { roleLabel: "סמל",    roleFilter: "סמ",   points: 1 },
+  { roleLabel: "מפקד",  roleFilter: "מפקד", points: 1 },
+  { roleLabel: "נהג",   roleFilter: "נהג",  points: 1 },
+  { roleLabel: "חייל 1", roleFilter: "חייל", points: 1 },
+  { roleLabel: "חייל 2", roleFilter: "חייל", points: 1 },
+  { roleLabel: "חייל 3", roleFilter: "חייל", points: 1 },
+  { roleLabel: "חייל 4", roleFilter: "חייל", points: 1 },
+  { roleLabel: "חייל 5", roleFilter: "חייל", points: 1 },
 ];
 
 const POINTS = {
   HAPAK: 3,
-  NIGHT_GUARD: 2, // 00:00 - 08:00
-  DAY_GUARD: 1    // 08:00 - 00:00
+  CHAMAL_NIGHT: 2,
+  CHAMAL_DAY: 1,
+  MISSION: 1,
 };
 
 const STORAGE_KEY = "guard_burden_points";
@@ -82,332 +110,161 @@ const BLOCKED_STORAGE_KEY = "guard_blocked_names";
 
 // ─── Logic ────────────────────────────────────────────────────────────────────
 
-function getPointsForHour(hour: number): number {
-  return (hour >= 0 && hour < 8) ? POINTS.NIGHT_GUARD : POINTS.DAY_GUARD;
-}
-
 const getYesterdayIso = (dateStr: string) => {
   const d = new Date(dateStr);
   d.setDate(d.getDate() - 1);
   return d.toISOString().split('T')[0];
 };
 
-function generateAssignment(records: AttendanceRecord[], history: PersonnelPoints, hapakRows: any[], blockedNames: Set<string>, date: string, yesterdayGuards: GuardShift[] = [], yesterdayRecords: AttendanceRecord[] = []): AssignmentData {
+function generateAssignment(
+  records: AttendanceRecord[],
+  history: PersonnelPoints,
+  hapakRows: any[],
+  blockedNames: Set<string>,
+  date: string,
+  previousAssignment: AssignmentData | null = null,
+  yesterdayRecords: AttendanceRecord[] = []
+): AssignmentData {
 
   try {
     if (!records) records = [];
     if (!hapakRows) hapakRows = [];
-    
-    const hapakAssignments: HapakMission[] = [];
+
     const assignedNames = new Set<string>(blockedNames);
 
-    const rows = (Array.isArray(hapakRows) ? hapakRows : []).filter(r => r && typeof r === 'object');
+    const getPresenceFor = (p: AttendanceRecord | undefined) =>
+      getComputedPresence(p, yesterdayRecords);
+
+    const findRecord = (name: string) =>
+      records.find(r => normalizeNameStr(r.name) === normalizeNameStr(name));
+
+    const isPersonAvailable = (name: string): boolean => {
+      if (!name) return false;
+      const rec = findRecord(name);
+      if (!rec) return false;
+      const p = getPresenceFor(rec);
+      const rawValue = String(rec.todayValue || "").trim();
+      return (p !== "none" && p !== "leaving") || rawValue === "";
+    };
+
+    // Minimal-change: prefer keeping the previous assignment.
+    // Only replace if the person is no longer available.
+    const findBest = (roleFilter: string | null, preferName?: string): string => {
+      if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName))) {
+        return preferName;
+      }
+      const candidates = records
+        .filter(p => {
+          const role = (p.role || "").trim();
+          const norm = normalizeNameStr(p.name);
+          const pres = getPresenceFor(p);
+          const rawValue = String(p.todayValue || "").trim();
+          if ((pres === "none" || pres === "leaving") && rawValue !== "") return false;
+          if (assignedNames.has(norm)) return false;
+          if (roleFilter && !role.includes(roleFilter)) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+          const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+          return aScore - bScore;
+        });
+      return candidates[0]?.name || "";
+    };
+
+    // ─── 1. חמל – 3 משמרות × אדם אחד מוגדר "חמל" ────────────────────────
+    const chamal: ChamalShift[] = CHAMAL_SHIFTS.map(shift => {
+      const prev = previousAssignment?.chamal?.find(c => c.shiftIndex === shift.shiftIndex)?.assignedTo;
+      const assigned = findBest("חמל", prev);
+      if (assigned) assignedNames.add(normalizeNameStr(assigned));
+      return { shiftIndex: shift.shiftIndex, timeLabel: shift.timeLabel, assignedTo: assigned };
+    });
+
+    // ─── 2. יזומה – מפקד + נהג + רחפן + חייל ──────────────────────────────
+    const prevIzuma = previousAssignment?.missions?.find(m => m.postType === "יזומה");
+    const izumaSlots: MissionSlot[] = IZUMA_SLOTS.map((slot, i) => {
+      const prev = prevIzuma?.slots?.[i]?.assignedTo;
+      const assigned = findBest(slot.roleFilter, prev);
+      if (assigned) assignedNames.add(normalizeNameStr(assigned));
+      return { roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned };
+    });
+
+    // ─── 3. פילבוקס – סמל + מפקד + נהג + 5 חיילים ────────────────────────
+    const prevPilbox = previousAssignment?.missions?.find(m => m.postType === "פילבוקס");
+    const pilboxSlots: MissionSlot[] = PILBOX_SLOTS.map((slot, i) => {
+      const prev = prevPilbox?.slots?.[i]?.assignedTo;
+      const assigned = findBest(slot.roleFilter, prev);
+      if (assigned) assignedNames.add(normalizeNameStr(assigned));
+      return { roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned };
+    });
+
+    const missions: MissionPost[] = [
+      { postType: "יזומה",   slots: izumaSlots  },
+      { postType: "פילבוקס", slots: pilboxSlots },
+    ];
+
+    // ─── 4. חפ"ק – רק אם הצוות הרלוונטי נמצא ────────────────────────────
+    const hapakAssignments: HapakMission[] = [];
+
+    const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
+      const normalized = normalizeNameStr(name);
+      const p = records.find(r => normalizeNameStr(r.name) === normalized);
+      if (p && String(p.todayValue || "").trim() === "") return "full";
+      const pres = getPresenceFor(p);
+      return pres === "leaving" ? "none" : pres;
+    };
 
     for (const mission of HAPAK_MISSIONS) {
       let currentMemberIndex = 1;
-      
-      // 1. Mandatory Commander (All missions)
-      const commanderRow = rows.find(r => String(r["תפקיד"] || "").trim().includes("מפקד") && !String(r["תפקיד"] || "").includes("2"));
-      const commander2Row = rows.find(r => String(r["תפקיד"] || "").trim().includes("מפקד2"));
-      
-      let commanderName = "טרם שובץ";
-      
-      const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
-        const normalizedQuery = normalizeNameStr(name);
-        const p = records.find(r => normalizeNameStr(r.name) === normalizedQuery);
-        const presence = getComputedPresence(p, yesterdayRecords);
-        // If schedule starts at 18:00, anyone "leaving" today has already gone.
-        return presence === "leaving" ? "none" : presence;
-      };
 
-      if (commanderRow && commanderRow[mission.key]) {
-        const pureNameFromApi = String(commanderRow[mission.key]);
-        const nameFromApi = normalizeNameStr(pureNameFromApi);
-        const status = getStatus(nameFromApi);
-        
-        if (nameFromApi && nameFromApi !== "טרם שובץ" && status !== "none") {
-          commanderName = pureNameFromApi.trim();
-        }
-      }
-      
-      if (commanderName === "טרם שובץ" && commander2Row && commander2Row[mission.key]) {
-        const pureNameFromApi = String(commander2Row[mission.key]);
-        const nameFromApi = normalizeNameStr(pureNameFromApi);
-        if (nameFromApi && nameFromApi !== "טרם שובץ" && getStatus(nameFromApi) !== "none") {
-          commanderName = pureNameFromApi.trim();
-        }
-      }
-      
-      // Special logic for Anuh Commander if not in registry
-      if (mission.key === "אנוח" && commanderName === "טרם שובץ") {
-        const eligibleCommanders = records.filter(p => {
-          const dept = (p.department || "").trim();
-          const role = (p.role || "").trim();
-          const name = normalizeNameStr(p.name);
-          const presence = getComputedPresence(p, yesterdayRecords);
-          const isPresent = presence !== "none" && presence !== "leaving";
-          
-          return isPresent && 
-                 dept.includes("אנוח") && 
-                 (role.includes("קצין") || role.includes("סמל")) &&
-                 !assignedNames.has(name);
-        }).sort((a, b) => (a.burdenPoints || 0) + (history[a.name] || 0) - ((b.burdenPoints || 0) + (history[b.name] || 0)));
-
-        if (eligibleCommanders.length > 0) {
-          commanderName = eligibleCommanders[0].name;
-        }
-      }
-
-      if (commanderName && commanderName !== "טרם שובץ") {
-        assignedNames.add(normalizeNameStr(commanderName));
-      }
-      
-      const commanderStatus = commanderName !== "טרם שובץ" ? getStatus(commanderName) : "none";
-      const commanderSuffix = commanderStatus === "leaving" ? " (ביציאה)" : commanderStatus === "returning" ? " (בדרך חזרה)" : "";
-
-      hapakAssignments.push({
-        id: mission.id,
-        memberIndex: currentMemberIndex++,
-        name: `חפ"ק ${mission.name} - מפקד${commanderSuffix}`,
-        assignedTo: commanderName === "טרם שובץ" ? "" : commanderName,
-        points: POINTS.HAPAK
+      // Filter anyone who has "חפק" / "חפ"ק" in their role or department
+      const missionTeam = records.filter(r => {
+        const role = String(r.role || "").trim();
+        const dept = String(r.department || "").trim();
+        return role.includes("חפק") || role.includes("חפ\"ק") || dept.includes("חפק") || dept.includes("חפ\"ק");
       });
-
-      // 2. Specialists
-      const specialistCount = (mission.key === "מפ" || mission.key === "אנוח") ? 3 : 2;
-      let filledSpecialists = 0;
       
-      let hasLeavingInSlot = false;
-      let hasReturningInSlot = false;
+      const presentTeam = missionTeam.filter(r => getStatus(r.name) !== "none");
 
-      // MP Prioritization: Engineer
-      if (mission.key === "מפ") {
-        const engineerRow = rows.find(r => String(r["תפקיד"] || "").includes("מהנדס"));
-        if (engineerRow && engineerRow["מפ"]) {
-          const purePersonName = String(engineerRow["מפ"]);
-          const personName = normalizeNameStr(purePersonName);
-          if (personName && personName !== "" && personName !== "טרם שובץ") {
-            const finalStatus = getStatus(personName);
-            if (finalStatus !== "none" && !assignedNames.has(purePersonName.trim())) {
-              if (finalStatus === "full") filledSpecialists++;
-              else if (finalStatus === "leaving") { hasLeavingInSlot = true; filledSpecialists++; }
-              else if (finalStatus === "returning") { hasReturningInSlot = true; filledSpecialists++; }
-              
-              assignedNames.add(normalizeNameStr(purePersonName));
-              const personSuffix = finalStatus === "leaving" ? " (ביציאה)" : finalStatus === "returning" ? " (בדרך חזרה)" : "";
-              hapakAssignments.push({
-                id: mission.id,
-                memberIndex: currentMemberIndex++,
-                name: `חפ"ק ${mission.name} - מהנדס${personSuffix}`,
-                assignedTo: purePersonName.trim(),
-                points: POINTS.HAPAK
-              });
-            }
-          }
-        }
+      if (presentTeam.length === 0) {
+        hapakAssignments.push({
+          id: mission.id, memberIndex: 1,
+          name: `חפ"ק ${mission.name} - לא פעיל`,
+          assignedTo: "", points: 0,
+        });
+        continue;
       }
 
-      // Normal registry loop for specialists
-      for (const row of rows) {
-        const rolePattern = String(row["תפקיד"] || "").trim();
-        if (!rolePattern || rolePattern === "מפקד" || rolePattern === "מפקד חפ\"ק") continue; 
-        if (mission.key === "מפ" && rolePattern.includes("מהנדס")) continue;
-
-        if (filledSpecialists >= specialistCount) {
-          if (!(filledSpecialists === specialistCount && ((hasLeavingInSlot && !hasReturningInSlot) || (!hasLeavingInSlot && hasReturningInSlot)))) {
-            break;
-          }
-        }
-
-        const purePersonName = String(row[mission.key] || "");
-        const personName = normalizeNameStr(purePersonName);
-        if (personName && personName !== "" && personName !== "טרם שובץ") {
-          if ((rolePattern.includes("רופא") || rolePattern.includes("חובש")) && mission.key !== "מפ") {
-            const alreadyHasMedical = hapakAssignments.some(h => {
-              if (h.id !== mission.id) return false;
-              if (h.name.includes("רופא") || h.name.includes("חובש")) return true;
-              const person = records.find(p => normalizeNameStr(p.name) === normalizeNameStr(h.assignedTo));
-              return person && ((person.role || "").includes("רופא") || (person.role || "").includes("חובש"));
-            });
-            if (alreadyHasMedical) continue;
-          }
-
-          if (rolePattern.includes("מפקד2") && mission.key !== "מפ") {
-            const alreadyHasCommander = hapakAssignments.some(h => 
-              h.id === mission.id && h.assignedTo !== "" && (h.name.includes("מפקד") && !h.name.includes("מפקד2"))
-            );
-            if (alreadyHasCommander) continue;
-          }
-
-          const isSaturday = new Date(date).getDay() === 6;
-          if (rolePattern.includes("מהנדס") && isSaturday && mission.key === "1ג") continue;
-
-          const finalStatus = getStatus(personName);
-          const assignedOriginalName = purePersonName.trim();
-          
-          if (finalStatus !== "none" && !assignedNames.has(assignedOriginalName)) {
-            if (finalStatus === "full") filledSpecialists++;
-            else if (finalStatus === "leaving") {
-              if (hasReturningInSlot) hasReturningInSlot = false; 
-              else { hasLeavingInSlot = true; filledSpecialists++; }
-            } else if (finalStatus === "returning") {
-              if (hasLeavingInSlot) hasLeavingInSlot = false; 
-              else { hasReturningInSlot = true; filledSpecialists++; }
-            }
-
-            assignedNames.add(normalizeNameStr(assignedOriginalName));
-            const personSuffix = finalStatus === "leaving" ? " (ביציאה)" : finalStatus === "returning" ? " (בדרך חזרה)" : "";
-            hapakAssignments.push({
-              id: mission.id,
-              memberIndex: currentMemberIndex++,
-              name: `חפ"ק ${mission.name} - ${rolePattern}${personSuffix}`,
-              assignedTo: assignedOriginalName,
-              points: POINTS.HAPAK
-            });
-          }
-        }
-      }
-
-      // Anuh Specialist Auto-population
-      if (mission.key === "אנוח" && filledSpecialists < specialistCount) {
-        const eligibleSoldiers = records.filter(p => {
-          const dept = (p.department || "").trim();
-          const role = (p.role || "").trim();
-          const name = normalizeNameStr(p.name);
-          const v = String(p.todayValue || "").trim().toUpperCase();
-          const isPresent = v === "נ" || v === "1" || v === "V";
-          
-          return isPresent && 
-                 dept.includes("אנוח") && 
-                 !(role.includes("קצין") || role.includes("סמל")) &&
-                 !assignedNames.has(name);
-        }).sort((a, b) => (a.burdenPoints || 0) + (history[a.name] || 0) - ((b.burdenPoints || 0) + (history[b.name] || 0)));
-
-        for (let i = 0; i < Math.min(specialistCount - filledSpecialists, eligibleSoldiers.length); i++) {
-          const person = eligibleSoldiers[i];
-          const name = person.name.trim();
-          assignedNames.add(normalizeNameStr(name));
-          filledSpecialists++;
+      for (const p of presentTeam) {
+        const norm = normalizeNameStr(p.name);
+        if (!assignedNames.has(norm)) {
+          assignedNames.add(norm);
+          const pStatus = getStatus(p.name);
+          const suffix = pStatus === "returning" ? " (בדרך חזרה)" : "";
+          const roleLabel = (p.role && p.role.trim() !== "") ? p.role.trim() : "לוחם";
           hapakAssignments.push({
             id: mission.id,
             memberIndex: currentMemberIndex++,
-            name: `חפ"ק ${mission.name} - אנוח`,
-            assignedTo: name,
-            points: POINTS.HAPAK
+            name: `חפ"ק ${mission.name} - ${roleLabel}${suffix}`,
+            assignedTo: p.name.trim(),
+            points: POINTS.HAPAK,
           });
         }
       }
 
-      while (filledSpecialists < specialistCount) {
-         filledSpecialists++;
-         hapakAssignments.push({
-           id: mission.id,
-           memberIndex: currentMemberIndex++,
-           name: `חפ"ק ${mission.name} - עמדה ${currentMemberIndex - 1}`,
-           assignedTo: "",
-           points: POINTS.HAPAK
-         });
-      }
-    }
-
-    const localGenerationPoints: Record<string, number> = {};
-    const guardCandidates = records.filter(p => {
-      const role = (p.role || "").trim();
-      const isExcluded = GUARD_EXCLUDED_ROLES.some(ex => role.includes(ex));
-      if (isExcluded) return false;
-      return !assignedNames.has(normalizeNameStr(p.name)) && 
-             GUARD_RELEVANT_ROLES.some(included => role.includes(included));
-    });
-
-    const allShifts = [];
-    for (let i = 0; i < 24; i++) {
-      const hour = (i + 18) % 24; 
-      let time = `${String(hour).padStart(2, "0")}:00 - ${String((hour + 1) % 24).padStart(2, "0")}:00`;
-      
-      // בחצות לרשום את התאריך למנוע בלבול
-      if (hour === 0) {
-        const nextDay = new Date(date);
-        nextDay.setDate(nextDay.getDate() + 1);
-        const dayStr = nextDay.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-        time = `${time} (${formatDateShort(nextDay.toISOString().split('T')[0])})`;
-      }
-      
-      const isNight = hour >= 0 && hour < 8; 
-      allShifts.push({ hour, time, isNight, shiftPoints: getPointsForHour(hour), originalIndex: i });
-    }
-
-    const sortedShifts = [...allShifts].sort((a, b) => {
-      if (a.isNight && !b.isNight) return -1;
-      if (!a.isNight && b.isNight) return 1;
-      return a.originalIndex - b.originalIndex; 
-    });
-
-    const yesterdayNightGuards = new Set(yesterdayGuards.filter(g => g.hour >= 0 && g.hour < 8 && g.name).map(g => normalizeNameStr(g.name)));
-
-    const getShiftIndex = (h: number) => (h - 18 + 24) % 24;
-
-    const temporaryAssignmentsMap = new Map<number, GuardShift>();
-    for (const shift of sortedShifts) {
-      const hour = shift.hour;
-      const currentShiftIndex = getShiftIndex(hour);
-
-      const hourlyEligible = guardCandidates.filter(p => {
-         const normName = normalizeNameStr(p.name);
-         
-         const presence = getComputedPresence(p, yesterdayRecords);
-         const isAvailable = (presence === "full" || presence === "returning");
-         
-         if (!isAvailable) return false;
-
-         // 2. 12-Hour Gap Check (Yesterday)
-         const workedYesterday = yesterdayGuards.filter(yg => normalizeNameStr(yg.name) === normName);
-         for (const yg of workedYesterday) {
-            const yesterdayIndex = getShiftIndex(yg.hour);
-            const gap = (currentShiftIndex + 24) - yesterdayIndex;
-            if (gap < 12) return false;
-         }
-
-         // 3. 12-Hour Gap Check (Current Session)
-         for (const assignedShift of temporaryAssignmentsMap.values()) {
-            if (normalizeNameStr(assignedShift.name) === normName) {
-               const assignedIndex = getShiftIndex(assignedShift.hour);
-               const gap = Math.abs(currentShiftIndex - assignedIndex);
-               if (gap < 12) return false;
-            }
-         }
-
-         return true;
-      });
-
-
-      if (hourlyEligible.length > 0) {
-        const best = hourlyEligible.reduce((prev, curr) => {
-          const prevAssignments = Math.floor((localGenerationPoints[prev.name] || 0) / 1000);
-          const currAssignments = Math.floor((localGenerationPoints[curr.name] || 0) / 1000);
-          if (currAssignments < prevAssignments) return curr;
-          if (currAssignments > prevAssignments) return prev;
-          let prevScore = (prev.burdenPoints || 0) + (history[prev.name] || 0) + ((localGenerationPoints[prev.name] || 0) % 1000);
-          let currScore = (curr.burdenPoints || 0) + (history[curr.name] || 0) + ((localGenerationPoints[curr.name] || 0) % 1000);
-          if (shift.isNight) {
-            if (yesterdayNightGuards.has(normalizeNameStr(prev.name))) prevScore += 10000;
-            if (yesterdayNightGuards.has(normalizeNameStr(curr.name))) currScore += 10000;
-
-            const prevPresence = getComputedPresence(prev, yesterdayRecords);
-            const currPresence = getComputedPresence(curr, yesterdayRecords);
-            if (prevPresence === "returning") prevScore -= 3; // מוריד 3 נקודות כדי לתת עדיפות, אבל עדיין מתחשב בהיסטוריה גדולה
-            if (currPresence === "returning") currScore -= 3;
-          }
-          return currScore < prevScore ? curr : prev;
+      // Ensure at least 4 slots for the UI layout
+      while (currentMemberIndex <= 4) {
+        hapakAssignments.push({
+          id: mission.id,
+          memberIndex: currentMemberIndex++,
+          name: `חפ"ק ${mission.name} - עמדה ${currentMemberIndex - 1}`,
+          assignedTo: "",
+          points: POINTS.HAPAK,
         });
-        temporaryAssignmentsMap.set(hour, { hour, time: shift.time, name: best.name, points: shift.shiftPoints });
-        localGenerationPoints[best.name] = (localGenerationPoints[best.name] || 0) + shift.shiftPoints + 1000;
-      } else {
-        temporaryAssignmentsMap.set(hour, { hour, time: shift.time, name: "", points: shift.shiftPoints });
       }
     }
 
-    const guardAssignments: GuardShift[] = allShifts.map(s => temporaryAssignmentsMap.get(s.hour)!);
-    return { hapak: hapakAssignments, guards: guardAssignments };
+    return { hapak: hapakAssignments, chamal, missions };
   } catch (error) {
     console.error("Critical error in generateAssignment:", error);
     throw error;
@@ -422,10 +279,8 @@ function PersonnelSwap({
   onSwap,
   readonly,
   allowEmpty,
-  hour,
   type,
   currentAssignments,
-  yesterdayGuards = [],
   yesterdayRecords = []
 }: {
   currentName: string;
@@ -433,14 +288,11 @@ function PersonnelSwap({
   onSwap: (newName: string) => void;
   readonly?: boolean;
   allowEmpty?: boolean;
-  hour?: number;
   type: "hapak" | "guard";
   currentAssignments?: AssignmentData | null;
-  yesterdayGuards?: GuardShift[];
   yesterdayRecords?: AttendanceRecord[];
 }) {
   const [open, setOpen] = useState(false);
-  const getShiftIndex = (h: number) => (h - 18 + 24) % 24;
 
   const available = useMemo(() => {
     if (!allPersonnel || !Array.isArray(allPersonnel)) return [];
@@ -448,45 +300,29 @@ function PersonnelSwap({
       return allPersonnel
         .filter(p => {
           const presence = getComputedPresence(p, yesterdayRecords);
-          // 18:00 start: anyone "leaving" is already gone. Anyone "returning" is back.
-          if (presence === "none" || presence === "leaving") return false;
+          const rawValue = String(p.todayValue || "").trim();
+          if ((presence === "none" || presence === "leaving") && rawValue !== "") return false;
           return true;
         })
         .map(p => {
-          const normName = normalizeNameStr(p.name);
-          let gapConflict = false;
-          let gapHours = 0;
-
-          if (type === "guard" && hour !== undefined) {
-             const currentIndex = getShiftIndex(hour);
-             const workedYesterday = (yesterdayGuards || []).filter(yg => yg && yg.name && normalizeNameStr(yg.name) === normName);
-             for (const yg of workedYesterday) {
-                const yIndex = getShiftIndex(yg.hour);
-                const gap = (currentIndex + 24) - yIndex;
-                if (gap < 12) { gapConflict = true; gapHours = gap; }
-             }
-             if (currentAssignments && Array.isArray(currentAssignments.guards)) {
-                for (const g of currentAssignments.guards) {
-                   if (g && g.name && normalizeNameStr(g.name) === normName && g.hour !== hour) {
-                      const assignedIndex = getShiftIndex(g.hour);
-                      const gap = Math.abs(currentIndex - assignedIndex);
-                      if (gap < 12) { gapConflict = true; gapHours = gap; }
-                   }
-                }
-             }
-          }
-          return { ...p, gapConflict, gapHours };
+          const alreadyAssigned =
+            currentAssignments?.hapak?.some(h => normalizeNameStr(h.assignedTo) === normalizeNameStr(p.name)) ||
+            currentAssignments?.chamal?.some(c => normalizeNameStr(c.assignedTo) === normalizeNameStr(p.name)) ||
+            currentAssignments?.missions?.some(m => m.slots.some(s => normalizeNameStr(s.assignedTo) === normalizeNameStr(p.name)));
+          return { ...p, alreadyAssigned: alreadyAssigned && normalizeNameStr(p.name) !== normalizeNameStr(currentName) };
         })
         .sort((a, b) => {
-          if (a.gapConflict && !b.gapConflict) return 1;
-          if (!a.gapConflict && b.gapConflict) return -1;
+          if (a.alreadyAssigned && !b.alreadyAssigned) return 1;
+          if (!a.alreadyAssigned && b.alreadyAssigned) return -1;
           return (a.burdenPoints || 0) - (b.burdenPoints || 0);
         });
     } catch (err) {
       console.error("Error in PersonnelSwap available useMemo:", err);
       return [];
     }
-  }, [allPersonnel, hour, type, currentAssignments, yesterdayGuards]);
+  }, [allPersonnel, currentName, currentAssignments, yesterdayRecords]);
+
+
 
   const person = useMemo(() => (allPersonnel || []).find(p => p && p.name === currentName), [allPersonnel, currentName]);
   const presence = getComputedPresence(person, yesterdayRecords);
@@ -698,39 +534,27 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     if (!data || !assignments) return [];
     const assigned = new Set<string>();
     assignments.hapak.forEach(h => {
-      if (h.assignedTo && h.assignedTo !== "טרם שובץ" && h.assignedTo !== "לא מאויש") {
-        assigned.add(normalizeNameStr(h.assignedTo));
-      }
+      if (h.assignedTo && h.assignedTo !== "טרם שובץ") assigned.add(normalizeNameStr(h.assignedTo));
     });
-    assignments.guards.forEach(g => {
-      if (g.name) assigned.add(normalizeNameStr(g.name));
+    assignments.chamal.forEach(c => {
+      if (c.assignedTo) assigned.add(normalizeNameStr(c.assignedTo));
+    });
+    assignments.missions.forEach(m => {
+      m.slots.forEach(s => { if (s.assignedTo) assigned.add(normalizeNameStr(s.assignedTo)); });
     });
     blockedNames.forEach(name => assigned.add(normalizeNameStr(name)));
-    
+
     return data.filter(p => {
       const presence = getComputedPresence(p, yesterdayAttendanceData);
-      if (presence === "none" || presence === "leaving") return false;
-
+      const rawValue = String(p.todayValue || "").trim();
+      if ((presence === "none" || presence === "leaving") && rawValue !== "") return false;
       if (assigned.has(normalizeNameStr(p.name))) return false;
-
       const role = (p.role || "").trim();
-      
-      // Explicit Whitelist for manual assignment visibility
       const ELIGIBLE_ROLES = [
-        "חייל", 
-        "קצין", 
-        "סמל", 
-        "סמ\"ר", 
-        "סמ\"ל", 
-        "סמר", 
-        "מפקד", 
-        "חובש", 
-        "מהנדס", 
-        "אוכלוסיה", 
-        "אנוח", 
-        "שו\"ב"
+        "חייל", "קצין", "סמל", "סמ\"ר", "סמ\"ל", "סמר",
+        "מפקד", "חובש", "מהנדס", "אוכלוסיה", "אנוח", "שו\"ב",
+        "חמל", "נהג", "רחפן",
       ];
-
       return ELIGIBLE_ROLES.some(eligible => role.includes(eligible));
     });
   }, [data, assignments, blockedNames]);
@@ -742,7 +566,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   const [isConfirming, setIsConfirming] = useState(false);
   const [isLedgerCollapsed, setIsLedgerCollapsed] = useState(false);
   const [isHapakCollapsed, setIsHapakCollapsed] = useState(false);
-  const [isGuardCollapsed, setIsGuardCollapsed] = useState(false);
+  const [isChamalCollapsed, setIsChamalCollapsed] = useState(false);
+  const [isMissionsCollapsed, setIsMissionsCollapsed] = useState(false);
   const [isAvailableCollapsed, setIsAvailableCollapsed] = useState(false);
 
   const handleExportHapak = async () => {
@@ -949,20 +774,6 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     }
   };
 
-  const loadHapakRegistry = async () => {
-    try {
-      const response = await fetch("https://151.145.89.228.sslip.io/webhook/hapak-eligible");
-      if (!response.ok) throw new Error("Failed to fetch hapak registry");
-      const results = await response.json();
-      const registryRows = results.map((r: any) => r.json || r);
-      setHapakData(registryRows);
-      return registryRows;
-    } catch (err) {
-      console.error("Error fetching Hapak registry:", err);
-      return null;
-    }
-  };
-
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -1000,7 +811,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
 
   useEffect(() => {
     const init = async () => {
-      if (data && data.length > 0 && (hapakData && hapakData.length > 0)) {
+      if (data && data.length > 0) {
         const saved = await fetchSavedAssignment(date);
         if (saved) {
           setAssignments(saved);
@@ -1011,10 +822,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
           if (isAuthorized) {
             const yesterday = getYesterdayIso(date);
             const yesterdayData = await fetchSavedAssignment(yesterday);
-            const yesterdayGuardsArray = yesterdayData?.guards || [];
-            
             const aggregatedHistory = generateAggregatedHistory(history);
-            setAssignments(generateAssignment(data, aggregatedHistory, hapakData, blockedNames, date, yesterdayGuardsArray, yesterdayAttendanceData || []));
+            setAssignments(generateAssignment(data, aggregatedHistory, [], blockedNames, date, yesterdayData, yesterdayAttendanceData || []));
             setIsSaved(false);
           } else {
             setAssignments(null);
@@ -1024,11 +833,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       }
     };
     init();
-  }, [date, history, isAuthenticated, blockedNames, data, hapakData]);
-
-  useEffect(() => {
-    loadHapakRegistry();
-  }, []);
+  }, [date, history, isAuthenticated, blockedNames, data]);
 
   const handleGenerate = async () => {
     if (!isAuthorized) {
@@ -1041,20 +846,17 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     try {
       // Reload everything before generating to ensure latest changes from Excel/spreadsheet are used
       const { data: latestData } = await refetch();
-      const latestHapakRows = await loadHapakRegistry();
       
       const yesterday = getYesterdayIso(date);
       const yesterdayData = await fetchSavedAssignment(yesterday);
-      const yesterdayGuardsArray = yesterdayData?.guards || [];
 
-
-      if (!latestData || !latestHapakRows) {
+      if (!latestData) {
         toast.error("נכשל בטעינת נתונים עדכניים. הגנרוט הופסק.");
         return;
       }
 
       const aggregatedHistory = generateAggregatedHistory(history);
-      setAssignments(generateAssignment(latestData, aggregatedHistory, latestHapakRows, blockedNames, date, yesterdayGuardsArray, yesterdayAttendanceData || []));
+      setAssignments(generateAssignment(latestData, aggregatedHistory, [], blockedNames, date, yesterdayData, yesterdayAttendanceData || []));
 
       setIsSaved(false);
     } catch (error) {
@@ -1065,50 +867,37 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     }
   };
 
-  const handleSwap = (type: "hapak" | "guard", id: number, newName: string, memberIndex?: number, hapakName?: string) => {
-    if (newName && newName !== "לא מאויש" && newName !== "טרם שובץ" && newName !== "-") {
-      const normalizedNew = normalizeNameStr(newName);
-      
-      // 1. Check Hapak Conflicts
-      const existingHapak = assignments?.hapak.find(h => 
-        h.assignedTo && normalizeNameStr(h.assignedTo) === normalizedNew && 
-        !(type === "hapak" && h.id === id && h.memberIndex === memberIndex)
-      );
-      
-      // 2. Check Guard Conflicts
-      const existingGuard = assignments?.guards.find(g => 
-        g.name && normalizeNameStr(g.name) === normalizedNew && 
-        !(type === "guard" && g.hour === id)
-      );
 
-      if (type === "guard" && existingHapak) {
-        toast.warning(`שים לב: ${newName} כבר משובץ ב${existingHapak.name}`, {
-          description: "השינוי בוצע, אך קיימת כפילות עם חפ\"ק.",
-          duration: 5000
-        });
-      } else if (type === "hapak" && existingGuard) {
-        toast.warning(`שים לב: ${newName} כבר משובץ בשמירה (${existingGuard.time})`, {
-          description: "השינוי בוצע, אך קיימת כפילות עם שמירות.",
-          duration: 5000
-        });
-      }
-    }
-
+  const handleSwap = (
+    type: "hapak" | "chamal" | "mission",
+    id: number,
+    newName: string,
+    memberIndex?: number,
+    hapakName?: string
+  ) => {
     setAssignments(prev => {
       if (!prev) return null;
       const next = { ...prev };
       if (type === "hapak") {
         next.hapak = next.hapak.map(h =>
-          (h.id === id && h.memberIndex === memberIndex && (!hapakName || h.name === hapakName)) ? { ...h, assignedTo: newName } : h
+          (h.id === id && h.memberIndex === memberIndex && (!hapakName || h.name === hapakName))
+            ? { ...h, assignedTo: newName } : h
         );
-      } else {
-        next.guards = next.guards.map(g =>
-          g.hour === id ? { ...g, name: newName } : g
+      } else if (type === "chamal") {
+        next.chamal = next.chamal.map(c =>
+          c.shiftIndex === id ? { ...c, assignedTo: newName } : c
+        );
+      } else if (type === "mission") {
+        // id = mission post index (0=יזומה, 1=פילבוקס), memberIndex = slot index
+        next.missions = next.missions.map((m, mIdx) =>
+          mIdx === id
+            ? { ...m, slots: m.slots.map((s, sIdx) => sIdx === memberIndex ? { ...s, assignedTo: newName } : s) }
+            : m
         );
       }
       return next;
     });
-    setIsSaved(false); 
+    setIsSaved(false);
   };
 
   const handleConfirm = async () => {
@@ -1121,65 +910,59 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     const addUpdate = (name: string, role: string, type: string, hours: string, points: number) => {
       if (!name || name === "לא מאויש" || name === "טרם שובץ" || name === "-") return;
       if (!consolidated.has(name)) {
-        consolidated.set(name, {
-          date: formattedDate,
-          name: name,
-          role: role,
-          type: type,
-          hours: hours,
-          points: points
-        });
+        consolidated.set(name, { date: formattedDate, name, role, type, hours, points });
       } else {
-        const existing = consolidated.get(name);
-        existing.role = Array.from(new Set([existing.role, role])).join(" + ");
-        existing.type = Array.from(new Set([existing.type, type])).join(" + ");
-        existing.hours = existing.hours === "לתאם" ? hours : hours === "לתאם" ? existing.hours : `${existing.hours} + ${hours}`;
-        existing.points += points;
+        const ex = consolidated.get(name);
+        ex.role  = Array.from(new Set([ex.role,  role ])).join(" + ");
+        ex.type  = Array.from(new Set([ex.type,  type ])).join(" + ");
+        ex.hours = ex.hours === "לתאם" ? hours : hours === "לתאם" ? ex.hours : `${ex.hours} + ${hours}`;
+        ex.points += points;
       }
     };
 
+    // חפ"ק
     assignments.hapak.forEach(h => {
-      if (h.assignedTo && h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") {
+      if (h.assignedTo && h.assignedTo !== "טרם שובץ" && h.points > 0) {
         const parts = h.name.split(' - ');
         const displayRole = parts.length > 1 ? parts[1].trim() : `עמדה ${h.memberIndex}`;
         addUpdate(h.assignedTo, displayRole, 'חפ"ק', 'לתאם', h.points);
       }
     });
 
-    assignments.guards.forEach(g => {
-      if (g.name && g.name !== "לא מאויש" && g.name !== "-") {
-        const person = data?.find(p => p.name === g.name);
-        addUpdate(g.name, person?.role || 'שומר', 'שמירה', g.time, g.points);
+    // חמל
+    assignments.chamal.forEach(c => {
+      if (c.assignedTo) {
+        const pts = c.shiftIndex === 0 ? POINTS.CHAMAL_NIGHT : POINTS.CHAMAL_DAY;
+        addUpdate(c.assignedTo, 'חמל', 'חמל', c.timeLabel, pts);
       }
     });
 
-    // ─── Differential Updates (UPSERT-0 Strategy) ──────────────────────────
+    // עמדות (יזומה / פילבוקס)
+    assignments.missions.forEach(m => {
+      m.slots.forEach(s => {
+        if (s.assignedTo) addUpdate(s.assignedTo, s.roleLabel, m.postType, 'לתאם', POINTS.MISSION);
+      });
+    });
+
+    // Differential – track removed assignments
     if (loadedAssignments) {
-        const currentActiveNames = new Set<string>();
-        assignments.hapak.forEach(h => {
-             if (h.assignedTo && h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") currentActiveNames.add(normalizeNameStr(h.assignedTo));
-        });
-        assignments.guards.forEach(g => {
-             if (g.name && g.name !== "לא מאויש" && g.name !== "-") currentActiveNames.add(normalizeNameStr(g.name));
-        });
+      const currentActive = new Set<string>();
+      assignments.hapak.forEach(h => { if (h.assignedTo) currentActive.add(normalizeNameStr(h.assignedTo)); });
+      assignments.chamal.forEach(c => { if (c.assignedTo) currentActive.add(normalizeNameStr(c.assignedTo)); });
+      assignments.missions.forEach(m => m.slots.forEach(s => { if (s.assignedTo) currentActive.add(normalizeNameStr(s.assignedTo)); }));
 
-        loadedAssignments.hapak.forEach(h => {
-            if (h.assignedTo && h.assignedTo !== "לא מאויש" && h.assignedTo !== "טרם שובץ") {
-                const normName = normalizeNameStr(h.assignedTo);
-                if (!currentActiveNames.has(normName) && !consolidated.has(h.assignedTo)) {
-                    addUpdate(h.assignedTo, 'הוסר מהשיבוץ', 'חפ"ק', 'הוסר', 0);
-                }
-            }
-        });
-
-        loadedAssignments.guards.forEach(g => {
-             if (g.name && g.name !== "לא מאויש" && g.name !== "-") {
-                const normName = normalizeNameStr(g.name);
-                if (!currentActiveNames.has(normName) && !consolidated.has(g.name)) {
-                   addUpdate(g.name, 'הוסר מהשיבוץ', 'שמירה', 'הוסר', 0);
-                }
-             }
-        });
+      loadedAssignments.hapak?.forEach(h => {
+        if (h.assignedTo && !currentActive.has(normalizeNameStr(h.assignedTo)) && !consolidated.has(h.assignedTo))
+          addUpdate(h.assignedTo, 'הוסר', 'חפ"ק', 'הוסר', 0);
+      });
+      loadedAssignments.chamal?.forEach(c => {
+        if (c.assignedTo && !currentActive.has(normalizeNameStr(c.assignedTo)) && !consolidated.has(c.assignedTo))
+          addUpdate(c.assignedTo, 'הוסר', 'חמל', 'הוסר', 0);
+      });
+      loadedAssignments.missions?.forEach(m => m.slots?.forEach(s => {
+        if (s.assignedTo && !currentActive.has(normalizeNameStr(s.assignedTo)) && !consolidated.has(s.assignedTo))
+          addUpdate(s.assignedTo, 'הוסר', m.postType, 'הוסר', 0);
+      }));
     }
 
     const sessionUpdates = Array.from(consolidated.values());
@@ -1558,81 +1341,99 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
               )}
             </div>
 
-            {/* Guard Table Card */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow" id="guard-export-container">
+            {/* Chamal Card */}
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
               <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setIsGuardCollapsed(!isGuardCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
-                    {isGuardCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                  <button onClick={() => setIsChamalCollapsed(!isChamalCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
+                    {isChamalCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </button>
-                  <div className="flex flex-col">
-                    <h2 className="font-black flex items-center gap-2 text-sm sm:text-base">
-                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                      לו"ז שמירות
-                    </h2>
-                    <span className="text-[10px] text-muted-foreground font-mono mr-6 sm:mr-7">טווח: {(() => {
-                      const d1 = date.split('-').reverse().slice(0, 2).join('/');
-                      const nextDateObj = new Date(date);
-                      nextDateObj.setDate(nextDateObj.getDate() + 1);
-                      const d2 = nextDateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
-                      return `${d1} - ${d2}`;
-                    })()}</span>
-                  </div>
+                  <h2 className="font-black flex items-center gap-2 text-sm sm:text-base">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                    חמל (3 משמרות)
+                  </h2>
                 </div>
-                {!isGuardCollapsed && (
-                  <Button 
-                    onClick={handleExportImage} 
-                    disabled={isExporting}
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 shadow-sm text-xs font-bold border-primary text-primary hover:bg-primary/5 no-export"
-                  >
-                    {isExporting ? <RefreshCw className="w-3.5 h-3.5 mr-2 animate-spin" /> : <Camera className="w-3.5 h-3.5 mr-2" />}
-                    תמונה
-                  </Button>
-                )}
               </div>
-              {!isGuardCollapsed && (
-                <div className={cn(!isExporting && "max-h-[800px] overflow-y-auto")}>
-                  <table className="w-full text-sm border-collapse">
-                    <thead className="sticky top-0 bg-muted z-10">
-                      <tr className="text-right">
-                        <th className="px-2 sm:px-4 py-2.5 font-black text-muted-foreground text-xs sm:text-sm w-2/5">שעה</th>
-                        <th className="px-2 sm:px-4 py-2.5 font-black text-muted-foreground text-xs sm:text-sm">שומר</th>
-                        {(!isExporting && isAuthorized) && <th className="px-2 sm:px-4 py-2.5 font-black text-muted-foreground text-xs sm:text-sm">ניקוד</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {assignments?.guards.map((g, idx) => (
-                        <tr key={idx} className={cn("border-t border-border transition-colors hover:bg-muted/50", idx % 2 === 0 ? "bg-card" : "bg-background")}>
-                          <td className="px-2 sm:px-4 py-2.5 font-mono text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap align-middle">
-                            {g.time}
-                          </td>
-                          <td className="px-2 sm:px-4 py-2.5 font-bold align-middle">
+              {!isChamalCollapsed && (
+                <div className="divide-y divide-border" dir="rtl">
+                  {assignments.chamal.map(shift => (
+                    <div key={shift.shiftIndex} className={cn(
+                      "flex items-center justify-between p-3 sm:p-4",
+                      shift.shiftIndex === 0 && "bg-indigo-500/5"
+                    )}>
+                      <span className={cn(
+                        "font-mono text-xs sm:text-sm font-bold",
+                        shift.shiftIndex === 0 ? "text-indigo-600" : "text-muted-foreground"
+                      )}>
+                        {shift.timeLabel}
+                        {shift.shiftIndex === 0 && (
+                          <span className="mr-2 text-[10px] bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full">לילה</span>
+                        )}
+                      </span>
+                      <PersonnelSwap
+                        currentName={shift.assignedTo}
+                        allPersonnel={(data || []).filter(p => (p.role || "").includes("חמל"))}
+                        onSwap={(newName) => handleSwap("chamal", shift.shiftIndex, newName)}
+                        readonly={!isAuthorized}
+                        allowEmpty={true}
+                        type="hapak"
+                        currentAssignments={assignments}
+                        yesterdayRecords={yesterdayAttendanceData || []}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Missions Card (יזומה + פילבוקס) */}
+            <div className="bg-card border border-border rounded-xl overflow-hidden card-shadow">
+              <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setIsMissionsCollapsed(!isMissionsCollapsed)} className="p-1 hover:bg-muted rounded-md transition-colors">
+                    {isMissionsCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                  </button>
+                  <h2 className="font-black flex items-center gap-2 text-sm sm:text-base">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                    עמדות (יזומה ופילבוקס)
+                  </h2>
+                </div>
+              </div>
+              {!isMissionsCollapsed && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+                  {assignments.missions.map((mission, mIdx) => (
+                    <div key={mission.postType} className="bg-card p-4">
+                      <h3 className="text-sm font-black mb-3 text-primary text-right" dir="rtl">
+                        {mission.postType}
+                        <span className="mr-2 text-[10px] text-muted-foreground font-normal">
+                          ({mission.slots.filter(s => s.assignedTo).length}/{mission.slots.length} מאויש)
+                        </span>
+                      </h3>
+                      <div className="space-y-2">
+                        {mission.slots.map((slot, sIdx) => (
+                          <div key={sIdx} className={cn(
+                            "flex items-center justify-between p-2 rounded-lg text-xs",
+                            sIdx === 0 ? "bg-amber-500/10 border border-amber-500/20" : "bg-muted/30"
+                          )}>
+                            <span className={cn(
+                              "font-medium text-right min-w-[50px]",
+                              sIdx === 0 ? "text-amber-700 font-black" : "text-muted-foreground"
+                            )}>{slot.roleLabel}</span>
                             <PersonnelSwap
-                              currentName={g.name}
+                              currentName={slot.assignedTo}
                               allPersonnel={data || []}
-                              onSwap={(newName) => handleSwap("guard", g.hour, newName)}
-                              readonly={!isAuthorized || isExporting}
+                              onSwap={(newName) => handleSwap("mission", mIdx, newName, sIdx)}
+                              readonly={!isAuthorized}
                               allowEmpty={true}
-                              hour={g.hour}
-                              type="guard"
+                              type="hapak"
                               currentAssignments={assignments}
-                              yesterdayGuards={loadedAssignments?.guards || []}
-                              yesterdayRecords={yesterdayAttendanceData}
+                              yesterdayRecords={yesterdayAttendanceData || []}
                             />
-                          </td>
-                          {(!isExporting && isAuthorized) && (
-                            <td className="px-2 sm:px-4 py-2.5 align-middle">
-                              <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap", g.points === 2 ? "bg-indigo-500/10 text-indigo-600" : "bg-yellow-500/10 text-yellow-700")}>
-                                {g.points} נק'
-                              </span>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -1640,13 +1441,12 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
         </div>
       )}
 
-      {/* Hidden shadow containers removed - using Canvas API instead */}
-
-      <CommanderAuthOverlay 
-        isOpen={showLoginPrompt && !isAuthorized} 
-        onClose={() => setShowLoginPrompt(false)} 
+      <CommanderAuthOverlay
+        isOpen={showLoginPrompt && !isAuthorized}
+        onClose={() => setShowLoginPrompt(false)}
         isAuthenticated={isAuthenticated}
       />
     </div>
   );
 }
+

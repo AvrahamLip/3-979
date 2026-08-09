@@ -58,14 +58,6 @@ export default function MainPage() {
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">ניהול שיבוץ שמירות</span>
             </Link>
-            <Link
-              to="/main/bus"
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm shadow-lg hover:shadow-primary/20 hover:scale-105 transition-all shadow-md active:scale-95"
-              aria-label="שיבוץ אוטובוסים"
-            >
-              <Bus className="w-4 h-4" />
-              <span className="hidden sm:inline">שיבוץ אוטובוסים</span>
-            </Link>
           </div>
         </div>
       </div>

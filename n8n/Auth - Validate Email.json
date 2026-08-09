@@ -10,13 +10,13 @@
           "allowedOrigins": "*"
         }
       },
-      "id": "0669a688-d858-4a87-b188-d7893468efb1",
+      "id": "63954482-2c18-47cf-8b41-b674ae8156d2",
       "name": "Webhook Validate",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -2656,
-        2208
+        -3312,
+        2912
       ],
       "webhookId": "52e30c18-ac98-4013-9de6-a6a3d4c3d3d1"
     },
@@ -41,7 +41,7 @@
             },
             {
               "id": "69ed24eb-433c-4f1e-9952-c02980b52624",
-              "leftValue": "={{ $('Webhook Validate').item.json.body.role }}",
+              "leftValue": "={{ $('Webhook Validate').item.json.body.roll }}",
               "rightValue": "={{ $json.roll }}",
               "operator": {
                 "type": "string",
@@ -53,13 +53,13 @@
         },
         "options": {}
       },
-      "id": "0c18d510-da1e-4304-b768-58e6e94c8b9a",
+      "id": "637913af-2bf4-4421-91a2-17590c1297ba",
       "name": "Check Whitelist",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -2240,
-        1984
+        -2896,
+        2688
       ]
     },
     {
@@ -70,28 +70,28 @@
           "responseCode": 403
         }
       },
-      "id": "24be78e2-d455-469c-bd7c-652b09ec9b48",
+      "id": "70251ec5-003e-4e82-a7e2-72ed6d298515",
       "name": "Unauthorized Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -1952,
-        2352
+        -2608,
+        3056
       ]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { authorized: true, email: .body.email, roll: .body.roll } }}",
+        "responseBody": "={{ { authorized: true, email: $json.email, roll: $json.roll } }}",
         "options": {}
       },
-      "id": "112afb0f-ce7c-4848-bd38-31387691e109",
+      "id": "aed5ba7c-93d3-4ad0-a151-98cea18f89aa",
       "name": "Respond with Success",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -1952,
-        2144
+        -2608,
+        2848
       ]
     },
     {
@@ -109,6 +109,10 @@
             {
               "keyName": "email",
               "keyValue": "={{ $json.body.email }}"
+            },
+            {
+              "keyName": "roll",
+              "keyValue": "={{ $json.body.role }}"
             }
           ]
         }
@@ -116,10 +120,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -2432,
-        2112
+        -3088,
+        2816
       ],
-      "id": "6f5110a5-bc03-4d86-b6e0-92165ad1761d",
+      "id": "32c1624e-0f38-4aa0-bd0c-3b9a0e89e0f0",
       "name": "Get row(s)"
     }
   ],
@@ -176,7 +180,7 @@
     "saveExecutionProgress": true,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "b7e2cf66-2b62-4527-ab5f-9248b0eb8377",
+  "versionId": "4e11eece-dbc6-4688-8ee8-c215997ed316",
   "meta": {
     "instanceId": "3d58c928056a8a686ed6f51eff3debe7d6dc6b96afa5deea546dcfb5b172f4fa"
   },
