@@ -81,21 +81,21 @@ const CHAMAL_SHIFTS: { shiftIndex: 0 | 1 | 2; timeLabel: string; points: number 
 ];
 
 const IZUMA_SLOTS = [
-  { roleLabel: "מפקד", roleFilter: "מפקד", points: 1 },
+  { roleLabel: "מפקד", roleFilter: ["סמ", "מפקד"], points: 1 },
   { roleLabel: "נהג",   roleFilter: "נהג",   points: 1 },
   { roleLabel: "רחפן", roleFilter: "רחפן", points: 1 },
-  { roleLabel: "חייל", roleFilter: "חייל", points: 1 },
+  { roleLabel: "חייל", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
 ];
 
 const PILBOX_SLOTS = [
   { roleLabel: "סמל",    roleFilter: "סמ",   points: 1 },
   { roleLabel: "מפקד",  roleFilter: "מפקד", points: 1 },
   { roleLabel: "נהג",   roleFilter: "נהג",  points: 1 },
-  { roleLabel: "חייל 1", roleFilter: "חייל", points: 1 },
-  { roleLabel: "חייל 2", roleFilter: "חייל", points: 1 },
-  { roleLabel: "חייל 3", roleFilter: "חייל", points: 1 },
-  { roleLabel: "חייל 4", roleFilter: "חייל", points: 1 },
-  { roleLabel: "חייל 5", roleFilter: "חייל", points: 1 },
+  { roleLabel: "חייל 1", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
+  { roleLabel: "חייל 2", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
+  { roleLabel: "חייל 3", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
+  { roleLabel: "חייל 4", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
+  { roleLabel: "חייל 5", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
 ];
 
 const POINTS = {
@@ -149,27 +149,36 @@ function generateAssignment(
 
     // Minimal-change: prefer keeping the previous assignment.
     // Only replace if the person is no longer available.
-    const findBest = (roleFilter: string | null, preferName?: string): string => {
+    const findBest = (roleFilters: string[] | string | null, preferName?: string): string => {
       if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName))) {
         return preferName;
       }
-      const candidates = records
-        .filter(p => {
-          const role = (p.role || "").trim();
-          const norm = normalizeNameStr(p.name);
-          const pres = getPresenceFor(p);
-          const rawValue = String(p.todayValue || "").trim();
-          if ((pres === "none" || pres === "leaving") && rawValue !== "") return false;
-          if (assignedNames.has(norm)) return false;
-          if (roleFilter && !role.includes(roleFilter)) return false;
-          return true;
-        })
-        .sort((a, b) => {
-          const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-          const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
-          return aScore - bScore;
-        });
-      return candidates[0]?.name || "";
+
+      const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
+
+      for (const filter of filters) {
+        const candidates = records
+          .filter(p => {
+            const role = (p.role || "").trim();
+            const norm = normalizeNameStr(p.name);
+            const pres = getPresenceFor(p);
+            const rawValue = String(p.todayValue || "").trim();
+            if ((pres === "none" || pres === "leaving") && rawValue !== "") return false;
+            if (assignedNames.has(norm)) return false;
+            if (filter && !role.includes(filter)) return false;
+            return true;
+          })
+          .sort((a, b) => {
+            const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+            const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+            return aScore - bScore;
+          });
+
+        if (candidates.length > 0) {
+          return candidates[0].name;
+        }
+      }
+      return "";
     };
 
     // ─── 1. חמל – 3 משמרות × אדם אחד מוגדר "חמל" ────────────────────────
@@ -282,6 +291,39 @@ function generateAssignment(
           points: POINTS.HAPAK,
         });
       }
+    }
+
+    // ─── 4.5. תורן רס"פ ──────────────────────────────
+    const rasapCandidates = records.filter(p => {
+      const norm = normalizeNameStr(p.name);
+      if (assignedNames.has(norm)) return false;
+      const pres = getPresenceFor(p);
+      const rawValue = String(p.todayValue || "").trim();
+      const isAvailable = (pres !== "none" && pres !== "leaving") || rawValue === "";
+      if (!isAvailable) return false;
+      
+      const role = (p.role || "").trim();
+      // Not a commander and not a sergeant
+      if (role.includes("מפקד") || role.includes("סמ") || role.includes("סמל")) return false;
+      
+      return true;
+    }).sort((a, b) => {
+      const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+      const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+      return aScore - bScore;
+    });
+
+    if (rasapCandidates.length > 0) {
+      const chosen = rasapCandidates[0];
+      assignedNames.add(normalizeNameStr(chosen.name));
+      missions.push({
+        postType: "תורן רס\"פ",
+        slots: [{
+          roleLabel: "תורן",
+          requiredRole: null,
+          assignedTo: chosen.name.trim()
+        }]
+      });
     }
 
     // ─── 5. הוספת חיילים פנויים נוספים לפילבוקס ──────────────────────────────
