@@ -75,9 +75,9 @@ const HAPAK_MISSIONS = [
 ];
 
 const CHAMAL_SHIFTS: { shiftIndex: 0 | 1 | 2; timeLabel: string; points: number }[] = [
-  { shiftIndex: 0, timeLabel: "00:00 – 08:00", points: 3 },
-  { shiftIndex: 1, timeLabel: "08:00 – 16:00", points: 2 },
-  { shiftIndex: 2, timeLabel: "16:00 – 00:00", points: 2 },
+  { shiftIndex: 0, timeLabel: "22:00 – 06:00", points: 3 },
+  { shiftIndex: 1, timeLabel: "06:00 – 14:00", points: 2 },
+  { shiftIndex: 2, timeLabel: "14:00 – 22:00", points: 2 },
 ];
 
 const IZUMA_SLOTS = [
@@ -1293,7 +1293,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             <div>
               <h1 className="text-xl sm:text-3xl font-black text-overlay leading-none">שיבוץ שוויוני ({formatDateRange(date)})</h1>
               <p className="text-overlay/70 text-xs sm:text-sm mt-1 sm:mt-0.5">
-                רשימת שמירות ושיבוצי חפ"ק (החל מ-18:00)
+                רשימת שמירות ושיבוצי חפ"ק (החל מ-14:00)
               </p>
             </div>
           </div>
