@@ -28,7 +28,8 @@ export default function DatePickerBar({ value, onChange, label }: DatePickerBarP
       <div className="flex items-center gap-1 bg-card border border-border rounded-xl p-1 card-shadow">
         <button
           onClick={next}
-          className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          aria-label="יום הבא"
+          className="flex items-center justify-center w-11 h-11 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
         >
           <ChevronRight className="w-4 h-4 rtl-flip" />
         </button>
@@ -36,10 +37,11 @@ export default function DatePickerBar({ value, onChange, label }: DatePickerBarP
         <div className="relative">
           <button
             onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted transition-colors"
+            aria-label="בחר תאריך"
+            className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors"
           >
             <Calendar className="w-4 h-4 text-primary" />
-            <span className="text-[10px] xs:text-xs sm:text-sm font-semibold text-center whitespace-nowrap">
+            <span className="text-xs sm:text-sm font-semibold text-center whitespace-nowrap">
               {display}
             </span>
           </button>
@@ -60,7 +62,8 @@ export default function DatePickerBar({ value, onChange, label }: DatePickerBarP
 
         <button
           onClick={prev}
-          className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          aria-label="יום קודם"
+          className="flex items-center justify-center w-11 h-11 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="w-4 h-4 rtl-flip" />
         </button>

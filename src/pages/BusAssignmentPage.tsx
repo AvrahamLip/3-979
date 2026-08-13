@@ -309,7 +309,7 @@ function PersonnelSwap({
                     </span>
                   </div>
                 </div>
-                {currentName === p.name && <Check className="w-3 h-3 text-primary ml-2 shrink-0" />}
+                {currentName === p.name && <Check className="w-3 h-3 text-primary mr-2 shrink-0" />}
               </CommandItem>
             );
           })}
@@ -349,7 +349,7 @@ function PersonnelSwap({
           <DrawerHeader className="pb-2 px-4 flex items-center justify-between space-y-0 text-right">
             <DrawerTitle className="text-right w-full text-base font-black">בחירת חייל לשיבוץ</DrawerTitle>
             <DrawerClose asChild>
-                <button className="p-2 rounded-full hover:bg-muted ml-2"><X className="w-4 h-4"/></button>
+                <button className="p-3 rounded-full hover:bg-muted mr-2" aria-label="סגור"><X className="w-4 h-4"/></button>
             </DrawerClose>
           </DrawerHeader>
           <div className="flex-1 overflow-hidden">

@@ -17,7 +17,7 @@ export default function SoldierLayout() {
       <header className="sticky top-0 z-50 gradient-hero border-b border-primary/20 shadow-lg">
         <div className="container mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-between h-14 sm:h-16">
-            <Link to="/guards" className="flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 group shrink-0" aria-label="Go to home">
+            <Link to="/guards" className="flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 group shrink-0" aria-label="לדף הבית">
               <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-accent text-accent-foreground font-black text-base sm:text-lg shadow-md group-hover:shadow-accent/20">
                 ד!
               </div>
@@ -95,13 +95,15 @@ export default function SoldierLayout() {
               <PWAInstallButton variant="header" />
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg text-overlay/80 hover:text-overlay hover:bg-white/10 transition-all duration-200"
+                aria-label={theme === "dark" ? "עבור למצב בהיר" : "עבור למצב כהה"}
+                className="flex items-center justify-center w-11 h-11 rounded-lg text-overlay/80 hover:text-overlay hover:bg-white/10 transition-all duration-200"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
               <button
                 onClick={() => setMobileMenuOpen((v) => !v)}
-                className="flex md:hidden items-center justify-center w-8 h-8 rounded-lg text-overlay/80 hover:text-overlay hover:bg-white/10 transition-all duration-200"
+                aria-label={mobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
+                className="flex md:hidden items-center justify-center w-11 h-11 rounded-lg text-overlay/80 hover:text-overlay hover:bg-white/10 transition-all duration-200"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>

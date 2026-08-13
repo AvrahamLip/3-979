@@ -127,8 +127,9 @@ export default function DataUpdatePage() {
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-overlay transition-colors disabled:opacity-50"
+              className="flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 hover:bg-white/20 text-overlay transition-colors disabled:opacity-50"
               title="רענן"
+              aria-label="רענן"
             >
               <RefreshCw className={cn("w-4 h-4", isFetching && "animate-spin")} />
             </button>

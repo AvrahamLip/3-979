@@ -214,8 +214,9 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
             <button
               key={key}
               onClick={() => handleSort(key)}
+              aria-pressed={sortKey === key}
               className={cn(
-                "text-[11px] px-1.5 py-0.5 rounded border transition-colors",
+                "text-xs px-3 py-2 rounded-lg border transition-colors min-h-[40px]",
                 sortKey === key
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-muted/50 text-muted-foreground border-border hover:bg-muted"
@@ -239,15 +240,15 @@ export default function AttendanceTable({ records }: AttendanceTableProps) {
               <div
                 key={`mobile-${r.name}-${idx}`}
                 className={cn(
-                  "flex items-center gap-2 px-2.5 py-1.5",
+                  "flex items-center gap-2 px-2.5 py-2",
                   idx > 0 && "border-t border-border",
                   idx % 2 === 0 ? "bg-card" : "bg-background"
                 )}
               >
                 {/* RTL order: Name first (rightmost in RTL) → Dept → Role → % → Status (leftmost) */}
-                <span className="font-semibold text-sm truncate flex-1 text-right">{r.name}</span>
-                <span className="text-[11px] text-muted-foreground truncate max-w-16 shrink-0 text-center">{r.department}</span>
-                <span className="text-[11px] text-muted-foreground truncate max-w-14 shrink-0 text-center">{r.role}</span>
+                <span className="font-semibold text-sm truncate flex-1 text-right min-w-0">{r.name}</span>
+                <span className="hidden min-[420px]:inline text-[11px] text-muted-foreground truncate max-w-16 shrink-0 text-center">{r.department}</span>
+                <span className="hidden min-[480px]:inline text-[11px] text-muted-foreground truncate max-w-14 shrink-0 text-center">{r.role}</span>
                 <span className={cn(
                   "text-[11px] w-8 text-center shrink-0",
                   r.vacationStatus != null && r.vacationStatus !== "" && Math.round(Number(r.vacationStatus) * 100) > 80
