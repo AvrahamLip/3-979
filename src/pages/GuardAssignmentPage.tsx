@@ -75,34 +75,36 @@ const HAPAK_MISSIONS = [
 ];
 
 const CHAMAL_SHIFTS: { shiftIndex: 0 | 1 | 2; timeLabel: string; points: number }[] = [
-  { shiftIndex: 0, timeLabel: "00:00 – 08:00", points: 2 },
-  { shiftIndex: 1, timeLabel: "08:00 – 16:00", points: 1 },
-  { shiftIndex: 2, timeLabel: "16:00 – 00:00", points: 1 },
+  { shiftIndex: 0, timeLabel: "00:00 – 08:00", points: 3 },
+  { shiftIndex: 1, timeLabel: "08:00 – 16:00", points: 2 },
+  { shiftIndex: 2, timeLabel: "16:00 – 00:00", points: 2 },
 ];
 
 const IZUMA_SLOTS = [
-  { roleLabel: "מפקד", roleFilter: ["סמ", "מפקד"], points: 1 },
-  { roleLabel: "נהג",   roleFilter: "נהג",   points: 1 },
-  { roleLabel: "רחפן", roleFilter: ["רחפן", "חייל", "חובש", "מפקד"], points: 1 },
-  { roleLabel: "חייל", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
+  { roleLabel: "מפקד", roleFilter: ["סמ", "מפקד"], points: 2 },
+  { roleLabel: "נהג",   roleFilter: "נהג",   points: 2 },
+  { roleLabel: "רחפן", roleFilter: ["רחפן", "חייל", "חובש", "מפקד"], points: 2 },
+  { roleLabel: "חייל", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 2 },
 ];
 
 const PILBOX_SLOTS = [
-  { roleLabel: "סמל",    roleFilter: "סמ",   points: 1 },
-  { roleLabel: "מפקד",  roleFilter: "מפקד", points: 1 },
-  { roleLabel: "נהג",   roleFilter: "נהג",  points: 1 },
-  { roleLabel: "חייל 1", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
-  { roleLabel: "חייל 2", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
-  { roleLabel: "חייל 3", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
-  { roleLabel: "חייל 4", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
-  { roleLabel: "חייל 5", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 1 },
+  { roleLabel: "סמל",    roleFilter: "סמ",   points: 3 },
+  { roleLabel: "מפקד",  roleFilter: "מפקד", points: 3 },
+  { roleLabel: "נהג",   roleFilter: "נהג",  points: 3 },
+  { roleLabel: "חייל 1", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 3 },
+  { roleLabel: "חייל 2", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 3 },
+  { roleLabel: "חייל 3", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 3 },
+  { roleLabel: "חייל 4", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 3 },
+  { roleLabel: "חייל 5", roleFilter: ["חייל", "נהג", "חובש", "מפקד"], points: 3 },
 ];
 
 const POINTS = {
   HAPAK: 3,
-  CHAMAL_NIGHT: 2,
-  CHAMAL_DAY: 1,
-  MISSION: 1,
+  CHAMAL_NIGHT: 3,
+  CHAMAL_DAY: 2,
+  PILBOX: 3,
+  IZUMA: 2,
+  RASAP: 1
 };
 
 const STORAGE_KEY = "guard_burden_points";
@@ -167,6 +169,7 @@ function generateAssignment(
             if (assignedNames.has(norm)) return false;
             if (filter) {
               if (filter === "חייל") {
+                if (role.includes("מנהלה")) return false;
                 if (!role.includes("חייל") && !role.includes("חובש")) return false;
               } else {
                 if (!role.includes(filter)) return false;
@@ -175,6 +178,15 @@ function generateAssignment(
             return true;
           })
           .sort((a, b) => {
+            const aRole = (a.role || "").trim();
+            const bRole = (b.role || "").trim();
+            
+            const aExact = filter ? aRole === filter : false;
+            const bExact = filter ? bRole === filter : false;
+
+            if (aExact && !bExact) return -1;
+            if (!aExact && bExact) return 1;
+
             const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
             const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
             return aScore - bScore;
@@ -347,6 +359,8 @@ function generateAssignment(
       if (assignedNames.has(norm)) return false;
       const pres = getPresenceFor(p);
       const rawValue = String(p.todayValue || "").trim();
+      const role = String(p.role || "").trim();
+      if (role.includes("מנהלה")) return false;
       return (pres !== "none" && pres !== "leaving");
     }).sort((a, b) => {
       const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
@@ -1093,7 +1107,13 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     // עמדות (יזומה / פילבוקס)
     assignments.missions.forEach(m => {
       m.slots.forEach(s => {
-        if (s.assignedTo) addUpdate(s.assignedTo, s.roleLabel, m.postType, 'לתאם', POINTS.MISSION);
+        if (s.assignedTo) {
+          let pts = 0;
+          if (m.postType.includes("פילבוקס")) pts = POINTS.PILBOX;
+          else if (m.postType.includes("יזומה")) pts = POINTS.IZUMA;
+          else if (m.postType.includes("תורן רס\"פ")) pts = POINTS.RASAP;
+          addUpdate(s.assignedTo, s.roleLabel, m.postType, 'לתאם', pts);
+        }
       });
     });
 
