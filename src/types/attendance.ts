@@ -20,6 +20,7 @@ export interface RawRecord {
   todayValue: string | number;
   VacationStatus?: number | string;
   burdenPoints?: number | string;
+  gender?: "ז" | "נ";
 }
 
 export interface AttendanceRecord {
@@ -31,6 +32,7 @@ export interface AttendanceRecord {
   status: StatusType;
   vacationStatus?: number | string;
   burdenPoints?: number;
+  gender?: "ז" | "נ";
 }
 
 export interface StatusCounts {

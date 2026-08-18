@@ -84,6 +84,7 @@ export function processRecords(raw: RawRecord[]): AttendanceRecord[] {
       status: normalizeStatus(r.todayValue),
       vacationStatus: r.VacationStatus,
       burdenPoints: Number(r.burdenPoints) || 0,
+      gender: r.gender,
     }));
 }
 
