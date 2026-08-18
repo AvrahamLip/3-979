@@ -41,6 +41,12 @@ export function formatDateShort(isoDate: string): string {
   return `${parts[2]}/${parts[1]}`;
 }
 
+export function getTomorrowIso(dateStr: string) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
 export function formatDateFull(isoDate: string): string {
   // YYYY-MM-DD → DD/MM/YY
   if (!isoDate) return "";

@@ -126,7 +126,8 @@ export function generateAssignment(
   blockedNames: Set<string>,
   date: string,
   previousAssignment: AssignmentData | null = null,
-  yesterdayRecords: AttendanceRecord[] = []
+  yesterdayRecords: AttendanceRecord[] = [],
+  tomorrowRecords: AttendanceRecord[] = []
 ): AssignmentData {
 
   try {
@@ -134,6 +135,28 @@ export function generateAssignment(
     if (!hapakRows) hapakRows = [];
 
     const assignedNames = new Set<string>(blockedNames);
+
+    // Extract yesterday's Pilbox team
+    const yesterdayPilboxNames = new Set<string>();
+    if (previousAssignment && previousAssignment.missions) {
+      previousAssignment.missions.forEach(m => {
+        if (m.postType === "פילבוקס") {
+          m.slots.forEach(s => {
+            if (s.assignedTo) {
+              yesterdayPilboxNames.add(normalizeNameStr(s.assignedTo));
+            }
+          });
+        }
+      });
+    }
+
+    const isLeavingTomorrow = (name: string) => {
+      const norm = normalizeNameStr(name);
+      const tomorrowRec = tomorrowRecords.find(r => normalizeNameStr(r.name) === norm);
+      if (!tomorrowRec) return false;
+      const status = tomorrowRec.status;
+      return ["יצא לאפטר", "אפטר", "מחלה / גימלים", "מנותק קשר", "קורס", "משתחרר", "שוחרר", "פיצול", "יציאה לפיצול"].includes(status);
+    };
 
     const getPresenceFor = (p: AttendanceRecord | undefined) =>
       getComputedPresence(p, yesterdayRecords);
@@ -206,9 +229,11 @@ export function generateAssignment(
     };
 
     // Helper for hypothetical assignments
-    const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>()): string => {
+    const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false): string => {
       if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName)) && !extraAssigned.has(normalizeNameStr(preferName))) {
-        if (!genderReq || findRecord(preferName)?.gender === genderReq) return preferName;
+        if (!genderReq || findRecord(preferName)?.gender === genderReq) {
+          if (!isPilbox || !isLeavingTomorrow(preferName)) return preferName;
+        }
       }
       const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
       for (const filter of filters) {
@@ -220,6 +245,7 @@ export function generateAssignment(
           if (assignedNames.has(norm) || extraAssigned.has(norm)) return false;
           if (role.includes("מ\"פ") || role === "מפ") return false;
           if (genderReq && p.gender !== genderReq) return false;
+          if (isPilbox && isLeavingTomorrow(p.name)) return false;
           if (filter) {
             if (filter === "חייל") {
               if (role.includes("מנהלה")) return false;
@@ -234,7 +260,16 @@ export function generateAssignment(
           const bExact = filter ? (b.role || "").trim() === filter : false;
           if (aExact && !bExact) return -1;
           if (!aExact && bExact) return 1;
-          return ((a.burdenPoints || 0) + (history[a.name] || 0)) - ((b.burdenPoints || 0) + (history[b.name] || 0));
+          
+          let aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+          let bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+          
+          if (isPilbox) {
+            if (yesterdayPilboxNames.has(normalizeNameStr(a.name))) aScore -= 2;
+            if (yesterdayPilboxNames.has(normalizeNameStr(b.name))) bScore -= 2;
+          }
+          
+          return aScore - bScore;
         });
         if (candidates.length > 0) return candidates[0].name;
       }
@@ -244,9 +279,8 @@ export function generateAssignment(
     // ─── 0. Pilbox Sergeant (סמל פילבוקס) ──────────────────────────────
     // Pre-assign Pilbox Sergeant so they are not taken by Izuma
     const pilboxSergeantSlot = PILBOX_SLOTS[0]; // Assuming index 0 is סמל
-    const prevPilbox = previousAssignment?.missions?.find(m => m.postType === "פילבוקס");
-    const prevPilboxSergeant = prevPilbox?.slots?.[0]?.assignedTo;
-    const assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant);
+    const prevPilboxSergeant = previousAssignment?.missions?.find(m => m.postType === "פילבוקס")?.slots?.[0]?.assignedTo;
+    const assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true);
     if (assignedPilboxSergeant) assignedNames.add(normalizeNameStr(assignedPilboxSergeant));
     let pilboxSergeantGender = "ז";
     if (assignedPilboxSergeant) {
@@ -305,6 +339,7 @@ export function generateAssignment(
     // Needs 3-4 females if females are used. Sergeant counts.
     const buildPilboxSlots = (): MissionSlot[] => {
       const remainingSlots = PILBOX_SLOTS.slice(1);
+      const prevPilbox = previousAssignment?.missions?.find(m => m.postType === "פילבוקס");
       
       const tryPattern = (genders: ("ז"|"נ" | undefined)[]): MissionSlot[] | null => {
         const tempAssigned = new Set<string>();
@@ -314,7 +349,7 @@ export function generateAssignment(
         for (let i = 0; i < remainingSlots.length; i++) {
           const slot = remainingSlots[i];
           const prev = prevPilbox?.slots?.[i + 1]?.assignedTo;
-          const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned);
+          const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true);
           if (!assigned && genders[i]) return null;
           if (assigned) {
             tempAssigned.add(normalizeNameStr(assigned));
@@ -519,10 +554,15 @@ export function generateAssignment(
       if (role.includes("מנהלה")) return false;
       if (role.includes("מ\"פ") || role === "מפ") return false;
       if (role.includes("קצין") || role.includes("מ\"מ")) return false;
+      if (isLeavingTomorrow(p.name)) return false;
       return (pres !== "none" && pres !== "leaving");
     }).sort((a, b) => {
-      const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-      const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+      let aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+      let bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+      
+      if (yesterdayPilboxNames.has(normalizeNameStr(a.name))) aScore -= 2;
+      if (yesterdayPilboxNames.has(normalizeNameStr(b.name))) bScore -= 2;
+
       return aScore - bScore;
     });
 
