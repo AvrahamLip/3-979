@@ -229,10 +229,10 @@ export function generateAssignment(
     };
 
     // Helper for hypothetical assignments
-    const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false): string => {
+    const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false, allowLeavingTomorrow = false): string => {
       if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName)) && !extraAssigned.has(normalizeNameStr(preferName))) {
         if (!genderReq || findRecord(preferName)?.gender === genderReq) {
-          if (!isPilbox || !isLeavingTomorrow(preferName)) return preferName;
+          if (!isPilbox || allowLeavingTomorrow || !isLeavingTomorrow(preferName)) return preferName;
         }
       }
       const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
@@ -245,7 +245,7 @@ export function generateAssignment(
           if (assignedNames.has(norm) || extraAssigned.has(norm)) return false;
           if (role.includes("מ\"פ") || role === "מפ") return false;
           if (genderReq && p.gender !== genderReq) return false;
-          if (isPilbox && isLeavingTomorrow(p.name)) return false;
+          if (isPilbox && !allowLeavingTomorrow && isLeavingTomorrow(p.name)) return false;
           if (filter) {
             if (filter === "חייל") {
               if (role.includes("מנהלה")) return false;
@@ -280,7 +280,11 @@ export function generateAssignment(
     // Pre-assign Pilbox Sergeant so they are not taken by Izuma
     const pilboxSergeantSlot = PILBOX_SLOTS[0]; // Assuming index 0 is סמל
     const prevPilboxSergeant = previousAssignment?.missions?.find(m => m.postType === "פילבוקס")?.slots?.[0]?.assignedTo;
-    const assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true);
+    let assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, false);
+    if (!assignedPilboxSergeant) {
+      // Fallback: allow leaving tomorrow if no choice
+      assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, true);
+    }
     if (assignedPilboxSergeant) assignedNames.add(normalizeNameStr(assignedPilboxSergeant));
     let pilboxSergeantGender = "ז";
     if (assignedPilboxSergeant) {
@@ -349,7 +353,11 @@ export function generateAssignment(
         for (let i = 0; i < remainingSlots.length; i++) {
           const slot = remainingSlots[i];
           const prev = prevPilbox?.slots?.[i + 1]?.assignedTo;
-          const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true);
+          let assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, false);
+          if (!assigned) {
+            // Fallback: allow leaving tomorrow if slot would remain empty
+            assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, true);
+          }
           if (!assigned && genders[i]) return null;
           if (assigned) {
             tempAssigned.add(normalizeNameStr(assigned));
