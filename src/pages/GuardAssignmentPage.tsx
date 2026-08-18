@@ -104,7 +104,8 @@ const POINTS = {
   CHAMAL_DAY: 2,
   PILBOX: 3,
   IZUMA: 2,
-  RASAP: 1
+  RASAP: 1,
+  DUTY_OFFICER: 2
 };
 
 const STORAGE_KEY = "guard_burden_points";
@@ -441,6 +442,37 @@ export function generateAssignment(
           points: POINTS.HAPAK,
         });
       }
+    }
+
+    // ─── 4.4. קצין תורן ──────────────────────────────
+    const dutyOfficerCandidates = records.filter(p => {
+      const norm = normalizeNameStr(p.name);
+      if (assignedNames.has(norm)) return false;
+      const pres = getPresenceFor(p);
+      const isAvailable = (pres !== "none" && pres !== "leaving");
+      if (!isAvailable) return false;
+      
+      const role = (p.role || "").trim();
+      // Must be an officer (קצין or מ"מ)
+      if (role.includes("קצין") || role.includes("מ\"מ")) return true;
+      return false;
+    }).sort((a, b) => {
+      const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+      const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+      return aScore - bScore;
+    });
+
+    if (dutyOfficerCandidates.length > 0) {
+      const chosen = dutyOfficerCandidates[0];
+      assignedNames.add(normalizeNameStr(chosen.name));
+      missions.push({
+        postType: "קצין תורן",
+        slots: [{
+          roleLabel: "קצין",
+          requiredRole: null,
+          assignedTo: chosen.name.trim()
+        }]
+      });
     }
 
     // ─── 4.5. תורן רס"פ ──────────────────────────────
@@ -1238,6 +1270,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
           if (m.postType.includes("פילבוקס")) pts = POINTS.PILBOX;
           else if (m.postType.includes("יזומה")) pts = POINTS.IZUMA;
           else if (m.postType.includes("תורן רס\"פ")) pts = POINTS.RASAP;
+          else if (m.postType.includes("קצין תורן")) pts = POINTS.DUTY_OFFICER;
           addUpdate(s.assignedTo, s.roleLabel, m.postType, 'לתאם', pts);
         }
       });
