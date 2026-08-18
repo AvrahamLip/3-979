@@ -264,14 +264,14 @@ export function generateAssignment(
     const buildIzuma = (prevM: any): MissionSlot[] => {
       // Strategy: Try exactly 2 Females and 2 Males
       // We will try Female for the last 2 slots (Soldier, Drone) and Male for Commander, Driver
-      const tryPattern = (genders: ("ז"| "נ")[]): MissionSlot[] | null => {
+      const tryPattern = (genders: ("ז"| "נ" | undefined)[]): MissionSlot[] | null => {
         const tempAssigned = new Set<string>();
         const slots: MissionSlot[] = [];
         for (let i = 0; i < IZUMA_SLOTS.length; i++) {
           const slot = IZUMA_SLOTS[i];
           const prev = prevM?.slots?.[i]?.assignedTo;
           const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned);
-          if (!assigned && genders[i] === "נ") return null; // Failed to find female
+          if (!assigned && genders[i]) return null; // Failed to find required gender
           if (assigned) tempAssigned.add(normalizeNameStr(assigned));
           slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
         }
@@ -286,7 +286,7 @@ export function generateAssignment(
       }
       if (!slots) {
         // Fallback without gender constraints
-        slots = tryPattern([undefined as any, undefined as any, undefined as any, undefined as any]);
+        slots = tryPattern([undefined, undefined, undefined, undefined]);
       }
       
       slots?.forEach(s => {
@@ -305,7 +305,7 @@ export function generateAssignment(
     const buildPilboxSlots = (): MissionSlot[] => {
       const remainingSlots = PILBOX_SLOTS.slice(1);
       
-      const tryPattern = (genders: ("ז"|"נ")[]): MissionSlot[] | null => {
+      const tryPattern = (genders: ("ז"|"נ" | undefined)[]): MissionSlot[] | null => {
         const tempAssigned = new Set<string>();
         const slots: MissionSlot[] = [{ roleLabel: pilboxSergeantSlot.roleLabel, requiredRole: pilboxSergeantSlot.roleFilter, assignedTo: assignedPilboxSergeant }];
         let femaleCount = pilboxSergeantGender === "נ" ? 1 : 0;
@@ -314,7 +314,7 @@ export function generateAssignment(
           const slot = remainingSlots[i];
           const prev = prevPilbox?.slots?.[i + 1]?.assignedTo;
           const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned);
-          if (!assigned && genders[i] === "נ") return null;
+          if (!assigned && genders[i]) return null;
           if (assigned) {
             tempAssigned.add(normalizeNameStr(assigned));
             if (findRecord(assigned)?.gender === "נ") femaleCount++;
@@ -331,7 +331,7 @@ export function generateAssignment(
       // We need 7 more people. Let's try 3 females out of 7 (if sergeant is male, we need 3 females. If sergeant is female, we need 2 more)
       // We will assign females to the last N "חייל" slots.
       let numFemalesNeeded = pilboxSergeantGender === "נ" ? 2 : 3;
-      const patternMixed: ("ז"|"נ")[] = ["ז", "ז", "ז", "ז", "ז", "ז", "ז"];
+      const patternMixed: ("ז"|"נ" | undefined)[] = ["ז", "ז", "ז", "ז", "ז", "ז", "ז"];
       // Fill the last `numFemalesNeeded` with "נ"
       for (let i = 0; i < numFemalesNeeded; i++) patternMixed[6 - i] = "נ";
       
@@ -342,7 +342,7 @@ export function generateAssignment(
       }
       if (!slots) {
         // Fallback
-        slots = tryPattern([undefined as any, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any]);
+        slots = tryPattern([undefined, undefined, undefined, undefined, undefined, undefined, undefined]);
       }
       
       slots?.forEach(s => {
