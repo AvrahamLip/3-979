@@ -518,6 +518,7 @@ export function generateAssignment(
       const role = String(p.role || "").trim();
       if (role.includes("מנהלה")) return false;
       if (role.includes("מ\"פ") || role === "מפ") return false;
+      if (role.includes("קצין") || role.includes("מ\"מ")) return false;
       return (pres !== "none" && pres !== "leaving");
     }).sort((a, b) => {
       const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
