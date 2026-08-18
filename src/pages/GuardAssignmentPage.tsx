@@ -495,7 +495,7 @@ export function generateAssignment(
 
     let extraIndex = 1;
     for (const p of unassignedSoldiers) {
-      if (extraIndex > 2) break; // Limit to maximum 2 extra soldiers
+      if (extraIndex > 1) break; // Limit to maximum 1 extra soldier
       assignedNames.add(normalizeNameStr(p.name));
       pilboxSlots.push({
         roleLabel: `חייל נוסף ${extraIndex++}`,
