@@ -223,7 +223,7 @@ export function generateAssignment(
 
       const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false, allowLeavingTomorrow = false): string => {
         if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName)) && !extraAssigned.has(normalizeNameStr(preferName))) {
-          if (!genderReq || findRecord(preferName)?.gender === genderReq) {
+          if (!genderReq || (findRecord(preferName)?.gender || "ז") === genderReq) {
             if (!isPilbox || allowLeavingTomorrow || !isLeavingTomorrow(preferName)) return preferName;
           }
         }
@@ -236,7 +236,7 @@ export function generateAssignment(
             if (pres === "none" || pres === "leaving") return false;
             if (assignedNames.has(norm) || extraAssigned.has(norm)) return false;
             if (role.includes("מ\"פ") || role === "מפ") return false;
-            if (genderReq && p.gender !== genderReq) return false;
+            if (genderReq && (p.gender || "ז") !== genderReq) return false;
             if (isPilbox && !allowLeavingTomorrow && isLeavingTomorrow(p.name)) return false;
             if (filter) {
               if (filter === "חייל") {
