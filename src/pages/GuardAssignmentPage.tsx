@@ -1414,6 +1414,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       });
       if (!response.ok) throw new Error("Save API failed");
       setLoadedAssignments(assignments);
+      setIsSaved(true);
       toast.success("השיבוץ נשמר בגיליון בהצלחה!");
     } catch (e) {
       console.error("Save API Error:", e);
