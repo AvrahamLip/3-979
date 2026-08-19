@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 // Single-level static configuration to allow Cloudflare's automated tools to easily parse and modify it
 export default defineConfig({
-  base: process.env.CF_PAGES === "1" ? "/" : "/3-979/",
+  base: (process.env.CF_PAGES === "1" || process.env.VERCEL === "1") ? "/" : "/3-979/",
   server: {
     host: "::",
     port: 8080,
