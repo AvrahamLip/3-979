@@ -1,6 +1,19 @@
 # 🛡️ תיעוד מערכת ההרשאות - פרויקט דוח-1
 
-## 📋 סיכום המצב הנוכחי (מרץ 2026)
+## 📋 סיכום המצב הנוכחי (אוגוסט 2026 — מעודכן)
+> עדכון: רוב התוכן בהמשך מתייחס לגרסה legacy (`update.html`). המצב בפועל ב-SPA (React):
+
+- **Roles בפועל**: `update` (עדכון נוכחות, `DataUpdatePage`) ו-`guard` (ניהול שיבוץ, `GuardAssignmentPage` במצב מפקד). ה-role `phone` לא קיים יותר.
+- **קבצים בפועל**: `src/components/CommanderGuard.tsx` (לא `AuthGuard.tsx`) + `src/hooks/useRoleAuth.ts` (Google Identity Services, Client ID `435530372836-...apps.googleusercontent.com`).
+- **שדה הבקשה**: הקוד שולח `{ email, roll, credential }` ל-`POST /webhook/validate`. ⚠️ הערה: ב-n8n `Auth - Validate Email.json` מסנן ה-Data Table קורא `body.role` בעוד צומת ה-IF משווה `body.roll` — חוסר עקביות אפשרי.
+- **אחסון**: `localStorage` — `is_commander` + `user_info.authorizedRolls` (ניתן לזיוף; ללא session אמיתי מהשרת).
+- **עקיפת הרשאות מקומית**: hostname שהוא localhost/`192.168.*`/`10.*`/`172.*` מקבל משתמש mock עם כל ההרשאות (`AuthContext.tsx:18-29`).
+- **הגנת webhook**: `/update-status` מאשר רק `lip.avi@gmail.com` (hardcoded ב-n8n) — הגנה אמיתית בשרת. `/validate` בודק רשימת הרשאות ב-n8n Data Table `emails`.
+- **`checkPermission()`** מוגדר ב-AuthContext אבל **אף פעם לא נקרא** באפליקציה.
+
+---
+
+## 📋 סיכום גרסה legacy (מרץ 2026)
 שחזרנו את המערכת למצב עבודה מלא לאחר תיקון באגים קריטיים במנגנון האימות ובמבנה הדפים.
 
 ### 🔑 מפתחות הרשאות (Roles)

@@ -1,53 +1,54 @@
 import type { StatusCounts, RoleStats } from "@/types/attendance";
 import { StatusCountsRow } from "./StatusCountsRow";
 import { Users, CheckCircle2 } from "lucide-react";
-import { getSummaryCategory } from "@/lib/attendanceUtils";
+import { getSummaryCategory, STATUS_COLORS } from "@/lib/attendanceUtils";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 interface SummaryCardsProps {
   totalCounts: StatusCounts;
   roles: RoleStats[];
 }
 
-function StatPill({
-  label,
-  value,
-  total,
-  colorClass,
-}: {
-  label: string;
-  value: number;
-  total: number;
-  colorClass: string;
-}) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
-  return (
-    <div className={`flex flex-col items-center p-3 rounded-xl ${colorClass}`}>
-      <span className="text-2xl font-black leading-tight">{value}</span>
-      <span className="text-xs font-semibold mt-0.5 opacity-80">{label}</span>
-      <span className="text-[10px] opacity-60">{pct}%</span>
-    </div>
-  );
-}
-
 export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) {
-  // Aggregate individual statuses into summary categories
-  const aggregated: Record<string, number> = {
-    "נוכח": 0,
-    "אפטר": 0,
-    "מחלה / גימלים": 0,
-    "אחר": 0,
-  };
+  // Aggregate individual statuses into summary categories for the Roles Breakdown (still using getSummaryCategory)
+  // For the total company card, we want the top 5 raw statuses + "אחר"
+  const entries = Object.entries(totalCounts)
+    .filter(([k, v]) => k !== "total" && k !== "אחר" && (v as number) > 0)
+    .sort((a, b) => (b[1] as number) - (a[1] as number));
 
-  Object.entries(totalCounts).forEach(([key, value]) => {
-    if (key === "total") return;
+  const top5 = entries.slice(0, 5);
+  const othersCount = entries.slice(5).reduce((sum, [, v]) => sum + (v as number), 0) + (totalCounts["אחר"] || 0);
+
+  const chartData = top5.map(([name, value]) => ({ name, value: value as number }));
+  if (othersCount > 0) {
+    chartData.push({ name: "אחר", value: othersCount });
+  }
+
+  // Calculate actual present users count using the existing logic so the title stats stay consistent
+  const presentCount = Object.entries(totalCounts).reduce((sum, [key, value]) => {
+    if (key === "total") return sum;
     const cat = getSummaryCategory(key as any);
-    aggregated[cat] += value;
-  });
+    if (cat === "נוכח") return sum + (value as number);
+    return sum;
+  }, 0);
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-popover text-popover-foreground text-xs p-2 rounded shadow-md border border-border">
+          <p className="font-bold">
+            {payload[0].name}: {payload[0].value}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Total Company Card */}
-      <div className="bg-card border border-border rounded-xl p-5 card-shadow">
+      <div className="bg-card border border-border rounded-xl p-5 card-shadow flex flex-col">
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg gradient-hero">
             <Users className="w-4 h-4 text-overlay" />
@@ -55,58 +56,38 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
           <div>
             <h3 className="font-bold text-sm">סיכום כולל</h3>
             <p className="text-xs text-muted-foreground">
-              {aggregated["נוכח"]}/{totalCounts.total} נוכחים
+              {presentCount}/{totalCounts.total} נוכחים
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <StatPill
-            label="נוכח"
-            value={aggregated["נוכח"]}
-            total={totalCounts.total}
-            colorClass="text-status-base bg-status-base-bg"
-          />
-          <StatPill
-            label="אפטר"
-            value={aggregated["אפטר"]}
-            total={totalCounts.total}
-            colorClass="text-status-home bg-status-home-bg"
-          />
-          <StatPill
-            label="גימלים"
-            value={aggregated["מחלה / גימלים"]}
-            total={totalCounts.total}
-            colorClass="text-status-sick bg-status-sick-bg"
-          />
-          <StatPill
-            label="אחר"
-            value={aggregated["אחר"]}
-            total={totalCounts.total}
-            colorClass="text-status-other bg-status-other-bg"
-          />
-        </div>
-        {/* Total bar */}
-        <div className="mt-4 space-y-1">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>סה&quot;כ {totalCounts.total} אנשים</span>
-            <span>
-              {totalCounts.total > 0
-                ? Math.round((aggregated["נוכח"] / totalCounts.total) * 100)
-                : 0}
-              % נוכחות
-            </span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-full bg-status-base rounded-full transition-all duration-700"
-              style={{
-                width:
-                  totalCounts.total > 0
-                    ? `${(aggregated["נוכח"] / totalCounts.total) * 100}%`
-                    : "0%",
-              }}
-            />
-          </div>
+        
+        <div className="flex-1 min-h-[220px] flex items-center justify-center -ml-4">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={75}
+                paddingAngle={2}
+                dataKey="value"
+                stroke="none"
+              >
+                {chartData.map((entry, index) => {
+                  const colorVar = STATUS_COLORS[entry.name as keyof typeof STATUS_COLORS] || "status-other";
+                  return <Cell key={`cell-${index}`} fill={`hsl(var(--${colorVar}))`} />;
+                })}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                layout="vertical" 
+                verticalAlign="middle" 
+                align="left"
+                wrapperStyle={{ fontSize: '12px', right: 0 }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
@@ -127,7 +108,7 @@ export default function SummaryCards({ totalCounts, roles }: SummaryCardsProps) 
             Object.entries(role.counts).forEach(([key, value]) => {
               if (key === "total") return;
               const cat = getSummaryCategory(key as any);
-              if (cat === "נוכח") roleAggregated["נוכח"] += value;
+              if (cat === "נוכח") roleAggregated["נוכח"] += (value as number);
             });
 
             return (

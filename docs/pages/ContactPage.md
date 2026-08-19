@@ -1,5 +1,5 @@
 # Page Title: Contacts (אנשי קשר)
-**Route:** `/contact`
+**Route:** `/guards/contact` (soldier) and `/main/contact` (commander) — same component
 
 ## Purpose & Description
 The `ContactPage` acts as a public phonebook or directory for all personnel currently registered in the system for the day. It provides a simple, searchable listing of individuals with quick-action buttons to call them or message them via WhatsApp. 

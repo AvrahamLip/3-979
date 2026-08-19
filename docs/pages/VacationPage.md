@@ -1,5 +1,5 @@
 # Page Title: Vacation Plan (תוכנית חופשים)
-**Route:** `/vacation`
+**Route:** `/guards/vacation` — routed but **nav-hidden** (nav links commented out in SoldierLayout)
 
 ## Purpose & Description
 The `VacationPage` is an embedded integration of a separate external web application (the Vacation Planner). Its sole purpose is to inject that application seamlessly into this primary dashboard so users don't have to navigate to a different URL.
@@ -17,5 +17,5 @@ The `VacationPage` is an embedded integration of a separate external web applica
 - **Data Fetching:** No native API hooks (`useQuery`) are used. All data ingestion, rendering, and management is handled by the remote document.
 
 ## Core Logic & Behaviors to Maintain
-- **Iframe Height Calculations:** The layout relies on exact viewport math (`h-[calc(100vh-64px-44px)]` on mobile, `h-[calc(100vh-64px-60px)]` on desktop) to ensure the embedded app takes up exactly the rest of the screen without causing a double-scroll-bar effect. Changing the header or navigation bar heights in `Layout.tsx` will require updating the math in this component to prevent overflow bugs.
+- **Iframe Height Calculations:** The layout relies on exact viewport math (`h-[calc(100vh-64px-44px)]` on mobile, `h-[calc(100vh-64px-60px)]` on desktop) to ensure the embedded app takes up exactly the rest of the screen without causing a double-scroll-bar effect. Changing the header or navigation bar heights in `SoldierLayout.tsx` will require updating the math in this component to prevent overflow bugs.
 - **OnLoad Toggle:** The `LoadingOverlay` is dismissed using the native `onLoad` event handler attached to the iframe.

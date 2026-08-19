@@ -1,5 +1,5 @@
 # Page Title: Work Plan (תוכנית עבודה)
-**Route:** `/workplan`
+**Route:** `/main/workplan`
 
 ## Purpose & Description
 The `WorkPlanPage` presents a 4-day matrix (Yesterday, Today, Tomorrow, Day After Tomorrow) displaying personnel availability. It is designed to help commanders see a broad view of attendance over time to facilitate planning and assignments.

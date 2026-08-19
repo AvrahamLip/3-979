@@ -317,8 +317,23 @@ export function generateAssignment(
         return slots;
       };
 
+      // Pilbox has priority for females (it needs 3 total, sergeant included).
+      // Only attempt the 2F/2M izuma pattern when pilbox is unaffected:
+      // - fewer eligible females than pilbox needs (pilbox goes all-male anyway), or
+      // - enough surplus females remain after izuma takes 2.
+      const pilboxFemaleNeed = pilboxSergeantGender === "נ" ? 2 : 3;
+      const femalePool = records.filter(p => {
+        if (p.gender !== "נ") return false;
+        const pres = getPresenceFor(p);
+        if (pres === "none" || pres === "leaving") return false;
+        return !assignedNames.has(normalizeNameStr(p.name));
+      }).length;
+
       // Try 2F/2M (Commander=M, Driver=M, Drone=F, Soldier=F)
-      let slots = tryPattern(["ז", "ז", "נ", "נ"]);
+      let slots: MissionSlot[] | null = null;
+      if (femalePool < pilboxFemaleNeed || femalePool - 2 >= pilboxFemaleNeed) {
+        slots = tryPattern(["ז", "ז", "נ", "נ"]);
+      }
       if (!slots) {
         // Try all males if mixed fails
         slots = tryPattern(["ז", "ז", "ז", "ז"]);
@@ -358,7 +373,9 @@ export function generateAssignment(
             // Fallback: allow leaving tomorrow if slot would remain empty
             assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, true);
           }
-          if (!assigned && genders[i]) return null;
+          // Relaxed: if a gender-required slot cannot be filled (e.g. male מפקד already
+          // taken by izuma), leave it empty and continue — a valid ≥3F team can still form.
+          // The femaleCount validation below rejects partial 1-2F teams.
           if (assigned) {
             tempAssigned.add(normalizeNameStr(assigned));
             if (findRecord(assigned)?.gender === "נ") femaleCount++;
@@ -378,8 +395,17 @@ export function generateAssignment(
       const patternMixed: ("ז"|"נ" | undefined)[] = ["ז", "ז", "ז", "ז", "ז", "ז", "ז"];
       // Fill the last `numFemalesNeeded` with "נ"
       for (let i = 0; i < numFemalesNeeded; i++) patternMixed[6 - i] = "נ";
-      
-      let slots = tryPattern(patternMixed);
+
+      // If no eligible females exist, skip the mixed pattern entirely — otherwise it
+      // "succeeds" with 0 females (validation allows it) and leaves the female-designated
+      // slots empty even though males are available, because the all-male fallback never runs.
+      const eligibleFemales = records.filter(p => {
+        if (p.gender !== "נ") return false;
+        const pres = getPresenceFor(p);
+        return pres !== "none" && pres !== "leaving";
+      }).length;
+
+      let slots = eligibleFemales > 0 ? tryPattern(patternMixed) : null;
       if (!slots) {
         // Try all males
         slots = tryPattern(["ז", "ז", "ז", "ז", "ז", "ז", "ז"]);

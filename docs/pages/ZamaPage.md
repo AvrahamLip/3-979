@@ -1,5 +1,5 @@
 # Page Title: ZAMA Report (דוח צמ"ה)
-**Route:** `/zama`
+**Route:** `/zama` — ⚠️ **DISABLED (dead code)**: removed in commit `f91413d`; import, route, and nav links are commented out (`src/App.tsx:9,49`, `CommanderLayout.tsx`). Do not resurrect without checking git history.
 
 ## Purpose & Description
 The `ZamaPage` is a specialized daily attendance report specifically meant for the ZAMA (צמ"ה - צמ"ה כבד) departments. It displays grouped personnel attendance, calculating presence percentages (בבסיס / Total) and showing role-based breakdowns for these specific departments in an expandable accordion format.

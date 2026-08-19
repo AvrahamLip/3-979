@@ -83,7 +83,9 @@ describe("WorkPlanPage", () => {
     await waitFor(() => {
       expect(screen.getByText(/מקרא:/)).toBeInTheDocument();
     });
-    expect(screen.getByText(/בבסיס/)).toBeInTheDocument();
-    expect(screen.getByText(/בבית/)).toBeInTheDocument();
+    expect(screen.getAllByText("נוכח").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("אפטר").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("מחלה / גימלים").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("אחר").length).toBeGreaterThan(0);
   });
 });

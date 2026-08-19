@@ -7,7 +7,6 @@ import {
   getTodayIso,
 } from "@/lib/attendanceUtils";
 import DatePickerBar from "@/components/DatePickerBar";
-import LegendCard from "@/components/LegendCard";
 import SummaryCards from "@/components/SummaryCards";
 import DepartmentAccordion from "@/components/DepartmentAccordion";
 import AttendanceTable from "@/components/AttendanceTable";
@@ -81,7 +80,6 @@ export default function MainPage() {
           {/* Summary Section */}
           <section className="space-y-4">
             <h2 className="text-lg font-black text-foreground">סיכום</h2>
-            <LegendCard />
             <SummaryCards totalCounts={totalCounts} roles={globalRoles} />
           </section>
 
