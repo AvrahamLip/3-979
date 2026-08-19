@@ -49,6 +49,17 @@
     --status-sick-bg: 0 72% 94%;
     --status-other: 215 14% 55%;
     --status-other-bg: 215 14% 92%;
+    
+    --status-returning: 180 70% 35%;
+    --status-returning-bg: 180 70% 94%;
+    --status-course: 280 60% 45%;
+    --status-course-bg: 280 60% 94%;
+    --status-released: 30 85% 45%;
+    --status-released-bg: 30 85% 94%;
+    --status-split: 250 60% 50%;
+    --status-split-bg: 250 60% 94%;
+    --status-awol: 340 70% 45%;
+    --status-awol-bg: 340 70% 94%;
 
     /* Sidebar */
     --sidebar-background: 213 55% 22%;
@@ -112,6 +123,17 @@
     --status-sick-bg: 0 84% 12%;
     --status-other: 215 14% 70%;
     --status-other-bg: 215 14% 20%;
+    
+    --status-returning: 180 70% 45%;
+    --status-returning-bg: 180 70% 15%;
+    --status-course: 280 60% 65%;
+    --status-course-bg: 280 60% 15%;
+    --status-released: 30 85% 55%;
+    --status-released-bg: 30 85% 15%;
+    --status-split: 250 60% 65%;
+    --status-split-bg: 250 60% 15%;
+    --status-awol: 340 70% 60%;
+    --status-awol-bg: 340 70% 15%;
 
     /* Sidebar */
     --sidebar-background: 213 45% 10%;

@@ -166,16 +166,16 @@ export const STATUS_LABELS: StatusType[] = [
 
 export const STATUS_COLORS: Record<StatusType, string> = {
   "נוכח": "status-base",
-  "יצא לאפטר": "status-returning", // Blueish
+  "יצא לאפטר": "status-returning", // Teal/Cyan
   "אפטר": "status-home",
   "מחלה / גימלים": "status-sick",
-  "מנותק קשר": "status-other",
-  "קורס": "status-other",
-  "משתחרר": "status-home",
-  "שוחרר": "status-home",
-  "פוטנציאל נפקדות": "status-sick",
-  "פיצול": "status-other",
-  "יציאה לפיצול": "status-returning",
+  "מנותק קשר": "status-awol", // Reddish
+  "קורס": "status-course", // Purple
+  "משתחרר": "status-released", // Orange
+  "שוחרר": "status-released",
+  "פוטנציאל נפקדות": "status-awol",
+  "פיצול": "status-split", // Indigo
+  "יציאה לפיצול": "status-split",
   "אחר": "status-other",
 };
 
