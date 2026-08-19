@@ -9,7 +9,7 @@ import type { RawRecord } from "@/types/attendance";
 const MAIN_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
 
 async function fetchMainData(date: string): Promise<AttendanceRecord[]> {
-  const res = await fetch(`${MAIN_API}?date=${encodeURIComponent(date)}`);
+  const res = await fetch(`${MAIN_API}?date=${encodeURIComponent(date)}`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`שגיאת שרת: ${res.status}`);
   const json = await res.json();
   const arr: RawRecord[] = Array.isArray(json) ? json : json.data ?? [];
@@ -33,7 +33,7 @@ const ZAMA_DEPTS = ["המושבה - פ\"ת", "צרעה", "מכון ויצמן - 
 
 async function fetchZamaDept(deptName: string, date: string): Promise<AttendanceRecord[]> {
   const url = `${ZAMA_API}?id=${encodeURIComponent(deptName)}&date=${encodeURIComponent(date)}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`שגיאת שרת עבור ${deptName}: ${res.status}`);
   const json = await res.json();
   const arr: RawRecord[] = Array.isArray(json) ? json : json.data ?? [];

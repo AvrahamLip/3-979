@@ -1185,7 +1185,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
 
   const fetchSavedAssignment = async (targetDate: string) => {
     try {
-      const response = await fetch(`https://151.145.89.228.sslip.io/webhook/load-guards?date=${formatDateForApi(targetDate)}`);
+      const response = await fetch(`https://151.145.89.228.sslip.io/webhook/load-guards?date=${formatDateForApi(targetDate)}`, { cache: 'no-store' });
       if (!response.ok) return null;
       const text = await response.text();
       if (!text || text.trim() === "") return null;
