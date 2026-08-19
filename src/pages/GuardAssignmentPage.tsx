@@ -134,21 +134,6 @@ export function generateAssignment(
     if (!records) records = [];
     if (!hapakRows) hapakRows = [];
 
-    const assignedNames = new Set<string>(blockedNames);
-
-    // Extract yesterday's Pilbox team
-    const yesterdayPilboxNames = new Set<string>();
-    if (previousAssignment && previousAssignment.missions) {
-      previousAssignment.missions.forEach(m => {
-        if (m.postType === "פילבוקס") {
-          m.slots.forEach(s => {
-            if (s.assignedTo) {
-              yesterdayPilboxNames.add(normalizeNameStr(s.assignedTo));
-            }
-          });
-        }
-      });
-    }
 
     const isLeavingTomorrow = (name: string) => {
       const norm = normalizeNameStr(name);
@@ -164,38 +149,95 @@ export function generateAssignment(
     const findRecord = (name: string) =>
       records.find(r => normalizeNameStr(r.name) === normalizeNameStr(name));
 
-    const isPersonAvailable = (name: string): boolean => {
-      if (!name) return false;
-      const rec = findRecord(name);
-      if (!rec) return false;
-      const p = getPresenceFor(rec);
-      const rawValue = String(rec.todayValue || "").trim();
-      return (p !== "none" && p !== "leaving");
-    };
-
-    // Minimal-change: prefer keeping the previous assignment.
-    // Only replace if the person is no longer available.
-    const findBest = (roleFilters: string[] | string | null, preferName?: string, requiredGender?: "ז" | "נ"): string => {
-      if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName))) {
-        // If gender is required, check if preferName matches it
-        if (!requiredGender || findRecord(preferName)?.gender === requiredGender) {
-          return preferName;
+    // Extract yesterday's Pilbox team
+    const yesterdayPilboxNames = new Set<string>();
+    if (previousAssignment && previousAssignment.missions) {
+      previousAssignment.missions.forEach(m => {
+        if (m.postType === "פילבוקס") {
+          m.slots.forEach(s => {
+            if (s.assignedTo) {
+              yesterdayPilboxNames.add(normalizeNameStr(s.assignedTo));
+            }
+          });
         }
-      }
+      });
+    }
 
-      const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
+    let bestAssignment: AssignmentData | null = null;
+    let minEmptyCount = 999;
 
-      for (const filter of filters) {
-        const candidates = records
-          .filter(p => {
+    // 3 Attempts: 1=Default, 2=Pilbox First, 3=Chamal First
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const assignedNames = new Set<string>(blockedNames);
+
+      const isPersonAvailable = (name: string): boolean => {
+        if (!name) return false;
+        const rec = findRecord(name);
+        if (!rec) return false;
+        const p = getPresenceFor(rec);
+        return (p !== "none" && p !== "leaving");
+      };
+
+      const findBest = (roleFilters: string[] | string | null, preferName?: string, requiredGender?: "ז" | "נ"): string => {
+        if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName))) {
+          if (!requiredGender || findRecord(preferName)?.gender === requiredGender) {
+            return preferName;
+          }
+        }
+        const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
+        for (const filter of filters) {
+          const candidates = records
+            .filter(p => {
+              const role = (p.role || "").trim();
+              const norm = normalizeNameStr(p.name);
+              const pres = getPresenceFor(p);
+              if (pres === "none" || pres === "leaving") return false;
+              if (assignedNames.has(norm)) return false;
+              if (role.includes("מ\"פ") || role === "מפ") return false;
+              if (requiredGender && p.gender !== requiredGender) return false;
+              if (filter) {
+                if (filter === "חייל") {
+                  if (role.includes("מנהלה")) return false;
+                  if (!role.includes("חייל") && !role.includes("חובש")) return false;
+                } else {
+                  if (!role.includes(filter)) return false;
+                }
+              }
+              return true;
+            })
+            .sort((a, b) => {
+              const aRole = (a.role || "").trim();
+              const bRole = (b.role || "").trim();
+              const aExact = filter ? aRole === filter : false;
+              const bExact = filter ? bRole === filter : false;
+              if (aExact && !bExact) return -1;
+              if (!aExact && bExact) return 1;
+              const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+              const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+              return aScore - bScore;
+            });
+          if (candidates.length > 0) return candidates[0].name;
+        }
+        return "";
+      };
+
+      const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false, allowLeavingTomorrow = false): string => {
+        if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName)) && !extraAssigned.has(normalizeNameStr(preferName))) {
+          if (!genderReq || findRecord(preferName)?.gender === genderReq) {
+            if (!isPilbox || allowLeavingTomorrow || !isLeavingTomorrow(preferName)) return preferName;
+          }
+        }
+        const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
+        for (const filter of filters) {
+          const candidates = records.filter(p => {
             const role = (p.role || "").trim();
             const norm = normalizeNameStr(p.name);
             const pres = getPresenceFor(p);
             if (pres === "none" || pres === "leaving") return false;
-            if (assignedNames.has(norm)) return false;
-            if (role.includes("מ\"פ") || role === "מפ") return false; // Exclude MP
-            if (requiredGender && p.gender !== requiredGender) return false;
-            
+            if (assignedNames.has(norm) || extraAssigned.has(norm)) return false;
+            if (role.includes("מ\"פ") || role === "מפ") return false;
+            if (genderReq && p.gender !== genderReq) return false;
+            if (isPilbox && !allowLeavingTomorrow && isLeavingTomorrow(p.name)) return false;
             if (filter) {
               if (filter === "חייל") {
                 if (role.includes("מנהלה")) return false;
@@ -205,413 +247,352 @@ export function generateAssignment(
               }
             }
             return true;
-          })
-          .sort((a, b) => {
-            const aRole = (a.role || "").trim();
-            const bRole = (b.role || "").trim();
-            
-            const aExact = filter ? aRole === filter : false;
-            const bExact = filter ? bRole === filter : false;
-
+          }).sort((a, b) => {
+            const aExact = filter ? (a.role || "").trim() === filter : false;
+            const bExact = filter ? (b.role || "").trim() === filter : false;
             if (aExact && !bExact) return -1;
             if (!aExact && bExact) return 1;
-
-            const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-            const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+            let aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+            let bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+            if (isPilbox) {
+              if (yesterdayPilboxNames.has(normalizeNameStr(a.name))) aScore -= 2;
+              if (yesterdayPilboxNames.has(normalizeNameStr(b.name))) bScore -= 2;
+            }
             return aScore - bScore;
           });
-
-        if (candidates.length > 0) {
-          return candidates[0].name;
+          if (candidates.length > 0) return candidates[0].name;
         }
-      }
-      return "";
-    };
+        return "";
+      };
 
-    // Helper for hypothetical assignments
-    const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false, allowLeavingTomorrow = false): string => {
-      if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName)) && !extraAssigned.has(normalizeNameStr(preferName))) {
-        if (!genderReq || findRecord(preferName)?.gender === genderReq) {
-          if (!isPilbox || allowLeavingTomorrow || !isLeavingTomorrow(preferName)) return preferName;
+      let assignedPilboxSergeant = "";
+      let pilboxSergeantGender: "ז" | "נ" = "ז";
+      let chamal: ChamalShift[] = [];
+      let izumaSlots: MissionSlot[] = [];
+      let pilboxSlots: MissionSlot[] = [];
+      let izumaBSlots: MissionSlot[] = [];
+
+      const doSergeant = () => {
+        const pilboxSergeantSlot = PILBOX_SLOTS[0];
+        const prevPilboxSergeant = previousAssignment?.missions?.find(m => m.postType === "פילבוקס")?.slots?.[0]?.assignedTo;
+        assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, false);
+        if (!assignedPilboxSergeant) {
+          assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, true);
         }
-      }
-      const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
-      for (const filter of filters) {
-        const candidates = records.filter(p => {
-          const role = (p.role || "").trim();
-          const norm = normalizeNameStr(p.name);
+        if (assignedPilboxSergeant) assignedNames.add(normalizeNameStr(assignedPilboxSergeant));
+        if (assignedPilboxSergeant) {
+          pilboxSergeantGender = findRecord(assignedPilboxSergeant)?.gender || "ז";
+        }
+      };
+
+      const doChamal = () => {
+        chamal = CHAMAL_SHIFTS.map(shift => {
+          const prev = previousAssignment?.chamal?.find(c => c.shiftIndex === shift.shiftIndex)?.assignedTo;
+          const assigned = getBestCandidate("חמל", prev);
+          if (assigned) assignedNames.add(normalizeNameStr(assigned));
+          return { shiftIndex: shift.shiftIndex, timeLabel: shift.timeLabel, assignedTo: assigned };
+        });
+      };
+
+      const buildIzuma = (prevM: any): MissionSlot[] => {
+        const tryPattern = (genders: ("ז"| "נ" | undefined)[]): MissionSlot[] | null => {
+          const tempAssigned = new Set<string>();
+          const slots: MissionSlot[] = [];
+          for (let i = 0; i < IZUMA_SLOTS.length; i++) {
+            const slot = IZUMA_SLOTS[i];
+            const prev = prevM?.slots?.[i]?.assignedTo;
+            const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned);
+            if (!assigned && genders[i]) return null;
+            if (assigned) tempAssigned.add(normalizeNameStr(assigned));
+            slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
+          }
+          return slots;
+        };
+
+        const pilboxFemaleNeed = pilboxSergeantGender === "נ" ? 2 : 3;
+        const femalePool = records.filter(p => {
+          if (p.gender !== "נ") return false;
           const pres = getPresenceFor(p);
           if (pres === "none" || pres === "leaving") return false;
-          if (assignedNames.has(norm) || extraAssigned.has(norm)) return false;
-          if (role.includes("מ\"פ") || role === "מפ") return false;
-          if (genderReq && p.gender !== genderReq) return false;
-          if (isPilbox && !allowLeavingTomorrow && isLeavingTomorrow(p.name)) return false;
-          if (filter) {
-            if (filter === "חייל") {
-              if (role.includes("מנהלה")) return false;
-              if (!role.includes("חייל") && !role.includes("חובש")) return false;
-            } else {
-              if (!role.includes(filter)) return false;
+          return !assignedNames.has(normalizeNameStr(p.name));
+        }).length;
+
+        let slots: MissionSlot[] | null = null;
+        if (femalePool < pilboxFemaleNeed || femalePool - 2 >= pilboxFemaleNeed) {
+          slots = tryPattern(["ז", "ז", "נ", "נ"]);
+        }
+        if (!slots) {
+          slots = tryPattern(["ז", "ז", "ז", "ז"]);
+        }
+        if (!slots) {
+          slots = tryPattern([undefined, undefined, undefined, undefined]);
+        }
+        slots?.forEach(s => {
+          if (s.assignedTo) assignedNames.add(normalizeNameStr(s.assignedTo));
+        });
+        return slots || [];
+      };
+
+      const buildPilboxSlots = (): MissionSlot[] => {
+        const remainingSlots = PILBOX_SLOTS.slice(1);
+        const prevPilbox = previousAssignment?.missions?.find(m => m.postType === "פילבוקס");
+        
+        const tryPattern = (genders: ("ז"|"נ" | undefined)[]): MissionSlot[] | null => {
+          const tempAssigned = new Set<string>();
+          const slots: MissionSlot[] = [{ roleLabel: PILBOX_SLOTS[0].roleLabel, requiredRole: PILBOX_SLOTS[0].roleFilter, assignedTo: assignedPilboxSergeant }];
+          let femaleCount = pilboxSergeantGender === "נ" ? 1 : 0;
+          
+          for (let i = 0; i < remainingSlots.length; i++) {
+            const slot = remainingSlots[i];
+            const prev = prevPilbox?.slots?.[i + 1]?.assignedTo;
+            let assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, false);
+            if (!assigned) {
+              assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, true);
             }
-          }
-          return true;
-        }).sort((a, b) => {
-          const aExact = filter ? (a.role || "").trim() === filter : false;
-          const bExact = filter ? (b.role || "").trim() === filter : false;
-          if (aExact && !bExact) return -1;
-          if (!aExact && bExact) return 1;
-          
-          let aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-          let bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
-          
-          if (isPilbox) {
-            if (yesterdayPilboxNames.has(normalizeNameStr(a.name))) aScore -= 2;
-            if (yesterdayPilboxNames.has(normalizeNameStr(b.name))) bScore -= 2;
+            if (assigned) {
+              tempAssigned.add(normalizeNameStr(assigned));
+              if (findRecord(assigned)?.gender === "נ") femaleCount++;
+            }
+            slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
           }
           
-          return aScore - bScore;
+          if (femaleCount > 0 && femaleCount < 3) return null;
+          return slots;
+        };
+        
+        const numFemalesNeeded = pilboxSergeantGender === "נ" ? 2 : 3;
+        const patternMixed: ("ז"|"נ" | undefined)[] = ["ז", "ז", "ז", "ז", "ז", "ז", "ז"];
+        for (let i = 0; i < numFemalesNeeded; i++) patternMixed[6 - i] = "נ";
+
+        const eligibleFemales = records.filter(p => {
+          if (p.gender !== "נ") return false;
+          const pres = getPresenceFor(p);
+          return pres !== "none" && pres !== "leaving";
+        }).length;
+
+        let slots = eligibleFemales > 0 ? tryPattern(patternMixed) : null;
+        if (!slots) {
+          slots = tryPattern(["ז", "ז", "ז", "ז", "ז", "ז", "ז"]);
+        }
+        if (!slots) {
+          slots = tryPattern([undefined, undefined, undefined, undefined, undefined, undefined, undefined]);
+        }
+        
+        slots?.forEach(s => {
+          if (s.assignedTo && s.assignedTo !== assignedPilboxSergeant) assignedNames.add(normalizeNameStr(s.assignedTo));
         });
-        if (candidates.length > 0) return candidates[0].name;
-      }
-      return "";
-    };
-
-    // ─── 0. Pilbox Sergeant (סמל פילבוקס) ──────────────────────────────
-    // Pre-assign Pilbox Sergeant so they are not taken by Izuma
-    const pilboxSergeantSlot = PILBOX_SLOTS[0]; // Assuming index 0 is סמל
-    const prevPilboxSergeant = previousAssignment?.missions?.find(m => m.postType === "פילבוקס")?.slots?.[0]?.assignedTo;
-    let assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, false);
-    if (!assignedPilboxSergeant) {
-      // Fallback: allow leaving tomorrow if no choice
-      assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, true);
-    }
-    if (assignedPilboxSergeant) assignedNames.add(normalizeNameStr(assignedPilboxSergeant));
-    let pilboxSergeantGender = "ז";
-    if (assignedPilboxSergeant) {
-      pilboxSergeantGender = findRecord(assignedPilboxSergeant)?.gender || "ז";
-    }
-
-    // ─── 1. חמל – 3 משמרות × אדם אחד מוגדר "חמל" ────────────────────────
-    const chamal: ChamalShift[] = CHAMAL_SHIFTS.map(shift => {
-      const prev = previousAssignment?.chamal?.find(c => c.shiftIndex === shift.shiftIndex)?.assignedTo;
-      const assigned = getBestCandidate("חמל", prev);
-      if (assigned) assignedNames.add(normalizeNameStr(assigned));
-      return { shiftIndex: shift.shiftIndex, timeLabel: shift.timeLabel, assignedTo: assigned };
-    });
-
-    // Helper to build Izuma with gender constraints (2M/2F or 4M)
-    const buildIzuma = (prevM: any): MissionSlot[] => {
-      // Strategy: Try exactly 2 Females and 2 Males
-      // We will try Female for the last 2 slots (Soldier, Drone) and Male for Commander, Driver
-      const tryPattern = (genders: ("ז"| "נ" | undefined)[]): MissionSlot[] | null => {
-        const tempAssigned = new Set<string>();
-        const slots: MissionSlot[] = [];
-        for (let i = 0; i < IZUMA_SLOTS.length; i++) {
-          const slot = IZUMA_SLOTS[i];
-          const prev = prevM?.slots?.[i]?.assignedTo;
-          const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned);
-          if (!assigned && genders[i]) return null; // Failed to find required gender
-          if (assigned) tempAssigned.add(normalizeNameStr(assigned));
-          slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
-        }
-        return slots;
+        return slots || [];
       };
 
-      // Pilbox has priority for females (it needs 3 total, sergeant included).
-      // Only attempt the 2F/2M izuma pattern when pilbox is unaffected:
-      // - fewer eligible females than pilbox needs (pilbox goes all-male anyway), or
-      // - enough surplus females remain after izuma takes 2.
-      const pilboxFemaleNeed = pilboxSergeantGender === "נ" ? 2 : 3;
-      const femalePool = records.filter(p => {
-        if (p.gender !== "נ") return false;
-        const pres = getPresenceFor(p);
-        if (pres === "none" || pres === "leaving") return false;
-        return !assignedNames.has(normalizeNameStr(p.name));
-      }).length;
-
-      // Try 2F/2M (Commander=M, Driver=M, Drone=F, Soldier=F)
-      let slots: MissionSlot[] | null = null;
-      if (femalePool < pilboxFemaleNeed || femalePool - 2 >= pilboxFemaleNeed) {
-        slots = tryPattern(["ז", "ז", "נ", "נ"]);
-      }
-      if (!slots) {
-        // Try all males if mixed fails
-        slots = tryPattern(["ז", "ז", "ז", "ז"]);
-      }
-      if (!slots) {
-        // Fallback without gender constraints
-        slots = tryPattern([undefined, undefined, undefined, undefined]);
-      }
-      
-      slots?.forEach(s => {
-        if (s.assignedTo) assignedNames.add(normalizeNameStr(s.assignedTo));
-      });
-      return slots || [];
-    };
-
-    // ─── 2. יזומה ──────────────────────────────
-    const prevIzuma = previousAssignment?.missions?.find(m => m.postType === "יזומה");
-    const izumaSlots: MissionSlot[] = buildIzuma(prevIzuma);
-
-    // ─── 3. פילבוקס ──────────────────────────────
-    // We already assigned Sergeant (slot 0)
-    // Needs 3-4 females if females are used. Sergeant counts.
-    const buildPilboxSlots = (): MissionSlot[] => {
-      const remainingSlots = PILBOX_SLOTS.slice(1);
-      const prevPilbox = previousAssignment?.missions?.find(m => m.postType === "פילבוקס");
-      
-      const tryPattern = (genders: ("ז"|"נ" | undefined)[]): MissionSlot[] | null => {
-        const tempAssigned = new Set<string>();
-        const slots: MissionSlot[] = [{ roleLabel: pilboxSergeantSlot.roleLabel, requiredRole: pilboxSergeantSlot.roleFilter, assignedTo: assignedPilboxSergeant }];
-        let femaleCount = pilboxSergeantGender === "נ" ? 1 : 0;
-        
-        for (let i = 0; i < remainingSlots.length; i++) {
-          const slot = remainingSlots[i];
-          const prev = prevPilbox?.slots?.[i + 1]?.assignedTo;
-          let assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, false);
-          if (!assigned) {
-            // Fallback: allow leaving tomorrow if slot would remain empty
-            assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, true);
-          }
-          // Relaxed: if a gender-required slot cannot be filled (e.g. male מפקד already
-          // taken by izuma), leave it empty and continue — a valid ≥3F team can still form.
-          // The femaleCount validation below rejects partial 1-2F teams.
-          if (assigned) {
-            tempAssigned.add(normalizeNameStr(assigned));
-            if (findRecord(assigned)?.gender === "נ") femaleCount++;
-          }
-          slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
-        }
-        
-        // Validation for females
-        if (femaleCount > 0 && femaleCount < 3) return null;
-        
-        return slots;
+      const doIzuma = () => {
+        const prevIzuma = previousAssignment?.missions?.find(m => m.postType === "יזומה");
+        izumaSlots = buildIzuma(prevIzuma);
       };
-      
-      // We need 7 more people. Let's try 3 females out of 7 (if sergeant is male, we need 3 females. If sergeant is female, we need 2 more)
-      // We will assign females to the last N "חייל" slots.
-      let numFemalesNeeded = pilboxSergeantGender === "נ" ? 2 : 3;
-      const patternMixed: ("ז"|"נ" | undefined)[] = ["ז", "ז", "ז", "ז", "ז", "ז", "ז"];
-      // Fill the last `numFemalesNeeded` with "נ"
-      for (let i = 0; i < numFemalesNeeded; i++) patternMixed[6 - i] = "נ";
 
-      // If no eligible females exist, skip the mixed pattern entirely — otherwise it
-      // "succeeds" with 0 females (validation allows it) and leaves the female-designated
-      // slots empty even though males are available, because the all-male fallback never runs.
-      const eligibleFemales = records.filter(p => {
-        if (p.gender !== "נ") return false;
+      const doPilbox = () => {
+        pilboxSlots = buildPilboxSlots();
+      };
+
+      const doIzumaB = () => {
+        const prevIzumaB = previousAssignment?.missions?.find(m => m.postType === "יזומה ב");
+        izumaBSlots = buildIzuma(prevIzumaB);
+      };
+
+      if (attempt === 1) {
+        doSergeant(); doChamal(); doIzuma(); doPilbox(); doIzumaB();
+      } else if (attempt === 2) {
+        doSergeant(); doPilbox(); doChamal(); doIzuma(); doIzumaB();
+      } else if (attempt === 3) {
+        doChamal(); doSergeant(); doPilbox(); doIzuma(); doIzumaB();
+      }
+
+      const missions: MissionPost[] = [
+        { postType: "יזומה",   slots: izumaSlots  },
+        { postType: "פילבוקס", slots: pilboxSlots },
+        { postType: "יזומה ב", slots: izumaBSlots },
+      ];
+
+      const hapakAssignments: HapakMission[] = [];
+      const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
+        const normalized = normalizeNameStr(name);
+        const p = records.find(r => normalizeNameStr(r.name) === normalized);
         const pres = getPresenceFor(p);
-        return pres !== "none" && pres !== "leaving";
-      }).length;
+        return pres === "leaving" ? "none" : pres;
+      };
 
-      let slots = eligibleFemales > 0 ? tryPattern(patternMixed) : null;
-      if (!slots) {
-        // Try all males
-        slots = tryPattern(["ז", "ז", "ז", "ז", "ז", "ז", "ז"]);
-      }
-      if (!slots) {
-        // Fallback
-        slots = tryPattern([undefined, undefined, undefined, undefined, undefined, undefined, undefined]);
-      }
-      
-      slots?.forEach(s => {
-        if (s.assignedTo && s.assignedTo !== assignedPilboxSergeant) assignedNames.add(normalizeNameStr(s.assignedTo));
-      });
-      return slots || [];
-    };
+      for (const mission of HAPAK_MISSIONS) {
+        let currentMemberIndex = 1;
+        const missionTeam = records.filter(r => {
+          const role = String(r.role || "").trim();
+          const dept = String(r.department || "").trim();
+          return role.includes("חפק") || role.includes("חפ\"ק") || dept.includes("חפק") || dept.includes("חפ\"ק");
+        });
+        const presentTeam = missionTeam.filter(r => getStatus(r.name) !== "none");
 
-    const pilboxSlots: MissionSlot[] = buildPilboxSlots();
+        if (presentTeam.length === 0) {
+          hapakAssignments.push({
+            id: mission.id, memberIndex: 1,
+            name: `חפ"ק ${mission.name} - לא פעיל`,
+            assignedTo: "", points: 0,
+          });
+          continue;
+        }
 
-    // ─── 3.5. יזומה ב ──────────────────────────────
-    const prevIzumaB = previousAssignment?.missions?.find(m => m.postType === "יזומה ב");
-    const izumaBSlots: MissionSlot[] = buildIzuma(prevIzumaB);
+        const razNorm = normalizeNameStr("רז חיון");
+        const razRecord = presentTeam.find(p => normalizeNameStr(p.name) === razNorm);
+        
+        let commanderName = "רז חיון";
+        if (razRecord && !assignedNames.has(razNorm)) {
+          assignedNames.add(razNorm);
+          commanderName = razRecord.name.trim();
+        } else {
+          assignedNames.add(razNorm);
+        }
 
-    const missions: MissionPost[] = [
-      { postType: "יזומה",   slots: izumaSlots  },
-      { postType: "פילבוקס", slots: pilboxSlots },
-      { postType: "יזומה ב", slots: izumaBSlots },
-    ];
-
-    // ─── 4. חפ"ק – רק אם הצוות הרלוונטי נמצא ────────────────────────────
-    const hapakAssignments: HapakMission[] = [];
-
-    const getStatus = (name: string): "full" | "leaving" | "returning" | "none" => {
-      const normalized = normalizeNameStr(name);
-      const p = records.find(r => normalizeNameStr(r.name) === normalized);
-      const pres = getPresenceFor(p);
-      return pres === "leaving" ? "none" : pres;
-    };
-
-    for (const mission of HAPAK_MISSIONS) {
-      let currentMemberIndex = 1;
-
-      // Filter anyone who has "חפק" / "חפ"ק" in their role or department
-      const missionTeam = records.filter(r => {
-        const role = String(r.role || "").trim();
-        const dept = String(r.department || "").trim();
-        return role.includes("חפק") || role.includes("חפ\"ק") || dept.includes("חפק") || dept.includes("חפ\"ק");
-      });
-      
-      const presentTeam = missionTeam.filter(r => getStatus(r.name) !== "none");
-
-      if (presentTeam.length === 0) {
         hapakAssignments.push({
-          id: mission.id, memberIndex: 1,
-          name: `חפ"ק ${mission.name} - לא פעיל`,
-          assignedTo: "", points: 0,
+          id: mission.id,
+          memberIndex: currentMemberIndex++,
+          name: `חפ"ק ${mission.name} - מפקד`,
+          assignedTo: commanderName,
+          points: POINTS.HAPAK,
         });
-        continue;
-      }
 
-      // Ensure Commander is Raz Hayun
-      const razNorm = normalizeNameStr("רז חיון");
-      const razRecord = presentTeam.find(p => normalizeNameStr(p.name) === razNorm);
-      
-      let commanderName = "רז חיון";
-      if (razRecord && !assignedNames.has(razNorm)) {
-        assignedNames.add(razNorm);
-        commanderName = razRecord.name.trim();
-      } else {
-        assignedNames.add(razNorm);
-      }
+        for (const p of presentTeam) {
+          const norm = normalizeNameStr(p.name);
+          if (!assignedNames.has(norm)) {
+            assignedNames.add(norm);
+            const pStatus = getStatus(p.name);
+            const suffix = pStatus === "returning" ? " (בדרך חזרה)" : "";
+            const roleLabel = (p.role && p.role.trim() !== "") ? p.role.trim() : "לוחם";
+            hapakAssignments.push({
+              id: mission.id,
+              memberIndex: currentMemberIndex++,
+              name: `חפ"ק ${mission.name} - ${roleLabel}${suffix}`,
+              assignedTo: p.name.trim(),
+              points: POINTS.HAPAK,
+            });
+          }
+        }
 
-      hapakAssignments.push({
-        id: mission.id,
-        memberIndex: currentMemberIndex++,
-        name: `חפ"ק ${mission.name} - מפקד`,
-        assignedTo: commanderName,
-        points: POINTS.HAPAK,
-      });
-
-      for (const p of presentTeam) {
-        const norm = normalizeNameStr(p.name);
-        if (!assignedNames.has(norm)) {
-          assignedNames.add(norm);
-          const pStatus = getStatus(p.name);
-          const suffix = pStatus === "returning" ? " (בדרך חזרה)" : "";
-          const roleLabel = (p.role && p.role.trim() !== "") ? p.role.trim() : "לוחם";
+        while (currentMemberIndex <= 4) {
           hapakAssignments.push({
             id: mission.id,
             memberIndex: currentMemberIndex++,
-            name: `חפ"ק ${mission.name} - ${roleLabel}${suffix}`,
-            assignedTo: p.name.trim(),
+            name: `חפ"ק ${mission.name} - עמדה ${currentMemberIndex - 1}`,
+            assignedTo: "",
             points: POINTS.HAPAK,
           });
         }
       }
 
-      // Ensure at least 4 slots for the UI layout
-      while (currentMemberIndex <= 4) {
-        hapakAssignments.push({
-          id: mission.id,
-          memberIndex: currentMemberIndex++,
-          name: `חפ"ק ${mission.name} - עמדה ${currentMemberIndex - 1}`,
-          assignedTo: "",
-          points: POINTS.HAPAK,
+      const dutyOfficerCandidates = records.filter(p => {
+        const norm = normalizeNameStr(p.name);
+        if (assignedNames.has(norm)) return false;
+        const pres = getPresenceFor(p);
+        const isAvailable = (pres !== "none" && pres !== "leaving");
+        if (!isAvailable) return false;
+        
+        const role = (p.role || "").trim();
+        if (role.includes("קצין") || role.includes("מ\"מ")) return true;
+        return false;
+      }).sort((a, b) => {
+        const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+        const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+        return aScore - bScore;
+      });
+
+      if (dutyOfficerCandidates.length > 0) {
+        const chosen = dutyOfficerCandidates[0];
+        assignedNames.add(normalizeNameStr(chosen.name));
+        missions.push({
+          postType: "קצין תורן",
+          slots: [{
+            roleLabel: "קצין",
+            requiredRole: null,
+            assignedTo: chosen.name.trim()
+          }]
         });
+      }
+
+      const rasapCandidates = records.filter(p => {
+        const norm = normalizeNameStr(p.name);
+        if (assignedNames.has(norm)) return false;
+        const pres = getPresenceFor(p);
+        const isAvailable = (pres !== "none" && pres !== "leaving");
+        if (!isAvailable) return false;
+        
+        const role = (p.role || "").trim();
+        if (role.includes("מפקד") || role.includes("סמ") || role.includes("סמל") || role.includes("קצין") || role.includes("רספ") || role.includes("רס\"פ") || role.includes("מנהלה")) return false;
+        if (role.includes("מ\"פ") || role === "מפ") return false;
+        
+        return true;
+      }).sort((a, b) => {
+        const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+        const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+        return aScore - bScore;
+      });
+
+      if (rasapCandidates.length > 0) {
+        const chosen = rasapCandidates[0];
+        assignedNames.add(normalizeNameStr(chosen.name));
+        missions.push({
+          postType: "תורן רס\"פ",
+          slots: [{
+            roleLabel: "תורן",
+            requiredRole: null,
+            assignedTo: chosen.name.trim()
+          }]
+        });
+      }
+
+      const unassignedSoldiers = records.filter(p => {
+        const norm = normalizeNameStr(p.name);
+        if (assignedNames.has(norm)) return false;
+        const pres = getPresenceFor(p);
+        const role = String(p.role || "").trim();
+        if (role.includes("מנהלה")) return false;
+        if (role.includes("מ\"פ") || role === "מפ") return false;
+        if (role.includes("קצין") || role.includes("מ\"מ")) return false;
+        if (isLeavingTomorrow(p.name)) return false;
+        return (pres !== "none" && pres !== "leaving");
+      }).sort((a, b) => {
+        let aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
+        let bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
+        if (yesterdayPilboxNames.has(normalizeNameStr(a.name))) aScore -= 2;
+        if (yesterdayPilboxNames.has(normalizeNameStr(b.name))) bScore -= 2;
+        return aScore - bScore;
+      });
+
+      let extraIndex = 1;
+      for (const p of unassignedSoldiers) {
+        if (extraIndex > 1) break;
+        assignedNames.add(normalizeNameStr(p.name));
+        pilboxSlots.push({
+          roleLabel: `חייל נוסף ${extraIndex++}`,
+          requiredRole: null,
+          assignedTo: p.name.trim()
+        });
+      }
+
+      // Evaluate score for THIS attempt
+      let emptyCount = 0;
+      chamal.forEach(c => { if (!c.assignedTo) emptyCount++; });
+      izumaSlots.forEach(s => { if (!s.assignedTo) emptyCount++; });
+      pilboxSlots.forEach(s => { if (!s.assignedTo && !s.roleLabel.includes("חייל נוסף")) emptyCount++; });
+      
+      const currentAssignment: AssignmentData = { hapak: hapakAssignments, chamal, missions };
+      
+      if (emptyCount < minEmptyCount) {
+        minEmptyCount = emptyCount;
+        bestAssignment = currentAssignment;
+      }
+      
+      if (minEmptyCount === 0) {
+        break; // Perfect assignment!
       }
     }
 
-    // ─── 4.4. קצין תורן ──────────────────────────────
-    const dutyOfficerCandidates = records.filter(p => {
-      const norm = normalizeNameStr(p.name);
-      if (assignedNames.has(norm)) return false;
-      const pres = getPresenceFor(p);
-      const isAvailable = (pres !== "none" && pres !== "leaving");
-      if (!isAvailable) return false;
-      
-      const role = (p.role || "").trim();
-      // Must be an officer (קצין or מ"מ)
-      if (role.includes("קצין") || role.includes("מ\"מ")) return true;
-      return false;
-    }).sort((a, b) => {
-      const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-      const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
-      return aScore - bScore;
-    });
-
-    if (dutyOfficerCandidates.length > 0) {
-      const chosen = dutyOfficerCandidates[0];
-      assignedNames.add(normalizeNameStr(chosen.name));
-      missions.push({
-        postType: "קצין תורן",
-        slots: [{
-          roleLabel: "קצין",
-          requiredRole: null,
-          assignedTo: chosen.name.trim()
-        }]
-      });
-    }
-
-    // ─── 4.5. תורן רס"פ ──────────────────────────────
-    const rasapCandidates = records.filter(p => {
-      const norm = normalizeNameStr(p.name);
-      if (assignedNames.has(norm)) return false;
-      const pres = getPresenceFor(p);
-      const rawValue = String(p.todayValue || "").trim();
-      const isAvailable = (pres !== "none" && pres !== "leaving");
-      if (!isAvailable) return false;
-      
-      const role = (p.role || "").trim();
-      // Not a commander, sergeant, officer, rasap, or minhala
-      if (role.includes("מפקד") || role.includes("סמ") || role.includes("סמל") || role.includes("קצין") || role.includes("רספ") || role.includes("רס\"פ") || role.includes("מנהלה")) return false;
-      if (role.includes("מ\"פ") || role === "מפ") return false;
-      
-      return true;
-    }).sort((a, b) => {
-      const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-      const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
-      return aScore - bScore;
-    });
-
-    if (rasapCandidates.length > 0) {
-      const chosen = rasapCandidates[0];
-      assignedNames.add(normalizeNameStr(chosen.name));
-      missions.push({
-        postType: "תורן רס\"פ",
-        slots: [{
-          roleLabel: "תורן",
-          requiredRole: null,
-          assignedTo: chosen.name.trim()
-        }]
-      });
-    }
-
-    // ─── 5. הוספת חיילים פנויים נוספים לפילבוקס ──────────────────────────────
-    const unassignedSoldiers = records.filter(p => {
-      const norm = normalizeNameStr(p.name);
-      if (assignedNames.has(norm)) return false;
-      const pres = getPresenceFor(p);
-      const rawValue = String(p.todayValue || "").trim();
-      const role = String(p.role || "").trim();
-      if (role.includes("מנהלה")) return false;
-      if (role.includes("מ\"פ") || role === "מפ") return false;
-      if (role.includes("קצין") || role.includes("מ\"מ")) return false;
-      if (isLeavingTomorrow(p.name)) return false;
-      return (pres !== "none" && pres !== "leaving");
-    }).sort((a, b) => {
-      let aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
-      let bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
-      
-      if (yesterdayPilboxNames.has(normalizeNameStr(a.name))) aScore -= 2;
-      if (yesterdayPilboxNames.has(normalizeNameStr(b.name))) bScore -= 2;
-
-      return aScore - bScore;
-    });
-
-    let extraIndex = 1;
-    for (const p of unassignedSoldiers) {
-      if (extraIndex > 1) break; // Limit to maximum 1 extra soldier
-      assignedNames.add(normalizeNameStr(p.name));
-      pilboxSlots.push({
-        roleLabel: `חייל נוסף ${extraIndex++}`,
-        requiredRole: null,
-        assignedTo: p.name.trim()
-      });
-    }
-
-    return { hapak: hapakAssignments, chamal, missions };
+    return bestAssignment || { hapak: [], chamal: [], missions: [] };
   } catch (error) {
     console.error("Critical error in generateAssignment:", error);
     throw error;
