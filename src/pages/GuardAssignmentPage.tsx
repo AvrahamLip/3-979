@@ -275,9 +275,17 @@ export function generateAssignment(
       const doSergeant = () => {
         const pilboxSergeantSlot = PILBOX_SLOTS[0];
         const prevPilboxSergeant = previousAssignment?.missions?.find(m => m.postType === "פילבוקס")?.slots?.[0]?.assignedTo;
-        assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, false);
+        
+        const availableFemales = records.filter(p => {
+          if (p.gender !== "נ") return false;
+          const pres = getPresenceFor(p);
+          return pres !== "none" && pres !== "leaving" && !assignedNames.has(normalizeNameStr(p.name));
+        }).length;
+        const sergeantGenderLimit = availableFemales >= 3 ? undefined : "ז";
+
+        assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, sergeantGenderLimit, undefined, true, false);
         if (!assignedPilboxSergeant) {
-          assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, undefined, undefined, true, true);
+          assignedPilboxSergeant = getBestCandidate(pilboxSergeantSlot.roleFilter, prevPilboxSergeant, sergeantGenderLimit, undefined, true, true);
         }
         if (assignedPilboxSergeant) assignedNames.add(normalizeNameStr(assignedPilboxSergeant));
         if (assignedPilboxSergeant) {
@@ -337,7 +345,7 @@ export function generateAssignment(
         const remainingSlots = PILBOX_SLOTS.slice(1);
         const prevPilbox = previousAssignment?.missions?.find(m => m.postType === "פילבוקס");
         
-        const tryPattern = (genders: ("ז"|"נ" | undefined)[]): MissionSlot[] | null => {
+        const tryPattern = (genders: ("ז"|"נ" | undefined)[], enforceFemaleRule = true): MissionSlot[] | null => {
           const tempAssigned = new Set<string>();
           const slots: MissionSlot[] = [{ roleLabel: PILBOX_SLOTS[0].roleLabel, requiredRole: PILBOX_SLOTS[0].roleFilter, assignedTo: assignedPilboxSergeant }];
           let femaleCount = pilboxSergeantGender === "נ" ? 1 : 0;
@@ -356,7 +364,7 @@ export function generateAssignment(
             slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
           }
           
-          if (femaleCount > 0 && femaleCount < 3) return null;
+          if (enforceFemaleRule && femaleCount > 0 && femaleCount < 3) return null;
           return slots;
         };
         
@@ -375,7 +383,7 @@ export function generateAssignment(
           slots = tryPattern(["ז", "ז", "ז", "ז", "ז", "ז", "ז"]);
         }
         if (!slots) {
-          slots = tryPattern([undefined, undefined, undefined, undefined, undefined, undefined, undefined]);
+          slots = tryPattern([undefined, undefined, undefined, undefined, undefined, undefined, undefined], false);
         }
         
         slots?.forEach(s => {
