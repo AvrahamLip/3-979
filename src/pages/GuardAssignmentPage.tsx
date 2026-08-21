@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
-import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence, formatDateShort, formatDateRange } from "@/lib/attendanceUtils";
+import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence, formatDateShort, formatDateRange, getTomorrowIso } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
-import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck } from "lucide-react";
+import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck, ArrowRightLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -617,16 +617,20 @@ function PersonnelSwap({
   allowEmpty,
   type,
   currentAssignments,
-  yesterdayRecords = []
+  yesterdayRecords = [],
+  tomorrowRecords = [],
+  previousAssignments = null
 }: {
   currentName: string;
   allPersonnel: AttendanceRecord[];
   onSwap: (newName: string) => void;
   readonly?: boolean;
   allowEmpty?: boolean;
-  type: "hapak" | "guard";
+  type: "hapak" | "guard" | "chamal" | "mission";
   currentAssignments?: AssignmentData | null;
   yesterdayRecords?: AttendanceRecord[];
+  tomorrowRecords?: AttendanceRecord[];
+  previousAssignments?: AssignmentData | null;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -663,24 +667,83 @@ function PersonnelSwap({
   const person = useMemo(() => (allPersonnel || []).find(p => p && p.name === currentName), [allPersonnel, currentName]);
   const presence = getComputedPresence(person, yesterdayRecords);
   
+  const isLeavingTomorrow = useMemo(() => {
+    if (!currentName || !tomorrowRecords) return false;
+    const norm = normalizeNameStr(currentName);
+    const tomorrowRec = tomorrowRecords.find(r => normalizeNameStr(r.name) === norm);
+    if (!tomorrowRec) return false;
+    return ["יצא לאפטר", "אפטר", "מחלה / גימלים", "מנותק קשר", "קורס", "משתחרר", "שוחרר", "פיצול", "יציאה לפיצול"].includes(tomorrowRec.status);
+  }, [currentName, tomorrowRecords]);
+
+  const previousTask = useMemo(() => {
+    if (!currentName || !previousAssignments) return null;
+    const norm = normalizeNameStr(currentName);
+    for (const h of previousAssignments.hapak || []) {
+      if (normalizeNameStr(h.assignedTo) === norm) return "חפ\"ק";
+    }
+    for (const c of previousAssignments.chamal || []) {
+      if (normalizeNameStr(c.assignedTo) === norm) return "חמ\"ל";
+    }
+    for (const m of previousAssignments.missions || []) {
+      for (const s of m.slots || []) {
+        if (normalizeNameStr(s.assignedTo) === norm) return m.postType;
+      }
+    }
+    return null;
+  }, [currentName, previousAssignments]);
+
+  const currentTask = useMemo(() => {
+    if (!currentName || !currentAssignments) return null;
+    const norm = normalizeNameStr(currentName);
+    for (const h of currentAssignments.hapak || []) {
+      if (normalizeNameStr(h.assignedTo) === norm) return "חפ\"ק";
+    }
+    for (const c of currentAssignments.chamal || []) {
+      if (normalizeNameStr(c.assignedTo) === norm) return "חמ\"ל";
+    }
+    for (const m of currentAssignments.missions || []) {
+      for (const s of m.slots || []) {
+        if (normalizeNameStr(s.assignedTo) === norm) return m.postType;
+      }
+    }
+    return null;
+  }, [currentName, currentAssignments]);
+
+  const taskChangedIcon = useMemo(() => {
+    if (!previousTask || !currentTask) return null;
+    if (previousTask !== currentTask) {
+      return (
+        <div className="group relative flex items-center justify-center cursor-help">
+          <ArrowRightLeft className="w-3 h-3 text-muted-foreground mx-1" />
+          <div className="absolute top-full mt-1 hidden group-hover:block w-max bg-popover text-popover-foreground border border-border text-[10px] px-2 py-1 rounded shadow-md z-50">
+            אתמול היה ב{previousTask}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }, [previousTask, currentTask]);
+
   const statusDot = useMemo(() => {
     if (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") return null;
     let color = "bg-green-500";
     if (presence === "leaving") color = "bg-amber-500";
+    else if (isLeavingTomorrow) color = "bg-orange-500";
     else if (presence === "returning") color = "bg-blue-500";
-    return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", color)} />;
-  }, [currentName, presence]);
+    return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", color)} title={presence === "returning" ? "חזר היום" : isLeavingTomorrow ? "יוצא מחר" : "נוכח"} />;
+  }, [currentName, presence, isLeavingTomorrow]);
+
+  const isMobile = useIsMobile();
 
   if (readonly) {
     return (
       <span className="font-bold text-right py-1 flex items-center gap-1.5 whitespace-nowrap">
         {statusDot}
+        {taskChangedIcon}
         {String(currentName || "")}
       </span>
     );
   }
-
-  const isMobile = useIsMobile();
 
   const SelectionContent = (
     <Command className="border-none">
@@ -716,11 +779,7 @@ function PersonnelSwap({
             >
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center gap-2 text-right" dir="rtl">
-                   <div className={cn(
-                     "w-1.5 h-1.5 rounded-full shrink-0",
-                     getComputedPresence(p, yesterdayRecords) === "leaving" ? "bg-amber-500" : 
-                     getComputedPresence(p, yesterdayRecords) === "returning" ? "bg-blue-500" : "bg-green-500"
-                   )} />
+                   {statusDot}
                    <span className="font-bold truncate text-sm">{p.name}</span>
                    <span className={cn(
                      "text-[10px] px-1.5 py-0.5 rounded-full font-bold tabular-nums shrink-0 ml-auto",
@@ -754,6 +813,7 @@ function PersonnelSwap({
         : "px-2 py-1 rounded-lg hover:bg-muted/60"
     )}>
       {statusDot}
+      {taskChangedIcon}
       <span className="truncate max-w-[120px]">
         {isEmpty ? "ריק / ללא שיבוץ" : currentName}
       </span>
@@ -883,6 +943,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   const { data, isLoading, isError, error, refetch, isFetching } = useMainAttendance(date);
   const yesterdayIsoDate = useMemo(() => getYesterdayIso(date), [date]);
   const { data: yesterdayAttendanceData } = useMainAttendance(yesterdayIsoDate);
+  const tomorrowIsoDate = useMemo(() => getTomorrowIso(date), [date]);
+  const { data: tomorrowAttendanceData } = useMainAttendance(tomorrowIsoDate);
   const [assignments, setAssignments] = useState<AssignmentData | null>(null);
   const [loadedAssignments, setLoadedAssignments] = useState<AssignmentData | null>(null);
   // history now stores points per date: { [date]: { [name]: points } }
@@ -1212,7 +1274,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
             const yesterday = getYesterdayIso(date);
             const yesterdayData = await fetchSavedAssignment(yesterday);
             const aggregatedHistory = generateAggregatedHistory(history);
-            setAssignments(generateAssignment(data, aggregatedHistory, [], blockedNames, date, yesterdayData, yesterdayAttendanceData || []));
+            setAssignments(generateAssignment(data, aggregatedHistory, [], blockedNames, date, yesterdayData, yesterdayAttendanceData || [], tomorrowAttendanceData || []));
             setIsSaved(false);
           } else {
             setAssignments(null);
@@ -1245,7 +1307,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       }
 
       const aggregatedHistory = generateAggregatedHistory(history);
-      setAssignments(generateAssignment(latestData, aggregatedHistory, [], blockedNames, date, yesterdayData, yesterdayAttendanceData || []));
+      setAssignments(generateAssignment(latestData, aggregatedHistory, [], blockedNames, date, yesterdayData, yesterdayAttendanceData || [], tomorrowAttendanceData || []));
 
       setIsSaved(false);
     } catch (error) {
@@ -1760,16 +1822,18 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                                <div key={`${h.id}-${h.memberIndex}-${hIdx}`} className={cn("flex items-center justify-between p-2 rounded-lg text-xs", h.memberIndex === 1 ? "bg-amber-500/10 border border-amber-500/20" : "bg-muted/30")}>
                                  <span className={cn("font-medium max-w-[100px] break-words text-right", h.memberIndex === 1 ? "text-amber-700 font-black" : "text-muted-foreground")}>{displayRole}</span>
                                  <div className="flex items-center gap-1.5 flex-row-reverse">
-                                    <PersonnelSwap
-                                      currentName={h.assignedTo}
-                                      allPersonnel={data || []}
-                                      onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
-                                      readonly={!isAuthorized || isExportingHapak}
-                                      allowEmpty={true}
-                                      type="hapak"
-                                      currentAssignments={assignments}
-                                      yesterdayGuards={loadedAssignments?.guards || []}
-                                    />
+                                     <PersonnelSwap
+                                       currentName={h.assignedTo}
+                                       allPersonnel={data || []}
+                                       onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
+                                       readonly={!isAuthorized || isExportingHapak}
+                                       allowEmpty={true}
+                                       type="hapak"
+                                       currentAssignments={assignments}
+                                       yesterdayRecords={yesterdayAttendanceData || []}
+                                       tomorrowRecords={tomorrowAttendanceData || []}
+                                       previousAssignments={loadedAssignments || null}
+                                     />
                                     {roleText && <span className="text-[10px] text-muted-foreground">{roleText}</span>}
                                  </div>
                                </div>
@@ -1820,9 +1884,11 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                         onSwap={(newName) => handleSwap("chamal", shift.shiftIndex, newName)}
                         readonly={!isAuthorized}
                         allowEmpty={true}
-                        type="hapak"
+                        type="chamal"
                         currentAssignments={assignments}
                         yesterdayRecords={yesterdayAttendanceData || []}
+                        tomorrowRecords={tomorrowAttendanceData || []}
+                        previousAssignments={loadedAssignments || null}
                       />
                     </div>
                   ))}
@@ -1892,9 +1958,11 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                                 onSwap={(newName) => handleSwap("mission", gIdx, newName, sIdx)}
                                 readonly={!isAuthorized}
                                 allowEmpty={true}
-                                type="hapak"
+                                type="mission"
                                 currentAssignments={assignments}
                                 yesterdayRecords={yesterdayAttendanceData || []}
+                                tomorrowRecords={tomorrowAttendanceData || []}
+                                previousAssignments={loadedAssignments || null}
                               />
                             </div>
                           ))}
