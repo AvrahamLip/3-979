@@ -11,16 +11,22 @@ export default function ContactPage() {
 
   const contacts = useMemo(() => {
     if (!data) return [];
-    const query = search.toLowerCase().trim();
-    if (!query) return data;
+    
+    // Sort all contacts by name alphabetically (Hebrew)
+    let result = [...data].sort((a, b) => a.name.localeCompare(b.name, "he"));
 
-    return data.filter(
-      (r) =>
-        r.name.toLowerCase().includes(query) ||
-        r.personalNumber.toString().includes(query) ||
-        r.role.toLowerCase().includes(query) ||
-        r.department.toLowerCase().includes(query)
-    );
+    const query = search.toLowerCase().trim();
+    if (query) {
+      result = result.filter(
+        (r) =>
+          r.name.toLowerCase().includes(query) ||
+          r.personalNumber.toString().includes(query) ||
+          r.role.toLowerCase().includes(query) ||
+          r.department.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
   }, [data, search]);
 
   const formatPhone = (num: string | number) => {
