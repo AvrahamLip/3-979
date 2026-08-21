@@ -26,6 +26,40 @@ export function useMainAttendance(date: string) {
   });
 }
 
+// ─── Contacts ──────────────────────────────────────────────────────────────────
+
+const CONTACTS_API = "https://151.145.89.228.sslip.io/webhook/mobile";
+
+async function fetchContactsData(): Promise<AttendanceRecord[]> {
+  const res = await fetch(CONTACTS_API, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`שגיאת שרת: ${res.status}`);
+  const json = await res.json();
+  const arr: any[] = Array.isArray(json) ? json : (json.data ?? []);
+  
+  // Map the Hebrew keys from the new API to AttendanceRecord format
+  return arr.map(item => ({
+    name: item["שם"] || "",
+    personalNumber: item["נייד"] || "",
+    role: item["תפקיד"] || "",
+    department: item["יחידה"] || item["מחלקה"] || "כללי",
+    status: "",
+    todayValue: "",
+    originalDate: "",
+    dateUsed: "",
+    gender: "male",
+    burdenPoints: 0,
+    sessionHistory: {}
+  }));
+}
+
+export function useContactsData() {
+  return useQuery({
+    queryKey: ["contacts-data"],
+    queryFn: fetchContactsData,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 // ─── Zama ────────────────────────────────────────────────────────────────────
 
 const ZAMA_API = "https://151.145.89.228.sslip.io/webhook/Zama/Doch-1";

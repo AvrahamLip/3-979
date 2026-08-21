@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
-import { useMainAttendance } from "../hooks/useAttendanceData";
-import { getTodayIso } from "../lib/attendanceUtils";
+import { useContactsData } from "../hooks/useAttendanceData";
 import { LoadingOverlay, ErrorMessage, EmptyState } from "../components/StatusMessages";
 import { Search, Phone, MessageSquare, User, Filter } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -8,8 +7,7 @@ import PWAInstallButton from "../components/PWAInstallButton";
 
 export default function ContactPage() {
   const [search, setSearch] = useState("");
-  const date = useMemo(() => getTodayIso(), []);
-  const { data, isLoading, isError, error, refetch } = useMainAttendance(date);
+  const { data, isLoading, isError, error, refetch } = useContactsData();
 
   const contacts = useMemo(() => {
     if (!data) return [];
