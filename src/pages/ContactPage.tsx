@@ -48,7 +48,7 @@ export default function ContactPage() {
   return (
     <div className="container max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 animate-fade-in">
       {/* Header Section */}
-      <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-card text-overlay relative overflow-hidden header-accent-border">
+      <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow relative overflow-hidden">
         <div className="relative z-10">
           <h1 className="text-2xl sm:text-4xl font-black mb-2">אנשי קשר</h1>
           <p className="text-overlay/80 text-sm sm:text-base font-medium">

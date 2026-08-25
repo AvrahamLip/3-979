@@ -1983,7 +1983,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
 
       {!isLoading && !isGenerating && !isError && !assignments && (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <div className="text-5xl">🛡️</div>
+          <Shield className="w-12 h-12 text-muted-foreground/50" />
           <p className="font-bold text-foreground text-lg">אין שיבוץ זמין</p>
           <p className="text-sm text-muted-foreground">לא נמצא שיבוץ שמירות לתאריך זה</p>
         </div>

@@ -19,10 +19,10 @@ export default function SoldierLayout() {
           <div className="flex items-center justify-between h-14 sm:h-16">
             <Link to="/guards" className="flex items-center gap-2 hover:opacity-90 transition-all active:scale-95 group shrink-0" aria-label="לדף הבית">
               <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-accent text-accent-foreground font-black text-base sm:text-lg shadow-md group-hover:shadow-accent/20">
-                ד!
+                ד1
               </div>
               <span className="text-lg sm:text-xl font-black text-overlay tracking-wide hidden sm:block">
-                דוח!
+                דוח 1
               </span>
             </Link>
 
@@ -179,16 +179,18 @@ export default function SoldierLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-border py-3 sm:py-4 px-3 sm:px-4 text-center text-xs text-muted-foreground bg-muted/30">
-        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+      <footer className="border-t border-border py-4 px-4 text-center text-xs text-muted-foreground bg-muted/30 mt-auto">
+        <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
-            <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">צור קשר</a>
+            <a href="mailto:lip.avi@gmail.com" className="hover:text-primary transition-colors font-bold underline decoration-dotted underline-offset-4">lip.avi@gmail.com</a>
             <span className="opacity-30">|</span>
-            <a href="tel:050-8853348" className="hover:text-primary transition-colors font-bold">050-8853348</a>
+            <a href="https://getbetter.games" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors font-bold text-primary/80">
+              © Developed by getbetter.games
+            </a>
             <span className="opacity-30">|</span>
             <span className="font-mono">גרסה {pkg.version}</span>
           </div>
-          <span className="opacity-70 font-medium">המערכת לחייל — שיבוצי האנרגיה</span>
+          <span className="opacity-70 font-medium">מערכת ניהול דוח 1</span>
         </div>
       </footer>
     </div>

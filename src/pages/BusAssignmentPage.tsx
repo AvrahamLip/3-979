@@ -570,19 +570,20 @@ export default function BusAssignmentPage() {
   if (isError) return <ErrorMessage message={(error as Error)?.message} />;
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6 animate-in fade-in duration-500 text-right" dir="rtl">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 animate-fade-in">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card border border-border p-4 rounded-2xl shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <Bus className="w-6 h-6 text-primary" />
+      <div className="gradient-hero rounded-xl sm:rounded-2xl p-4 sm:p-6 elevated-shadow">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center text-white">
+              <Bus className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-overlay">שיבוץ מפקדים וניוד ({formatDateShort(date)})</h1>
+              <p className="text-xs text-overlay/70 font-medium mt-1">ניהול חפ"קים ומחלקות יומי (תקף מהשעה 18:00)</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-black">שיבוץ מפקדים וניוד ({formatDateShort(date)})</h1>
-            <p className="text-xs text-muted-foreground font-black">ניהול חפ"קים ומחלקות יומי (תקף מהשעה 18:00)</p>
-          </div>
-        </div>
         
         <div className="flex items-center gap-2 flex-wrap justify-center" data-html2canvas-ignore>
           <DatePickerBar value={date} onChange={setDate} />
@@ -620,6 +621,7 @@ export default function BusAssignmentPage() {
             <Camera className="w-4 h-4 ml-2" />
             ייצוא תמונה
           </Button>
+        </div>
         </div>
       </div>
 
