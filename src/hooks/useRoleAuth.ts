@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
-// The validation API for commanders
-const VALIDATE_API = "https://151.145.89.228.sslip.io/webhook/validate";
+import { getApiUrl } from "@/lib/apiHelper";
+
 const CLIENT_ID = "435530372836-c3u3vtge3v4hvrskon21ovfb1rvtkf7p.apps.googleusercontent.com";
 
 export type UserRole = "commander" | "soldier" | "none";
@@ -46,7 +46,8 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
     setError(null);
 
     try {
-      const res = await fetch(VALIDATE_API, {
+      const url = getApiUrl("validate");
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,7 +109,8 @@ export function useRoleAuth(buttonId?: string, defaultRoll: string = "guard") {
 
       console.log("Auth attempt for:", payload.email, "Roll:", getCurrentContextRoll());
 
-      const res = await fetch(VALIDATE_API, {
+      const url = getApiUrl("validate");
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

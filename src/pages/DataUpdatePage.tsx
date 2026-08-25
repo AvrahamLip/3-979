@@ -7,8 +7,7 @@ import { LoadingOverlay, ErrorMessage, EmptyState } from "@/components/StatusMes
 import { Search, Edit, RefreshCw, Filter, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-const UPDATE_API = "https://151.145.89.228.sslip.io/webhook/update-status";
+import { getApiUrl } from "@/lib/apiHelper";
 
 const STATUS_OPTIONS = [
   { value: "נ", label: "נוכח", color: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800" },
@@ -85,7 +84,8 @@ export default function DataUpdatePage() {
       };
       console.log("Update Payload:", payload);
 
-      const res = await fetch(UPDATE_API, {
+      const url = getApiUrl("update-status");
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

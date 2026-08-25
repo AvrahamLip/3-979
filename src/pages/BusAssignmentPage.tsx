@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
 import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence, formatDateShort, formatDateRange } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
+import { getApiUrl } from "@/lib/apiHelper";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
 import { RefreshCw, Shield, Bus, Users, Save, Camera, Check, ChevronDown, Shuffle, UserCheck, Trash2 } from "lucide-react";
@@ -406,7 +407,8 @@ export default function BusAssignmentPage() {
 
   const fetchRegistry = async () => {
     try {
-      const res = await fetch("https://151.145.89.228.sslip.io/webhook/hapak-eligible");
+      const url = getApiUrl("hapak-eligible");
+      const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         setHapakRegistry(Array.isArray(json) ? json : []);
@@ -416,7 +418,8 @@ export default function BusAssignmentPage() {
 
   const loadSaved = async (targetDate: string) => {
     try {
-      const res = await fetch(`https://151.145.89.228.sslip.io/webhook/load-bus?date=${formatDateForApi(targetDate)}`);
+      const url = getApiUrl("load-bus", { date: formatDateForApi(targetDate) });
+      const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         if (json && json.status !== "not_found") {
@@ -452,7 +455,8 @@ export default function BusAssignmentPage() {
     if (!assignments) return;
     setIsSaving(true);
     try {
-      const res = await fetch("https://151.145.89.228.sslip.io/webhook/save-bus", {
+      const url = getApiUrl("save-bus");
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

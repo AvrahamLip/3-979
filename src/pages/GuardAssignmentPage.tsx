@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMainAttendance } from "@/hooks/useAttendanceData";
 import { getTodayIso, formatDateForApi, normalizeNameStr, getComputedPresence, formatDateShort, formatDateRange, getTomorrowIso } from "@/lib/attendanceUtils";
 import type { AttendanceRecord } from "@/types/attendance";
+import { getApiUrl } from "@/lib/apiHelper";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
 import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck, ArrowRightLeft } from "lucide-react";
@@ -1247,7 +1248,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
 
   const fetchSavedAssignment = async (targetDate: string) => {
     try {
-      const response = await fetch(`https://151.145.89.228.sslip.io/webhook/load-guards?date=${formatDateForApi(targetDate)}`, { cache: 'no-store' });
+      const url = getApiUrl("load-guards", { date: formatDateForApi(targetDate) });
+      const response = await fetch(url, { cache: 'no-store' });
       if (!response.ok) return null;
       const text = await response.text();
       if (!text || text.trim() === "") return null;
@@ -1426,7 +1428,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     const sessionUpdates = Array.from(consolidated.values());
 
     try {
-      const response = await fetch("https://151.145.89.228.sslip.io/webhook/confirm-guards", {
+      const url = getApiUrl("confirm-guards");
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ updates: sessionUpdates })
@@ -1466,7 +1469,8 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     if (!assignments) return;
     setIsSavingToSheet(true);
     try {
-      const response = await fetch("https://151.145.89.228.sslip.io/webhook/save-guards", {
+      const url = getApiUrl("save-guards");
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

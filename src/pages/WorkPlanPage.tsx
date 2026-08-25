@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDateForApi, processRecords, getTodayIso } from "@/lib/attendanceUtils";
+import { getApiUrl } from "@/lib/apiHelper";
 import type { AttendanceRecord, StatusType } from "@/types/attendance";
 import StatusBadge from "@/components/StatusBadge";
 import { LoadingOverlay } from "@/components/StatusMessages";
@@ -39,11 +40,10 @@ function formatDayLabel(isoDate: string, offset: number): string {
 
 // ─── API fetch ────────────────────────────────────────────────────────────────
 
-const MAIN_API = "https://151.145.89.228.sslip.io/webhook/Doch-1";
-
 async function fetchDayData(isoDate: string): Promise<AttendanceRecord[]> {
   const apiDate = formatDateForApi(isoDate);
-  const res = await fetch(`${MAIN_API}?date=${encodeURIComponent(apiDate)}`);
+  const url = getApiUrl("Doch-1", { date: apiDate });
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`שגיאת שרת: ${res.status}`);
   const json = await res.json();
   const arr = Array.isArray(json) ? json : json.data ?? [];
