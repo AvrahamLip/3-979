@@ -13,10 +13,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        2144,
-        1616
+        1328,
+        1792
       ],
-      "id": "fc91dc90-3ae2-4fed-8022-4100a2b1447a",
+      "id": "88d56aed-23f1-4643-9369-deaea07b5e7a",
       "name": "Webhook Save",
       "webhookId": "31f085b7-a07c-44a7-b8c4-75f90f2a3a98"
     },
@@ -31,10 +31,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        1920,
-        1008
+        1104,
+        1184
       ],
-      "id": "76f3736f-8946-4c84-ae22-5c38ee12959b",
+      "id": "e9f03d42-cfad-4c15-8514-b77fde88f232",
       "name": "Webhook Load",
       "webhookId": "e5cdf848-4f9f-414e-8de5-ce165d67e6ec"
     },
@@ -57,10 +57,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2144,
-        1008
+        1328,
+        1184
       ],
-      "id": "fdd417e8-1664-476b-aa25-2bfeedf83890",
+      "id": "4851565b-fd52-4d36-8e72-e7333d8d5d93",
       "name": "Read Assignments",
       "alwaysOutputData": true,
       "credentials": {
@@ -77,10 +77,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2368,
-        1008
+        1552,
+        1184
       ],
-      "id": "e12422f3-15ea-42fc-85a9-9f0d3ecace7a",
+      "id": "5d971579-88ac-4cd8-abc7-cfd69e6ef9a6",
       "name": "Filter by Date"
     },
     {
@@ -92,10 +92,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        2592,
-        1104
+        1776,
+        1280
       ],
-      "id": "4e75f25a-422e-4613-afac-7a7576cf4c0c",
+      "id": "8c6a0f48-d1b4-4188-aa8e-7527035614d1",
       "name": "Respond Load"
     },
     {
@@ -110,10 +110,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        1920,
-        1424
+        1104,
+        1600
       ],
-      "id": "5ff3f374-3c9c-42cd-ab8b-e5aa9ebe9fc3",
+      "id": "042c25ad-70aa-4203-b595-2988da27a443",
       "name": "Webhook Confirm",
       "webhookId": "e6a50bb8-0b1f-424c-91b7-5db373af70a4"
     },
@@ -170,10 +170,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2368,
-        1616
+        1552,
+        1792
       ],
-      "id": "f3fd5252-4952-4826-aba9-72b1b8b6f3d0",
+      "id": "765d9c8f-dece-4e39-9e8f-a38221f3df17",
       "name": "Append Assignment",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -189,10 +189,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2144,
-        1424
+        1328,
+        1600
       ],
-      "id": "2d6c0b5d-b9b1-437e-af6f-6bfa3de7500c",
+      "id": "6667dc5c-0dbb-44af-8caf-ae5ef7c1e17d",
       "name": "Prepare Updates"
     },
     {
@@ -204,10 +204,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        2592,
-        1616
+        1776,
+        1792
       ],
-      "id": "f448dbc3-641a-40c8-bb0e-e397968dade7",
+      "id": "7e8c1290-518c-4b8f-a28d-9fe010c1375d",
       "name": "Respond Success"
     },
     {
@@ -218,10 +218,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        2368,
-        2032
+        1552,
+        2432
       ],
-      "id": "f079693f-2f2c-4c8c-b317-47d8374dc011",
+      "id": "bcf21b9e-008e-4917-871f-b6a4a40cb0d1",
       "name": "Respond Load1"
     },
     {
@@ -233,10 +233,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        1920,
-        2032
+        1104,
+        2432
       ],
-      "id": "767b918e-e178-42a9-919d-add0d58446b9",
+      "id": "20d4f61d-cb17-48ff-baa8-24540d9a784a",
       "name": "Webhook hapak",
       "webhookId": "a5281f20-e2a8-4a09-9053-501574b658c7"
     },
@@ -269,10 +269,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2144,
-        2032
+        1328,
+        2432
       ],
-      "id": "36f19b02-c879-4408-a5e4-e4deb2e78f0e",
+      "id": "583542b4-c91c-416d-b07d-0d96a7c0c9fe",
       "name": "Get hapak-eligible",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -374,10 +374,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2368,
-        1424
+        1552,
+        1600
       ],
-      "id": "884f2f05-8200-469c-abf6-0575d3037473",
+      "id": "d0c01b7b-8c19-4569-9b97-643f796091c3",
       "name": "Append Log",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -397,10 +397,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        1920,
-        1200
+        1104,
+        1376
       ],
-      "id": "45cbed62-c299-4e16-97db-2684afc4339b",
+      "id": "8aa1c9a9-372d-4c91-b7d9-253273a63f80",
       "name": "Webhook Load1",
       "webhookId": "e5cdf848-4f9f-414e-8de5-ce165d67e6ec"
     },
@@ -423,10 +423,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2144,
-        1200
+        1328,
+        1376
       ],
-      "id": "165a52bb-2808-42c0-b1bd-064df390065d",
+      "id": "66a77c33-79c5-444d-a2f9-1fa45840b53a",
       "name": "Read Assignments1",
       "alwaysOutputData": true,
       "credentials": {
@@ -443,10 +443,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2368,
-        1200
+        1552,
+        1376
       ],
-      "id": "58202310-ac80-4ccd-90e8-ccf767b55ea6",
+      "id": "05334ef4-3889-4854-aadc-9e9dd9d1ad94",
       "name": "Filter by Date1"
     },
     {
@@ -461,10 +461,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        2144,
-        1808
+        1328,
+        1984
       ],
-      "id": "09c3470f-198d-4b08-82b9-45d2fde1f853",
+      "id": "c7a4d294-117c-4ca7-af5c-90937ff32ef6",
       "name": "Webhook Save1",
       "webhookId": "31f085b7-a07c-44a7-b8c4-75f90f2a3a98"
     },
@@ -521,10 +521,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2368,
-        1808
+        1552,
+        1984
       ],
-      "id": "7f0288af-9c9d-419d-84d6-39ed74072c39",
+      "id": "04eda876-d9a5-40d9-900f-1e789872736d",
       "name": "Append Assignment1",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -532,6 +532,82 @@
           "name": "Google Sheets MP 3 979"
         }
       }
+    },
+    {
+      "parameters": {
+        "path": "get-points",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        2208
+      ],
+      "id": "62045a0c-e497-4ba5-bed9-a786b4b2e207",
+      "name": "Webhook Get Points",
+      "webhookId": "7a476a89-043e-456e-a358-55a0921d18eb"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1CG8OQGdvOZdji15yY3ZV2QL6NhcLlxZ5fBBothfLSx8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 179062763,
+          "mode": "list",
+          "cachedResultName": "יומן פעילות",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CG8OQGdvOZdji15yY3ZV2QL6NhcLlxZ5fBBothfLSx8/edit#gid=179062763"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1328,
+        2208
+      ],
+      "id": "903edd1a-3310-44fa-b39b-92a42a76d3d0",
+      "name": "Get Points Ledger",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gc1kEdz83WlO5i4v",
+          "name": "Google Sheets MP 3 979"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aggregated = {};\n\nfor (const item of $input.all()) {\n  const name = item.json['שם'];\n  const points = parseFloat(item.json['ניקוד']);\n  if (name && !isNaN(points)) {\n    aggregated[name] = (aggregated[name] || 0) + points;\n  }\n}\n\nreturn [{ json: { data: aggregated } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        2208
+      ],
+      "id": "6b4f022c-f030-4748-a1e8-32a78837aea9",
+      "name": "Aggregate Points"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1776,
+        2208
+      ],
+      "id": "87e17a19-7b64-4d57-b860-57735b1d594b",
+      "name": "Respond Get Points"
     }
   ],
   "pinData": {},
@@ -700,19 +776,55 @@
           }
         ]
       ]
+    },
+    "Webhook Get Points": {
+      "main": [
+        [
+          {
+            "node": "Get Points Ledger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Points Ledger": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Points": {
+      "main": [
+        [
+          {
+            "node": "Respond Get Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "8cba61c1-52e5-4c8d-8d09-ecbc47738642",
+  "versionId": "8ce94a85-1635-4ea8-8978-01a9c56dff32",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3d58c928056a8a686ed6f51eff3debe7d6dc6b96afa5deea546dcfb5b172f4fa"
   },
+  "nodeGroups": [],
   "id": "YNRTHrb8a4uPgFyz",
   "tags": []
 }

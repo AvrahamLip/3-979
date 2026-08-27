@@ -1595,64 +1595,27 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   };
 
   const handleRestorePoints = async () => {
-    if (!window.confirm("פעולה זו תשאב את כל השיבוצים מ-14 הימים האחרונים ותחשב מחדש את יומן הפעילות. פעולה זו עשויה לארוך מספר שניות. האם להמשיך?")) return;
+    if (!window.confirm("פעולה זו תשאב את הניקוד מיומן הפעילות המרכזי. האם להמשיך?")) return;
     
     setIsRestoringPoints(true);
     try {
-      const newHistory: Record<string, Record<string, number>> = {};
-      const targetDateObj = new Date(date);
+      const url = getApiUrl("get-points");
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error("API get-points failed");
+      const json = await response.json();
       
-      // Go back 14 days
-      for (let i = 0; i <= 14; i++) {
-        const d = new Date(targetDateObj);
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        
-        const fetched = await fetchSavedAssignment(dateStr);
-        if (fetched && fetched.status !== "not_found") {
-          const dayKey = formatDateForApi(dateStr);
-          newHistory[dayKey] = {};
-          
-          if (fetched.hapak) {
-            fetched.hapak.forEach((h: any) => {
-              if (h.assignedTo) {
-                newHistory[dayKey][h.assignedTo] = (newHistory[dayKey][h.assignedTo] || 0) + POINTS.HAPAK;
-              }
-            });
-          }
-          if (fetched.chamal) {
-            fetched.chamal.forEach((c: any) => {
-              if (c.assignedTo) {
-                newHistory[dayKey][c.assignedTo] = (newHistory[dayKey][c.assignedTo] || 0) + (c.shiftIndex === 0 ? POINTS.CHAMAL_NIGHT : POINTS.CHAMAL_DAY);
-              }
-            });
-          }
-          if (fetched.missions) {
-            fetched.missions.forEach((m: any) => {
-              let pts = 0;
-              if (m.postType === "פילבוקס") pts = POINTS.PILBOX;
-              else if (m.postType === "יזומה" || m.postType === "יזומה ב") pts = POINTS.IZUMA;
-              else if (m.postType === "תורן רס\"פ") pts = POINTS.RASAP;
-              else if (m.postType === "קצין תורן") pts = POINTS.DUTY_OFFICER;
-              
-              if (m.slots) {
-                m.slots.forEach((s: any) => {
-                  if (s.assignedTo) {
-                    newHistory[dayKey][s.assignedTo] = (newHistory[dayKey][s.assignedTo] || 0) + pts;
-                  }
-                });
-              }
-            });
-          }
-        }
+      const newHistory: Record<string, Record<string, number>> = {};
+      const dataObj = Array.isArray(json) ? json[0]?.data : json.data;
+      if (dataObj) {
+        newHistory["CENTRAL"] = dataObj;
       }
       
       setHistory(newHistory);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
-      toast.success("יומן הפעילות שוחזר בהצלחה!");
+      toast.success("יומן הפעילות סונכרן בהצלחה!");
     } catch (error) {
       console.error("Failed to restore points", error);
-      toast.error("שגיאה בשחזור הנקודות מהשרת.");
+      toast.error("שגיאה בסנכרון הנקודות מהשרת.");
     } finally {
       setIsRestoringPoints(false);
     }
