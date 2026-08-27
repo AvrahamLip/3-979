@@ -225,12 +225,42 @@ export function generateAssignment(
       };
 
       const getBestCandidate = (roleFilters: string[] | string | null, preferName?: string, genderReq?: "ז" | "נ", extraAssigned = new Set<string>(), isPilbox = false, allowLeavingTomorrow = false): string => {
+        const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
+        
         if (preferName && isPersonAvailable(preferName) && !assignedNames.has(normalizeNameStr(preferName)) && !extraAssigned.has(normalizeNameStr(preferName))) {
-          if (!genderReq || (findRecord(preferName)?.gender || "ז") === genderReq) {
+          const rec = findRecord(preferName);
+          const role = (rec?.role || "").trim();
+          let matchesRole = false;
+          
+          if (filters.length === 0 || filters[0] === null) {
+            matchesRole = true;
+          } else {
+            for (const filter of filters) {
+              if (!filter) {
+                matchesRole = true;
+                break;
+              }
+              if (filter === "חייל") {
+                const dept = String(rec?.department || "").trim();
+                const isHQ = role.includes("מנהלה") || dept.includes("מפקד") || role.includes("חפק") || role.includes("רספ");
+                if (!isHQ && (role.includes("חייל") || role.includes("חובש"))) {
+                  matchesRole = true;
+                  break;
+                }
+              } else {
+                if (role.includes(filter)) {
+                  matchesRole = true;
+                  break;
+                }
+              }
+            }
+          }
+          
+          if (matchesRole && (!genderReq || (rec?.gender || "ז") === genderReq)) {
             if (!isPilbox || allowLeavingTomorrow || !isLeavingTomorrow(preferName)) return preferName;
           }
         }
-        const filters = Array.isArray(roleFilters) ? roleFilters : [roleFilters];
+
         for (const filter of filters) {
           const candidates = records.filter(p => {
             const role = (p.role || "").trim();
