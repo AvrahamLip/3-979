@@ -1,0 +1,3502 @@
+[
+  {
+    "date": "1/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "לירז מזרחי"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "שחר כהן"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "גל ליבל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף דאלי"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יעקב ביבס"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדו רומנו"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליאל צגאי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "רומי טבע"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "יוסף אובריין"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "טליה פיטוסי"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:56:46.154Z"
+    }
+  },
+  {
+    "date": "2/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - עמדה 3",
+          "assignedTo": "",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - עמדה 4",
+          "assignedTo": "",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "לירז מזרחי"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "מיה קידר"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף דאלי"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יעקב ביבס"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדו רומנו"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליאל צגאי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "רומי טבע"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:56:49.707Z"
+    }
+  },
+  {
+    "date": "3/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - עמדה 3",
+          "assignedTo": "",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - עמדה 4",
+          "assignedTo": "",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "לירז מזרחי"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "מיה קידר"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף דאלי"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יעקב ביבס"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדו רומנו"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליאל צגאי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "יוסף אובריין"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:56:53.599Z"
+    }
+  },
+  {
+    "date": "4/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "לירז מזרחי"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "דורון פלץ"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף דאלי"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יעקב ביבס"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדו רומנו"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליאל צגאי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "חננאל מלכא"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "נתי אבידן"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "נאור בוקובזה"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:56:57.222Z"
+    }
+  },
+  {
+    "date": "5/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "לירז מזרחי"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "דורון פלץ"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף דאלי"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יעקב ביבס"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "חננאל מלכא"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליאל צגאי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "נתי אבידן"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "עדו רומנו"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:00.795Z"
+    }
+  },
+  {
+    "date": "6/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "לירז מזרחי"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "דורון פלץ"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "לוי יצחק הורביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "חננאל מלכא"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עומר קדוש"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "חייל נוסף 1",
+              "requiredRole": null,
+              "assignedTo": "עידו רחמני"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "דוד גרשקוביץ'"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אמיר לוי"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "נתי אבידן"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "מיה בראונשטיין"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:04.551Z"
+    }
+  },
+  {
+    "date": "7/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "שחר כהן"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "עומר קדוש"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "לוי יצחק הורביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "חננאל מלכא"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלכס דייץ"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה שטרן"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה פרדוארו"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדי פרחי"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "אמיר לוי"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "דוד גרשקוביץ'"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ישראל אנקווה"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "נתי אבידן"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "מיה בראונשטיין"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:08.171Z"
+    }
+  },
+  {
+    "date": "8/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "שחר כהן"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "עומר קדוש"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה שטרן"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה פרדוארו"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלכס דייץ"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "דוד גרשקוביץ'"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "חננאל מלכא"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "לוי יצחק הורביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדי פרחי"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "יוסף אובריין"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "מיה בראונשטיין"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:12.677Z"
+    }
+  },
+  {
+    "date": "9/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "שחר כהן"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "עומר קדוש"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה שטרן"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה פרדוארו"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "דוד גרשקוביץ'"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלכס דייץ"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "טליה פיטוסי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "רומי טבע"
+            },
+            {
+              "roleLabel": "חייל נוסף 1",
+              "requiredRole": null,
+              "assignedTo": "אמיר לוי"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "גל ליבל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "לוי יצחק הורביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "יוסף אובריין"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "מיה בראונשטיין"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:16.272Z"
+    }
+  },
+  {
+    "date": "10/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "מיה בראונשטיין"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "שחר כהן"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "דורון פלץ"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "עומר קדוש"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה שטרן"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ליה פרדוארו"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "גל ליבל"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "שי חסאן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "דוד גרשקוביץ'"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלכס דייץ"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עילי עמיאל"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "טליה פיטוסי"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עדי פרחי"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "רומי טבע"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "אמיר לוי"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "לוי יצחק הורביץ"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "יוסף אובריין"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "נאור בוקובזה"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:19.879Z"
+    }
+  },
+  {
+    "date": "11/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": ""
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:23.352Z"
+    }
+  },
+  {
+    "date": "12/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": ""
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:26.002Z"
+    }
+  },
+  {
+    "date": "13/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": ""
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:28.619Z"
+    }
+  },
+  {
+    "date": "14/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": ""
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": ""
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:31.250Z"
+    }
+  },
+  {
+    "date": "15/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - לא פעיל",
+          "assignedTo": "",
+          "points": 0
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "לירז מזרחי"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף דאלי"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אסף בנקורמונו"
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "גל ליבל"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "חננאל מלכא"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "עדו רומנו"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": ""
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "נתי אבידן"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:34.957Z"
+    }
+  },
+  {
+    "date": "16/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "לירז מזרחי"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "גל ליבל"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "חננאל מלכא"
+            },
+            {
+              "roleLabel": "חייל נוסף 1",
+              "requiredRole": null,
+              "assignedTo": "אסף בנקורמונו"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "קצין תורן",
+          "slots": [
+            {
+              "roleLabel": "קצין",
+              "requiredRole": null,
+              "assignedTo": "נתי אבידן"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "אסף דאלי"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:39.205Z"
+    }
+  },
+  {
+    "date": "17/9/26",
+    "assignment": {
+      "hapak": [
+        {
+          "id": 1,
+          "memberIndex": 1,
+          "name": "חפ\"ק מ\"פ - מפקד",
+          "assignedTo": "רז חיון",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 2,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "גיא וונג",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 3,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "יוליאן ברזניצקי",
+          "points": 3
+        },
+        {
+          "id": 1,
+          "memberIndex": 4,
+          "name": "חפ\"ק מ\"פ - חפ\"ק",
+          "assignedTo": "ליאור תורגמן",
+          "points": 3
+        }
+      ],
+      "chamal": [
+        {
+          "shiftIndex": 0,
+          "timeLabel": "22:00 – 06:00",
+          "assignedTo": "אברהם ליפשיץ"
+        },
+        {
+          "shiftIndex": 1,
+          "timeLabel": "06:00 – 14:00",
+          "assignedTo": "מיה קידר"
+        },
+        {
+          "shiftIndex": 2,
+          "timeLabel": "14:00 – 22:00",
+          "assignedTo": "לירז מזרחי"
+        }
+      ],
+      "missions": [
+        {
+          "postType": "יזומה",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "מעין כהן"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "שי דהן"
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "קוראל שניאור"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "שירז דרור "
+            }
+          ]
+        },
+        {
+          "postType": "פילבוקס",
+          "slots": [
+            {
+              "roleLabel": "סמל",
+              "requiredRole": "סמ",
+              "assignedTo": "גל ליבל"
+            },
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": "מפקד",
+              "assignedTo": "מתן עוזיאל"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": "איציק אדרי"
+            },
+            {
+              "roleLabel": "חייל 1",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אברהם איזנמן"
+            },
+            {
+              "roleLabel": "חייל 2",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "נאור בוקובזה"
+            },
+            {
+              "roleLabel": "חייל 3",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אדם ברקוביץ"
+            },
+            {
+              "roleLabel": "חייל 4",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "ישראל אנקווה"
+            },
+            {
+              "roleLabel": "חייל 5",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "חננאל מלכא"
+            },
+            {
+              "roleLabel": "חייל נוסף 1",
+              "requiredRole": null,
+              "assignedTo": "אסף בנקורמונו"
+            }
+          ]
+        },
+        {
+          "postType": "יזומה ב",
+          "slots": [
+            {
+              "roleLabel": "מפקד",
+              "requiredRole": [
+                "סמ",
+                "מפקד"
+              ],
+              "assignedTo": "יואל ון דייק"
+            },
+            {
+              "roleLabel": "נהג",
+              "requiredRole": "נהג",
+              "assignedTo": ""
+            },
+            {
+              "roleLabel": "רחפן",
+              "requiredRole": [
+                "רחפן",
+                "חייל",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "עידו רחמני"
+            },
+            {
+              "roleLabel": "חייל",
+              "requiredRole": [
+                "חייל",
+                "נהג",
+                "חובש",
+                "מפקד"
+              ],
+              "assignedTo": "אלי שמחון"
+            }
+          ]
+        },
+        {
+          "postType": "תורן רס\"פ",
+          "slots": [
+            {
+              "roleLabel": "תורן",
+              "requiredRole": null,
+              "assignedTo": "אסף דאלי"
+            }
+          ]
+        }
+      ],
+      "lastUpdated": "2026-08-25T15:57:42.022Z"
+    }
+  }
+]

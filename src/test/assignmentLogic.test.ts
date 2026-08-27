@@ -85,6 +85,7 @@ describe("generateAssignment", () => {
     
     const assignedNames = izuma?.slots.map(s => s.assignedTo) || [];
     const assignedGenders = assignedNames.map(name => records.find(r => r.name === name)?.gender);
+    console.log("IZUMA ASSIGNED:", assignedNames, assignedGenders, izuma?.slots);
     
     const femaleCount = assignedGenders.filter(g => g === "נ").length;
     const maleCount = assignedGenders.filter(g => g === "ז").length;
@@ -400,7 +401,7 @@ describe("generateAssignment - extras (קצין תורן / רס\"פ / חייל �
 });
 
 describe("generateAssignment - exclusions & edge cases", () => {
-  it("should never assign a מ\"פ/מפ or מנהלה role to any post", () => {
+  it("should never assign a מ\"פ/מפ role to any post", () => {
     const records = [
       createRecord("מפ א", "מ\"פ", "ז"),
       createRecord("מנהלה א", "מנהלה", "ז"),
@@ -411,7 +412,6 @@ describe("generateAssignment - exclusions & edge cases", () => {
     const result = generateAssignment(records, {}, [], new Set(), "2026-08-18");
 
     expect(allAssigned(result)).not.toContain("מפ א");
-    expect(allAssigned(result)).not.toContain("מנהלה א");
   });
 
   it("should respect blocked names", () => {

@@ -6,7 +6,7 @@ import type { AttendanceRecord } from "@/types/attendance";
 import { getApiUrl } from "@/lib/apiHelper";
 import DatePickerBar from "@/components/DatePickerBar";
 import { LoadingOverlay, ErrorMessage } from "@/components/StatusMessages";
-import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck, ArrowRightLeft } from "lucide-react";
+import { RefreshCw, Shield, ShieldOff, Users, Clock, Shuffle, CheckCircle2, Save, Trash2, Info, Camera, ChevronUp, ChevronDown, UserCheck, ArrowRightLeft, CloudDownload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -76,7 +76,7 @@ const HAPAK_MISSIONS = [
 ];
 
 const CHAMAL_SHIFTS: { shiftIndex: 0 | 1 | 2; timeLabel: string; points: number }[] = [
-  { shiftIndex: 0, timeLabel: "22:00 – 06:00", points: 3 },
+  { shiftIndex: 0, timeLabel: "22:00 – 06:00", points: 2 },
   { shiftIndex: 1, timeLabel: "06:00 – 14:00", points: 2 },
   { shiftIndex: 2, timeLabel: "14:00 – 22:00", points: 2 },
 ];
@@ -101,7 +101,7 @@ const PILBOX_SLOTS = [
 
 const POINTS = {
   HAPAK: 3,
-  CHAMAL_NIGHT: 3,
+  CHAMAL_NIGHT: 2,
   CHAMAL_DAY: 2,
   PILBOX: 3,
   IZUMA: 2,
@@ -197,10 +197,12 @@ export function generateAssignment(
               if (role.includes("מ\"פ") || role === "מפ") return false;
               if (requiredGender && p.gender !== requiredGender) return false;
               if (filter) {
-                if (filter === "חייל") {
-                  if (role.includes("מנהלה")) return false;
-                  if (!role.includes("חייל") && !role.includes("חובש")) return false;
-                } else {
+              if (filter === "חייל") {
+                const dept = String(p.department || "").trim();
+                const isHQ = role.includes("מנהלה") || dept.includes("מפקד") || role.includes("חפק") || role.includes("רספ");
+                if (isHQ) return false;
+                if (!role.includes("חייל") && !role.includes("חובש")) return false;
+              } else {
                   if (!role.includes(filter)) return false;
                 }
               }
@@ -239,9 +241,12 @@ export function generateAssignment(
             if (role.includes("מ\"פ") || role === "מפ") return false;
             if (genderReq && (p.gender || "ז") !== genderReq) return false;
             if (isPilbox && !allowLeavingTomorrow && isLeavingTomorrow(p.name)) return false;
+            if (isPilbox && role.includes("חמל")) return false;
             if (filter) {
               if (filter === "חייל") {
-                if (role.includes("מנהלה")) return false;
+                const dept = String(p.department || "").trim();
+                const isHQ = role.includes("מנהלה") || dept.includes("מפקד") || role.includes("חפק") || role.includes("רספ");
+                if (isHQ) return false;
                 if (!role.includes("חייל") && !role.includes("חובש")) return false;
               } else {
                 if (!role.includes(filter)) return false;
@@ -536,6 +541,16 @@ export function generateAssignment(
         
         return true;
       }).sort((a, b) => {
+        const aRole = String(a.role || "").trim();
+        const aDept = String(a.department || "").trim();
+        const bRole = String(b.role || "").trim();
+        const bDept = String(b.department || "").trim();
+        const aIsHQ = aRole.includes("מנהלה") || aDept.includes("מפקד");
+        const bIsHQ = bRole.includes("מנהלה") || bDept.includes("מפקד");
+        
+        if (aIsHQ && !bIsHQ) return -1;
+        if (!aIsHQ && bIsHQ) return 1;
+
         const aScore = (a.burdenPoints || 0) + (history[a.name] || 0);
         const bScore = (b.burdenPoints || 0) + (history[b.name] || 0);
         return aScore - bScore;
@@ -559,9 +574,13 @@ export function generateAssignment(
         if (assignedNames.has(norm)) return false;
         const pres = getPresenceFor(p);
         const role = String(p.role || "").trim();
-        if (role.includes("מנהלה")) return false;
+        const dept = String(p.department || "").trim();
         if (role.includes("מ\"פ") || role === "מפ") return false;
         if (role.includes("קצין") || role.includes("מ\"מ")) return false;
+        
+        const isHQ = role.includes("מנהלה") || dept.includes("מפקד") || role.includes("חפק") || role.includes("רספ");
+        if (isHQ) return false;
+
         if (isLeavingTomorrow(p.name)) return false;
         return (pres !== "none" && pres !== "leaving");
       }).sort((a, b) => {
@@ -573,8 +592,16 @@ export function generateAssignment(
       });
 
       let extraIndex = 1;
+      const pilboxFemalesCount = pilboxSlots.filter(s => {
+        if (!s.assignedTo) return false;
+        const r = records.find(x => normalizeNameStr(x.name) === normalizeNameStr(s.assignedTo!));
+        return r && r.gender === "נ";
+      }).length;
+
       for (const p of unassignedSoldiers) {
         if (extraIndex > 1) break;
+        if (pilboxFemalesCount === 0 && p.gender === "נ") continue;
+        
         assignedNames.add(normalizeNameStr(p.name));
         pilboxSlots.push({
           roleLabel: `חייל נוסף ${extraIndex++}`,
@@ -590,6 +617,8 @@ export function generateAssignment(
       pilboxSlots.forEach(s => { if (!s.assignedTo && !s.roleLabel.includes("חייל נוסף")) emptyCount++; });
       
       const currentAssignment: AssignmentData = { hapak: hapakAssignments, chamal, missions };
+      
+      console.log(`ATTEMPT ${attempt} emptyCount: ${emptyCount}`);
       
       if (emptyCount < minEmptyCount) {
         minEmptyCount = emptyCount;
@@ -727,9 +756,20 @@ function PersonnelSwap({
 
   const statusDot = useMemo(() => {
     if (!currentName || currentName === "לא מאויש" || currentName === "טרם שובץ") return null;
+    
+    if (presence === "none" || presence === "leaving") {
+      const isLeaving = presence === "leaving";
+      const text = isLeaving ? "יצא הביתה!" : "נעדר!";
+      return (
+        <div className="flex items-center gap-1 shrink-0 bg-red-100 px-1 py-0.5 rounded border border-red-200" title={isLeaving ? "שגיאה: חייל זה סומן כיוצא הביתה" : "שגיאה: חייל זה נעדר מדוח הנוכחות"}>
+          <div className="w-1.5 h-1.5 rounded-full bg-red-600" />
+          <span className="text-[9px] text-red-600 font-black leading-none">{text}</span>
+        </div>
+      );
+    }
+    
     let color = "bg-green-500";
-    if (presence === "leaving") color = "bg-amber-500";
-    else if (isLeavingTomorrow) color = "bg-orange-500";
+    if (isLeavingTomorrow) color = "bg-orange-500";
     else if (presence === "returning") color = "bg-blue-500";
     return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", color)} title={presence === "returning" ? "חזר היום" : isLeavingTomorrow ? "יוצא מחר" : "נוכח"} />;
   }, [currentName, presence, isLeavingTomorrow]);
@@ -951,7 +991,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   // history now stores points per date: { [date]: { [name]: points } }
   const [history, setHistory] = useState<Record<string, PersonnelPoints>>({});
   const [isSaved, setIsSaved] = useState(false);
-  const [hapakData, setHapakData] = useState<any[]>([]);
+  const [isRestoringPoints, setIsRestoringPoints] = useState(false);
   const [blockedNames, setBlockedNames] = useState<Set<string>>(new Set());
 
   const availablePersonnel = useMemo(() => {
@@ -1498,6 +1538,70 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     }
   };
 
+  const handleRestorePoints = async () => {
+    if (!window.confirm("פעולה זו תשאב את כל השיבוצים מ-14 הימים האחרונים ותחשב מחדש את יומן הפעילות. פעולה זו עשויה לארוך מספר שניות. האם להמשיך?")) return;
+    
+    setIsRestoringPoints(true);
+    try {
+      const newHistory: Record<string, Record<string, number>> = {};
+      const targetDateObj = new Date(date);
+      
+      // Go back 14 days
+      for (let i = 0; i <= 14; i++) {
+        const d = new Date(targetDateObj);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        const fetched = await fetchSavedAssignment(dateStr);
+        if (fetched && fetched.status !== "not_found") {
+          const dayKey = formatDateForApi(dateStr);
+          newHistory[dayKey] = {};
+          
+          if (fetched.hapak) {
+            fetched.hapak.forEach((h: any) => {
+              if (h.assignedTo) {
+                newHistory[dayKey][h.assignedTo] = (newHistory[dayKey][h.assignedTo] || 0) + POINTS.HAPAK;
+              }
+            });
+          }
+          if (fetched.chamal) {
+            fetched.chamal.forEach((c: any) => {
+              if (c.assignedTo) {
+                newHistory[dayKey][c.assignedTo] = (newHistory[dayKey][c.assignedTo] || 0) + (c.shiftIndex === 0 ? POINTS.CHAMAL_NIGHT : POINTS.CHAMAL_DAY);
+              }
+            });
+          }
+          if (fetched.missions) {
+            fetched.missions.forEach((m: any) => {
+              let pts = 0;
+              if (m.postType === "פילבוקס") pts = POINTS.PILBOX;
+              else if (m.postType === "יזומה" || m.postType === "יזומה ב") pts = POINTS.IZUMA;
+              else if (m.postType === "תורן רס\"פ") pts = POINTS.RASAP;
+              else if (m.postType === "קצין תורן") pts = POINTS.DUTY_OFFICER;
+              
+              if (m.slots) {
+                m.slots.forEach((s: any) => {
+                  if (s.assignedTo) {
+                    newHistory[dayKey][s.assignedTo] = (newHistory[dayKey][s.assignedTo] || 0) + pts;
+                  }
+                });
+              }
+            });
+          }
+        }
+      }
+      
+      setHistory(newHistory);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+      toast.success("יומן הפעילות שוחזר בהצלחה!");
+    } catch (error) {
+      console.error("Failed to restore points", error);
+      toast.error("שגיאה בשחזור הנקודות מהשרת.");
+    } finally {
+      setIsRestoringPoints(false);
+    }
+  };
+
   const toggleBlock = (name: string) => {
     setBlockedNames(prev => {
       const next = new Set(prev);
@@ -1680,6 +1784,9 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-muted-foreground tabular-nums whitespace-nowrap">סה"כ {totalPoints} נק'</span>
+                    <button onClick={handleRestorePoints} disabled={isRestoringPoints} type="button" title="שחזר יומן פעילות מהשרת" aria-label="שחזר יומן פעילות מהשרת" className="p-2 text-muted-foreground hover:text-blue-500 transition-colors disabled:opacity-50">
+                      {isRestoringPoints ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CloudDownload className="w-4 h-4" />}
+                    </button>
                     <button onClick={handleResetBlocks} type="button" title="בטל את כל החסימות" aria-label="בטל את כל החסימות" className="p-2 text-muted-foreground hover:text-amber-500 transition-colors">
                       <ShieldOff className="w-4 h-4" />
                     </button>
