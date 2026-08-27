@@ -331,8 +331,7 @@ export function generateAssignment(
 
       const doChamal = () => {
         chamal = CHAMAL_SHIFTS.map(shift => {
-          const prev = previousAssignment?.chamal?.find(c => c.shiftIndex === shift.shiftIndex)?.assignedTo;
-          const assigned = getBestCandidate("חמל", prev);
+          const assigned = getBestCandidate("חמל", undefined);
           if (assigned) assignedNames.add(normalizeNameStr(assigned));
           return { shiftIndex: shift.shiftIndex, timeLabel: shift.timeLabel, assignedTo: assigned };
         });
@@ -344,8 +343,7 @@ export function generateAssignment(
           const slots: MissionSlot[] = [];
           for (let i = 0; i < IZUMA_SLOTS.length; i++) {
             const slot = IZUMA_SLOTS[i];
-            const prev = prevM?.slots?.[i]?.assignedTo;
-            const assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned);
+            const assigned = getBestCandidate(slot.roleFilter, undefined, genders[i], tempAssigned);
             if (!assigned && genders[i]) return null;
             if (assigned) tempAssigned.add(normalizeNameStr(assigned));
             slots.push({ roleLabel: slot.roleLabel, requiredRole: slot.roleFilter, assignedTo: assigned });
@@ -388,10 +386,9 @@ export function generateAssignment(
           
           for (let i = 0; i < remainingSlots.length; i++) {
             const slot = remainingSlots[i];
-            const prev = prevPilbox?.slots?.[i + 1]?.assignedTo;
-            let assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, false);
+            let assigned = getBestCandidate(slot.roleFilter, undefined, genders[i], tempAssigned, true, false);
             if (!assigned) {
-              assigned = getBestCandidate(slot.roleFilter, prev, genders[i], tempAssigned, true, true);
+              assigned = getBestCandidate(slot.roleFilter, undefined, genders[i], tempAssigned, true, true);
             }
             if (assigned) {
               tempAssigned.add(normalizeNameStr(assigned));
@@ -1542,6 +1539,24 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       setHistory(newHistory);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
       setLoadedAssignments(assignments);
+      
+      try {
+        const ptsUrl = getApiUrl("get-points");
+        const ptsResponse = await fetch(ptsUrl, { cache: 'no-store' });
+        if (ptsResponse.ok) {
+          const json = await ptsResponse.json();
+          const fetchedHistory: Record<string, Record<string, number>> = {};
+          const dataObj = Array.isArray(json) ? json[0]?.data : json.data;
+          if (dataObj) {
+            fetchedHistory["CENTRAL"] = dataObj;
+          }
+          setHistory(fetchedHistory);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(fetchedHistory));
+        }
+      } catch(e) {
+        console.error("Failed to fetch updated points after confirm", e);
+      }
+
       toast.success("השיבוץ אושר ונרשם ביומן הפעילות בהצלחה!");
     } catch (e) {
       console.error("Confirm API Error:", e);
