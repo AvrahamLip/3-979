@@ -1288,6 +1288,9 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       link.href = dataUrl;
       link.click();
       toast.success("תמונת השמירות נשמרה בהצלחה!");
+      if (checkAbsent(assignments)) {
+        toast.warning("שים לב! ישנם חיילים משובצים בתמונה שנעדרים מדוח הנוכחות או שיצאו הביתה. מומלץ לתקן את השיבוץ.");
+      }
     } catch (error) {
       console.error("Failed to export guard image", error);
       toast.error("שגיאה בשמירת התמונה.");
@@ -1332,6 +1335,26 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
     }
   };
 
+  const checkAbsent = (assignmentsToCheck: AssignmentData | null) => {
+    if (!assignmentsToCheck || !data) return false;
+    let hasAbsent = false;
+    
+    const checkName = (name: string) => {
+      if (!name || name === "לא מאויש" || name === "טרם שובץ") return;
+      const p = data.find(x => normalizeNameStr(x.name) === normalizeNameStr(name));
+      if (p) {
+        const presence = getComputedPresence(p, date, yesterdayAttendanceData || []);
+        if (presence === "none" || presence === "leaving") hasAbsent = true;
+      }
+    };
+
+    assignmentsToCheck.hapak.forEach(h => checkName(h.assignedTo));
+    assignmentsToCheck.chamal.forEach(c => checkName(c.assignedTo));
+    assignmentsToCheck.missions.forEach(m => m.slots.forEach(s => checkName(s.assignedTo)));
+    
+    return hasAbsent;
+  };
+
   useEffect(() => {
     const init = async () => {
       if (data && data.length > 0) {
@@ -1340,6 +1363,9 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
           setAssignments(saved);
           setLoadedAssignments(saved);
           setIsSaved(true);
+          if (checkAbsent(saved)) {
+            toast.warning("שים לב! נטען שיבוץ שמור הכולל חיילים שנעדרים מדוח הנוכחות או שיצאו הביתה. אנא עדכן את השיבוץ.");
+          }
         } else {
           setLoadedAssignments(null);
           if (isAuthorized) {
