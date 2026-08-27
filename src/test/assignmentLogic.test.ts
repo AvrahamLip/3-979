@@ -71,8 +71,10 @@ describe("generateAssignment", () => {
 
   it("should assign exactly 2 males and 2 females to Izuma if females are assigned", () => {
     const records = [
-      createRecord("מפקד זכר", "מפקד", "ז"),
-      createRecord("נהג זכר", "נהג", "ז"),
+      createRecord("מפקד זכר 1", "מפקד", "ז"),
+      createRecord("מפקד זכר 2", "מפקד", "ז"),
+      createRecord("נהג זכר 1", "נהג", "ז"),
+      createRecord("נהג זכר 2", "נהג", "ז"),
       createRecord("רחפניסט זכר", "רחפן", "ז"),
       createRecord("חייל זכר", "חייל", "ז"),
       createRecord("רחפנית נקבה", "רחפן", "נ"),
