@@ -1033,6 +1033,17 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
   const [isRestoringPoints, setIsRestoringPoints] = useState(false);
   const [blockedNames, setBlockedNames] = useState<Set<string>>(new Set());
 
+  const eligibleForDropdown = useMemo(() => {
+    if (!data) return [];
+    return data.filter(p => {
+      const role = String(p.role || "").trim();
+      // סינון אנשים לא רלוונטיים כגון מ"פ ומנהלה
+      if (role.includes("מ\"פ") || role === "מפ") return false;
+      if (role.includes("מנהלה") || role === "רס\"פ" || role === "רספ") return false;
+      return true;
+    });
+  }, [data]);
+
   const availablePersonnel = useMemo(() => {
     if (!data || !assignments) return [];
     const assigned = new Set<string>();
@@ -1980,7 +1991,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                                  <div className="flex items-center gap-1.5 flex-row-reverse">
                                      <PersonnelSwap
                                        currentName={h.assignedTo}
-                                       allPersonnel={data || []}
+                                       allPersonnel={eligibleForDropdown}
                                        onSwap={(newName) => handleSwap("hapak", h.id, newName, h.memberIndex, h.name)}
                                        readonly={!isAuthorized || isExportingHapak}
                                        allowEmpty={true}
@@ -2110,7 +2121,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
                               )}>{slot.roleLabel}</span>
                               <PersonnelSwap
                                 currentName={slot.assignedTo}
-                                allPersonnel={data || []}
+                                allPersonnel={eligibleForDropdown}
                                 onSwap={(newName) => handleSwap("mission", gIdx, newName, sIdx)}
                                 readonly={!isAuthorized}
                                 allowEmpty={true}
