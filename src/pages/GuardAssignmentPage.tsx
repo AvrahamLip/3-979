@@ -694,19 +694,31 @@ function PersonnelSwap({
   const available = useMemo(() => {
     if (!allPersonnel || !Array.isArray(allPersonnel)) return [];
     try {
+      const assignedSet = new Set<string>();
+      if (currentAssignments) {
+        currentAssignments.hapak?.forEach(h => {
+          if (h.assignedTo) assignedSet.add(normalizeNameStr(h.assignedTo));
+        });
+        currentAssignments.chamal?.forEach(c => {
+          if (c.assignedTo) assignedSet.add(normalizeNameStr(c.assignedTo));
+        });
+        currentAssignments.missions?.forEach(m => {
+          m.slots.forEach(s => {
+            if (s.assignedTo) assignedSet.add(normalizeNameStr(s.assignedTo));
+          });
+        });
+      }
+
       return allPersonnel
         .filter(p => {
           const presence = getComputedPresence(p, yesterdayRecords);
-          const rawValue = String(p.todayValue || "").trim();
           if (presence === "none" || presence === "leaving") return false;
           return true;
         })
         .map(p => {
-          const alreadyAssigned =
-            currentAssignments?.hapak?.some(h => normalizeNameStr(h.assignedTo) === normalizeNameStr(p.name)) ||
-            currentAssignments?.chamal?.some(c => normalizeNameStr(c.assignedTo) === normalizeNameStr(p.name)) ||
-            currentAssignments?.missions?.some(m => m.slots.some(s => normalizeNameStr(s.assignedTo) === normalizeNameStr(p.name)));
-          return { ...p, alreadyAssigned: alreadyAssigned && normalizeNameStr(p.name) !== normalizeNameStr(currentName) };
+          const normName = normalizeNameStr(p.name);
+          const alreadyAssigned = assignedSet.has(normName);
+          return { ...p, alreadyAssigned: alreadyAssigned && normName !== normalizeNameStr(currentName) };
         })
         .sort((a, b) => {
           if (a.alreadyAssigned && !b.alreadyAssigned) return 1;
@@ -1037,7 +1049,6 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
 
     return data.filter(p => {
       const presence = getComputedPresence(p, yesterdayAttendanceData);
-      const rawValue = String(p.todayValue || "").trim();
       if (presence === "none" || presence === "leaving") return false;
       if (assigned.has(normalizeNameStr(p.name))) return false;
       const role = (p.role || "").trim();
@@ -1049,7 +1060,7 @@ export default function GuardAssignmentPage({ mode = "soldier" }: { mode?: "sold
       ];
       return ELIGIBLE_ROLES.some(eligible => role.includes(eligible));
     });
-  }, [data, assignments, blockedNames]);
+  }, [data, assignments, blockedNames, yesterdayAttendanceData]);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
